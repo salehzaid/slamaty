@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار زر CAPA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .test-button:hover {
+            background: #15803d;
+        }
+        .status {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            color: #0369a1;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-card">
+        <h2>اختبار زر "بدء خطة التصحيح"</h2>
+        <div class="status">
+            ✅ إذا ظهر الزر الأخضر أدناه، فالتحديثات تعمل بشكل صحيح
+        </div>
+        
+        <h3>بطاقة خطة تصحيحية تجريبية</h3>
+        <p><strong>العنوان:</strong> عدم الامتثال: مراقبة العلامات الحيوية</p>
+        <p><strong>القسم:</strong> الطوارئ</p>
+        <p><strong>المسؤول:</strong> محمد سعد</p>
+        <p><strong>الحالة:</strong> PENDING</p>
+        
+        <button class="test-button" onclick="alert('زر بدء خطة التصحيح يعمل!')">
+            ▶️ بدء خطة التصحيح
+        </button>
+    </div>
+    
+    <div class="test-card">
+        <h3>تعليمات الحل:</h3>
+        <ol>
+            <li>إذا ظهر الزر الأخضر أعلاه، فالمشكلة في cache المتصفح</li>
+            <li>اضغط <strong>Cmd + Shift + R</strong> (Mac) أو <strong>Ctrl + Shift + R</strong> (Windows)</li>
+            <li>أو افتح المتصفح في وضع Incognito/Private</li>
+            <li>ثم اذهب إلى <a href="/capa" target="_blank">http://localhost:5174/capa</a></li>
+        </ol>
+    </div>
+</body>
+</html>

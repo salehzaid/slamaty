@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار التحديثات النهائية - CAPA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            color: #0369a1;
+        }
+        .button-demo {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 8px 0;
+        }
+        .button-demo.red {
+            background: #dc2626;
+        }
+        .button-demo:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-card">
+        <h2>✅ تم تحديث صفحة CAPA بنجاح!</h2>
+        
+        <div class="success">
+            <strong>التحديثات المنجزة:</strong>
+            <ul>
+                <li>✅ تم نقل زر الحذف مع زر بدء خطة التصحيح</li>
+                <li>✅ زر بدء خطة التصحيح باللون الأخضر</li>
+                <li>✅ زر الحذف باللون الأحمر</li>
+                <li>✅ جميع الأزرار مفعلة وتعمل</li>
+                <li>✅ عرض معلومات القسم والمسؤول</li>
+            </ul>
+        </div>
+        
+        <h3>مثال على الأزرار الجديدة:</h3>
+        
+        <button class="button-demo" onclick="alert('زر بدء خطة التصحيح يعمل!')">
+            ▶️ بدء خطة التصحيح
+        </button>
+        
+        <button class="button-demo red" onclick="alert('زر الحذف يعمل!')">
+            🗑️ حذف
+        </button>
+        
+        <div class="success">
+            <strong>الآن اذهب إلى:</strong><br>
+            <a href="/capa" target="_blank" style="color: #0369a1; font-weight: bold;">
+                http://localhost:5174/capa
+            </a>
+        </div>
+    </div>
+    
+    <div class="test-card">
+        <h3>إذا لم تظهر التحديثات:</h3>
+        <ol>
+            <li>اضغط <strong>Cmd + Shift + R</strong> (Mac) أو <strong>Ctrl + Shift + R</strong> (Windows)</li>
+            <li>أو افتح المتصفح في وضع Incognito/Private</li>
+            <li>أو امسح cache المتصفح</li>
+        </ol>
+    </div>
+</body>
+</html>

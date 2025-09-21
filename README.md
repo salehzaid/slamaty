@@ -1,36 +1,168 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# نظام سلامتي - نظام إدارة جولات الجودة وسلامة المرضى
 
-## Getting Started
+نظام ويب متكامل لإدارة جولات الجودة وسلامة المرضى في المؤسسات الصحية.
 
-First, run the development server:
+## 🚀 المميزات
 
+### Frontend (React + TypeScript)
+- ✅ **Dashboard تفاعلي** مع Charts متقدمة
+- ✅ **تصميم عصري** مع shadcn/ui
+- ✅ **دعم RTL** كامل للغة العربية
+- ✅ **Forms متقدمة** مع react-hook-form و zod
+- ✅ **Charts تفاعلية** مع Recharts
+- ✅ **نظام مصادقة** متقدم
+- ✅ **خطوط AWS Pro** - Inter و JetBrains Mono
+
+### Backend (FastAPI + PostgreSQL)
+- ✅ **API قوي** مع FastAPI
+- ✅ **قاعدة بيانات** PostgreSQL
+- ✅ **نظام مصادقة** JWT
+- ✅ **توثيق تلقائي** Swagger/OpenAPI
+- ✅ **Type Safety** كامل
+
+## 🛠️ التقنيات المستخدمة
+
+### Frontend
+- **React 18** - مكتبة واجهة المستخدم
+- **TypeScript** - للكتابة الآمنة
+- **TailwindCSS** - للتصميم
+- **shadcn/ui** - مكونات UI متقدمة
+- **Recharts** - للرسوم البيانية
+- **React Hook Form** - لإدارة النماذج
+- **Zod** - للتحقق من البيانات
+- **Lucide React** - للأيقونات
+- **Inter Font** - خط AWS Pro للنصوص
+- **JetBrains Mono** - خط AWS Pro للأكواد
+- **Noto Kufi Arabic** - خط عربي محسن
+
+### Backend
+- **FastAPI** - إطار عمل Python سريع
+- **PostgreSQL** - قاعدة البيانات
+- **SQLAlchemy** - ORM
+- **Alembic** - إدارة الهجرة
+- **JWT** - للمصادقة
+- **Pydantic** - للتحقق من البيانات
+
+## 📦 التثبيت والتشغيل
+
+### 1. Frontend
 ```bash
+# تثبيت المكتبات
+npm install
+
+# تشغيل الخادم المحلي
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Backend
+```bash
+# الانتقال لمجلد Backend
+cd backend
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# إنشاء بيئة افتراضية
+python -m venv venv
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# تفعيل البيئة الافتراضية
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
 
-## Learn More
+# تثبيت المكتبات
+pip install -r requirements.txt
 
-To learn more about Next.js, take a look at the following resources:
+# تشغيل الخادم
+python main.py
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. قاعدة البيانات
+```bash
+# تثبيت PostgreSQL
+# إنشاء قاعدة البيانات
+createdb salamaty_db
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# إعداد متغيرات البيئة
+cp backend/env.example backend/.env
+# تعديل ملف .env بالقيم الصحيحة
+```
 
-## Deploy on Vercel
+## 📊 المميزات الرئيسية
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Dashboard
+- إحصائيات شاملة للجولات والخطط التصحيحية
+- رسوم بيانية تفاعلية لمعدلات الامتثال
+- توزيع الجولات حسب النوع والقسم
+- اتجاهات شهرية للأداء
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### إدارة الجولات
+- إنشاء وجدولة الجولات
+- تتبع حالة الجولات
+- تقييم معدلات الامتثال
+- إدارة المهام المخصصة
+
+### الخطط التصحيحية (CAPA)
+- إنشاء خطط تصحيحية
+- تتبع حالة التنفيذ
+- إدارة الأولويات والمواعيد النهائية
+- تقييم المخاطر
+
+### إدارة المستخدمين
+- نظام أدوار متقدم
+- إدارة الصلاحيات
+- تتبع نشاط المستخدمين
+
+## 🎨 نظام الخطوط المتقدم
+
+### خطوط AWS Pro
+- **Inter**: خط رئيسي للنصوص والعناوين
+- **JetBrains Mono**: خط مخصص للأكواد والمعرفات
+- **Noto Kufi Arabic**: خط عربي محسن للنصوص العربية
+
+### ميزات الخطوط
+- **دعم RTL كامل**: للنصوص العربية والإنجليزية
+- **تدرج هرمي متقدم**: أحجام وأوزان متنوعة
+- **وضوح عالي**: محسن للقراءة على جميع الشاشات
+- **أداء سريع**: تحميل محسن للخطوط
+
+### فئات CSS المتاحة
+```css
+.font-aws-pro          /* خط Inter */
+.font-aws-pro-mono     /* خط JetBrains Mono */
+.text-display          /* 3.5rem - للعناوين الكبيرة */
+.text-heading-1        /* 2.5rem - للعناوين الرئيسية */
+.text-heading-2        /* 2rem - للعناوين الفرعية */
+.text-body             /* 1rem - للنصوص الأساسية */
+.text-code             /* 0.875rem - للأكواد */
+```
+
+## 🔧 التطوير
+
+### إضافة مكونات جديدة
+```bash
+# إضافة مكون shadcn/ui
+npx shadcn@latest add [component-name]
+
+# إضافة مكتبة جديدة
+npm install [package-name]
+```
+
+### إضافة API endpoints
+1. إضافة النموذج في `schemas.py`
+2. إضافة العمليات في `crud.py`
+3. إضافة الـ endpoint في `main.py`
+
+## 📝 الترخيص
+
+هذا المشروع مرخص تحت رخصة MIT.
+
+## 🤝 المساهمة
+
+نرحب بالمساهمات! يرجى قراءة دليل المساهمة قبل إرسال Pull Request.
+
+## 📞 الدعم
+
+للحصول على الدعم، يرجى فتح issue في المستودع أو التواصل معنا.
+
+---
+
+تم تطوير هذا النظام باستخدام أحدث التقنيات لضمان الأداء العالي وسهولة الاستخدام.

@@ -1,0 +1,579 @@
+INFO:     Will watch for changes in these directories: ['/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [61857] using WatchFiles
+INFO:     Started server process [61860]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[DB] Using database: salamaty_db
+INFO:     127.0.0.1:54194 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54513 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54513 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54615 - "OPTIONS /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54616 - "OPTIONS /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54619 - "OPTIONS /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54620 - "OPTIONS /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54615 - "OPTIONS /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54623 - "OPTIONS /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54616 - "OPTIONS /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54624 - "OPTIONS /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54619 - "GET /rounds HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54620 - "GET /capa HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54615 - "GET /users HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54623 - "GET /departments HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54616 - "GET /capa HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54624 - "GET /rounds HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54620 - "GET /users HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54619 - "GET /departments HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54651 - "OPTIONS /auth/signin HTTP/1.1" 200 OK
+(trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+INFO:     127.0.0.1:54651 - "POST /auth/signin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54651 - "GET /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54655 - "GET /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54657 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54656 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54651 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54662 - "GET /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54657 - "GET /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54656 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54656 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54657 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54656 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54657 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54664 - "OPTIONS /departments/5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54664 - "PUT /departments/5 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:54664 - "PUT /departments/5 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:54664 - "DELETE /departments/5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54664 - "GET /departments HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [61860]
+INFO:     Started server process [71795]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[DB] Using database: salamaty_db
+INFO:     127.0.0.1:54711 - "PUT /departments/1 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54715 - "POST /auth/signin HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:54717 - "PUT /departments/1 HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:54722 - "POST /auth/signin HTTP/1.1" 400 Bad Request
+(trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+INFO:     127.0.0.1:54726 - "POST /auth/signin HTTP/1.1" 200 OK
+🔧 Updating department 1 with data: {'name': 'التمريض المحدث', 'name_en': 'Updated Nursing', 'code': 'NUR', 'floor': 'الطابق الأول', 'building': 'المبنى A', 'managers': []}
+✅ Department data validated: name='التمريض المحدث' name_en='Updated Nursing' code='NUR' floor='الطابق الأول' building='المبنى A' description=None managers=[]
+✅ Department 1 updated successfully
+INFO:     127.0.0.1:54728 - "PUT /departments/1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54737 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54738 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54745 - "GET /users HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [71795]
+INFO:     Started server process [75398]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[DB] Using database: salamaty_db
+INFO:     127.0.0.1:54751 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54752 - "GET /users HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [75398]
+INFO:     Started server process [75565]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[DB] Using database: salamaty_db
+INFO:     127.0.0.1:54798 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54799 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54798 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54799 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54802 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54816 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54802 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54816 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54816 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54802 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54818 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54802 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54802 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54818 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54816 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54857 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54857 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54816 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54816 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54857 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54857 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54816 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54961 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54962 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54961 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54965 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54965 - "OPTIONS /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54961 - "OPTIONS /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54962 - "OPTIONS /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54966 - "OPTIONS /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54965 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54966 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54962 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54965 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55005 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55006 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55006 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55005 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55006 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55005 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55008 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55038 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55008 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55041 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55042 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55058 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55079 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55082 - "OPTIONS /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55079 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55082 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55079 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55087 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55088 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55087 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55088 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55088 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55087 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55088 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55087 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55090 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55088 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55088 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55088 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55090 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55087 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55090 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55093 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55093 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55093 - "OPTIONS /departments/4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55103 - "OPTIONS /departments/4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55103 - "GET /departments/4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55093 - "GET /departments/4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55106 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55107 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55106 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55107 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55124 - "GET /departments HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55125 - "GET /users HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55124 - "GET /users HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55127 - "GET /departments HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55202 - "OPTIONS /auth/signin HTTP/1.1" 200 OK
+(trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+INFO:     127.0.0.1:55202 - "POST /auth/signin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55202 - "OPTIONS /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55205 - "OPTIONS /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55202 - "OPTIONS /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55207 - "OPTIONS /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55205 - "OPTIONS /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55210 - "OPTIONS /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55211 - "OPTIONS /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55212 - "OPTIONS /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55207 - "GET /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55202 - "GET /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55205 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55212 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55211 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55210 - "GET /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55212 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55205 - "GET /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55229 - "GET /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55232 - "GET /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55247 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55248 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55248 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55251 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55248 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55251 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55251 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55247 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55251 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55247 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55247 - "OPTIONS /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55251 - "OPTIONS /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55247 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55251 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55252 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55262 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55262 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55265 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55343 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55344 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55344 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55343 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55343 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55344 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55348 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55343 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55348 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55343 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55343 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55348 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55348 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55343 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55343 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55348 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55343 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55348 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55348 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55343 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56328 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56330 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56328 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56334 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56357 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56359 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56357 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56359 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56375 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56375 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56378 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56375 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56837 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56838 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56838 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56842 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56842 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56838 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56838 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56842 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56868 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56868 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56868 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56868 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56868 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56874 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56874 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56868 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56868 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56874 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56874 - "OPTIONS /departments/6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56868 - "OPTIONS /departments/6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56874 - "GET /departments/6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56868 - "GET /departments/6 HTTP/1.1" 200 OK
+🔧 Updating department 6 with data: {'name': 'النساء والولادة', 'name_en': 'Obstetrics', 'code': 'OBS', 'floor': 'الارضي', 'building': 'الادارة', 'managers': [24, 19]}
+✅ Department data validated: name='النساء والولادة' name_en='Obstetrics' code='OBS' floor='الارضي' building='الادارة' description=None managers=[24, 19]
+✅ Department 6 updated successfully
+INFO:     127.0.0.1:56922 - "PUT /departments/6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56922 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56924 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56922 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56924 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56989 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56991 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56991 - "GET /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56989 - "GET /departments/13 HTTP/1.1" 200 OK
+🔧 Updating department 13 with data: {'name': 'قسم الاختبار من React', 'name_en': 'Test Department from React', 'code': 'DEPT-001', 'floor': 'الاول', 'building': 'التنويم', 'managers': [24, 19, 20]}
+✅ Department data validated: name='قسم الاختبار من React' name_en='Test Department from React' code='DEPT-001' floor='الاول' building='التنويم' description=None managers=[24, 19, 20]
+✅ Department 13 updated successfully
+INFO:     127.0.0.1:56999 - "PUT /departments/13 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56999 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57001 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56999 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57004 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57006 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57006 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57006 - "OPTIONS /departments/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57008 - "OPTIONS /departments/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57006 - "GET /departments/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57008 - "GET /departments/2 HTTP/1.1" 200 OK
+🔧 Updating department 2 with data: {'name': 'الطوارئ', 'name_en': None, 'code': 'EMR', 'floor': 'الارضي', 'building': 'التنويم', 'managers': [22, 1]}
+✅ Department data validated: name='الطوارئ' name_en=None code='EMR' floor='الارضي' building='التنويم' description=None managers=[22, 1]
+✅ Department 2 updated successfully
+INFO:     127.0.0.1:57013 - "PUT /departments/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57013 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57015 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57013 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57018 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57020 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57020 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57026 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57027 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57029 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57026 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57026 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57029 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57465 - "OPTIONS /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57467 - "OPTIONS /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57468 - "OPTIONS /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57469 - "OPTIONS /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57465 - "GET /departments HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:57468 - "GET /users HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:57469 - "GET /departments HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:57467 - "GET /users HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:57467 - "OPTIONS /auth/signin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57467 - "POST /auth/signin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57467 - "OPTIONS /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57469 - "OPTIONS /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57481 - "OPTIONS /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57467 - "OPTIONS /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57469 - "GET /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57481 - "GET /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57465 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57468 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57469 - "GET /rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57467 - "GET /capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57465 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57468 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57488 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57489 - "GET /users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57488 - "GET /departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57489 - "GET /users HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [75565]
+INFO:     Started server process [6211]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+(trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+[DB] Using database: salamaty_db
+INFO:     127.0.0.1:57527 - "POST /auth/signin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57530 - "POST /capa HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 256, in create_capa
+    status = CapaStatus.ASSIGNED
+             ^^^^^^^^^^
+NameError: name 'CapaStatus' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 78, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 75, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/routing.py", line 302, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/routing.py", line 213, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 172, in create_new_capa
+    return create_capa(db, capa, current_user.id)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 275, in create_capa
+    status = CapaStatus.PENDING
+             ^^^^^^^^^^
+NameError: name 'CapaStatus' is not defined
+INFO:     127.0.0.1:57534 - "OPTIONS /departments/13 HTTP/1.1" 200 OK
+🔧 Updating department 13 with data: {'name': 'قسم الاختبار من React', 'name_en': 'Test Department from React', 'code': 'DEPT-001', 'floor': 'الاول', 'building': 'التنويم', 'description': None, 'managers': '[24, 19, 20]', 'id': 13, 'is_active': True, 'created_at': '2025-09-09T18:02:27.236453+03:00', 'updated_at': None, 'isActive': True}
+❌ Department validation error: 1 validation error for DepartmentCreate
+managers
+  Input should be a valid list [type=list_type, input_value='[24, 19, 20]', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/list_type
+INFO:     127.0.0.1:57534 - "PUT /departments/13 HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:57540 - "POST /capa HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 256, in create_capa
+    status = CapaStatus.ASSIGNED
+             ^^^^^^^^^^
+NameError: name 'CapaStatus' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 78, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 75, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/routing.py", line 302, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/routing.py", line 213, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 172, in create_new_capa
+    return create_capa(db, capa, current_user.id)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 275, in create_capa
+    status = CapaStatus.PENDING
+             ^^^^^^^^^^
+NameError: name 'CapaStatus' is not defined
+WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [6211]
+INFO:     Started server process [8025]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8025]
+INFO:     Started server process [8098]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8098]
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x0000000203f720c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x0000000203f720c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x0000000203f720c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x0000000203f720c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x0000000203f720c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'models_updated.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x0000000203f720c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'models_updated.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x0000000203f720c0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'models_updated.py', 'crud.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x0000000203f720c0 (most recent call first):
+  <no Python frame>
+INFO:     Stopping reloader process [61857]
