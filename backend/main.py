@@ -74,7 +74,11 @@ security = HTTPBearer()
 # Serve built frontend at root if available
 DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist"))
 if os.path.exists(DIST_DIR):
+    # Serve entire dist (optional) and assets under their expected path
     app.mount("/static", StaticFiles(directory=DIST_DIR), name="static")
+    assets_dir = os.path.join(DIST_DIR, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
 @app.get("/", response_class=FileResponse)
 async def serve_index():
