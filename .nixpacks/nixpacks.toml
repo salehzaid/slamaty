@@ -14,8 +14,8 @@ cmds = [
 [phases.build]
 cmds = [
   "npm run build",
-  "cd backend && python -c 'from database import engine; from models_updated import Base; Base.metadata.create_all(bind=engine)'"
+  "cd backend && python3 -c 'from database import engine; from models_updated import Base; Base.metadata.create_all(bind=engine)'
 ]
 
 [start]
-cmd = "cd backend && python main.py"
+cmd = "cd backend && python3 main.py"

@@ -4,4 +4,4 @@ npm ci
 npm run build
 
 # Start backend
-cd backend && python main.py
+cd backend && python3 main.py
