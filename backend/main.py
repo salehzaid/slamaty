@@ -4,8 +4,11 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 import uvicorn
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from typing import List, Optional
 from datetime import datetime, timedelta
+import os
 
 from database import get_db, engine
 from models_updated import Base, UserRole, User, Round, Capa, Department
@@ -67,6 +70,18 @@ app.add_middleware(
 )
 
 security = HTTPBearer()
+
+# Serve built frontend at root if available
+DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist"))
+if os.path.exists(DIST_DIR):
+    app.mount("/static", StaticFiles(directory=DIST_DIR), name="static")
+
+@app.get("/", response_class=FileResponse)
+async def serve_index():
+    index_path = os.path.join(DIST_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    raise HTTPException(status_code=404, detail="Not Found")
 
 @app.get("/api")
 async def root():
