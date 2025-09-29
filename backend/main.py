@@ -1696,3 +1696,28 @@ async def get_monthly_rounds(
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# Add static file serving for frontend
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+
+# Mount static files
+if os.path.exists("../dist"):
+    app.mount("/static", StaticFiles(directory="../dist"), name="static")
+
+@app.get("/", response_class=FileResponse)
+async def serve_frontend():
+    """Serve the frontend application"""
+    if os.path.exists("../dist/index.html"):
+        return FileResponse("../dist/index.html")
+    else:
+        return {"message": "Frontend not built. Please run 'npm run build' first."}
+
+@app.get("/{path:path}")
+async def serve_frontend_routes(path: str):
+    """Serve frontend routes (for React Router)"""
+    if os.path.exists("../dist/index.html"):
+        return FileResponse("../dist/index.html")
+    else:
+        return {"message": "Frontend not built. Please run 'npm run build' first."}
