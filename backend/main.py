@@ -1695,7 +1695,10 @@ async def get_monthly_rounds(
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Bind to PORT provided by hosting (e.g., Railway), default to 8000 locally
+    import os as _os
+    _port = int(_os.getenv("PORT", "8000"))
+    uvicorn.run(app, host="0.0.0.0", port=_port)
 
 # Add static file serving for frontend
 from fastapi.staticfiles import StaticFiles
