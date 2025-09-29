@@ -68,7 +68,7 @@ app.add_middleware(
 
 security = HTTPBearer()
 
-@app.get("/")
+@app.get("/api")
 async def root():
     return {"message": "مرحباً بك في نظام سلامتي API"}
 
