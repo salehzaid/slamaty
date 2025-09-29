@@ -26,53 +26,22 @@ const EvaluateRoundPage: React.FC = () => {
       const failing = payload.evaluations.filter((e: any) => e.status === 'not_applied' || e.status === 'partial')
       
       if (failing && failing.length > 0) {
-        // Get round details to prefill department/title
-        const r = await apiClient.getRound(parseInt(roundId!))
-        const round = (r as any)?.data || (r as any)
-        const title = `خطة تصحيحية - ${round?.title || ''}`
-        const description = `نتج عن تقييم الجولة ${round?.title || ''} العناصر التالية بحاجة لتصحيح:\n` + 
-          failing.map((f: any) => `- عنصر ID ${f.item_id} (${f.status})`).join('\n')
+      // prepare failing items and round info
 
-        const defaultTarget = new Date()
-        defaultTarget.setDate(defaultTarget.getDate() + 7)
+      // Instead of creating a single CAPA automatically, forward failing items
+      // to the Enhanced CAPA Management page so the responsible department can
+      // create one CAPA per evaluation item (or draft plans for each).
+      const roundResponse = await apiClient.getRound(parseInt(roundId!))
+      const roundObj = (roundResponse as any)?.data || (roundResponse as any)
 
-        const capaPayload = {
-          title,
-          description,
-          round_id: parseInt(roundId!),
-          department: round?.department || '',
-          priority: 'medium',
-          assigned_to: user?.first_name + ' ' + user?.last_name || '',
-          target_date: defaultTarget.toISOString(),
-          risk_score: 3
+      navigate('/capa-enhanced', {
+        state: {
+          message: 'تم إرسال التقييم بنجاح. يوجد عناصر غير مكتملة تحتاج إلى خطة تصحيحية',
+          success: true,
+          failingItems: failing,
+          round: roundObj
         }
-
-        try {
-          const createdCapa = await apiClient.createCapa(capaPayload)
-          console.log('CAPA created automatically:', createdCapa)
-          
-          // Navigate back with CAPA info
-          navigate('/rounds/my-rounds', { 
-            state: { 
-              message: 'تم إرسال التقييم وإنشاء خطة تصحيحية تلقائياً',
-              success: true,
-              capaCreated: true,
-              capaId: (createdCapa as any)?.id || (createdCapa as any)?.data?.id
-            }
-          })
-        } catch (capaError) {
-          console.error('Failed to create CAPA automatically:', capaError)
-          
-          // Navigate back with info about evaluation success but CAPA creation failure
-          navigate('/rounds/my-rounds', { 
-            state: { 
-              message: 'تم إرسال التقييم بنجاح. يرجى إنشاء خطة تصحيحية يدوياً للعناصر غير المطبقة.',
-              success: true,
-              capaNeeded: true,
-              roundId: parseInt(roundId!)
-            }
-          })
-        }
+      })
       } else {
         // All items passed, no CAPA needed
         navigate('/rounds/my-rounds', { 

@@ -5,10 +5,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'arabic': ['Noto Kufi Arabic', 'sans-serif'],
-        'aws-pro': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'ibm-plex': ['IBM Plex Sans Arabic', 'Tajawal', 'Noto Kufi Arabic', 'sans-serif'],
+        'arabic': ['IBM Plex Sans Arabic', 'Tajawal', 'Noto Kufi Arabic', 'sans-serif'],
+        'aws-pro': ['IBM Plex Sans Arabic', 'Tajawal', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         'aws-pro-mono': ['JetBrains Mono', 'Monaco', 'Cascadia Code', 'Segoe UI Mono', 'Roboto Mono', 'monospace'],
-        'sans': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'sans': ['IBM Plex Sans Arabic', 'Tajawal', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         'mono': ['JetBrains Mono', 'Monaco', 'Cascadia Code', 'Segoe UI Mono', 'Roboto Mono', 'monospace'],
       },
       direction: {

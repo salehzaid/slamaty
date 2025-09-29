@@ -2,12 +2,13 @@ from fastapi import FastAPI, Depends, HTTPException, status, Form, Body, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 import uvicorn
 from typing import List, Optional
 from datetime import datetime, timedelta
 
 from database import get_db, engine
-from models_updated import Base, UserRole, User
+from models_updated import Base, UserRole, User, Round, Capa, Department
 from schemas import (
     UserCreate, UserUpdate, UserResponse, RoundCreate, RoundResponse, CapaCreate, CapaResponse, 
     DepartmentCreate, DepartmentResponse, EvaluationCategoryCreate, EvaluationCategoryResponse,
@@ -21,7 +22,7 @@ from auth import get_current_user, create_access_token, verify_password, get_pas
 from notification_service import get_notification_service
 from crud import (
     create_user, get_user_by_email, get_user_by_username, get_user_by_id, get_users, update_user_data, delete_user_data,
-    create_round, get_rounds, get_rounds_by_user, get_round_by_id, update_round, delete_round, create_capa, get_capas, get_all_capas_unfiltered, delete_capa, delete_all_capas, create_department, get_departments, 
+    create_round, get_rounds, get_rounds_by_user, get_round_by_id, update_round, delete_round, create_capa, get_capas, get_capa_by_id, update_capa, get_all_capas_unfiltered, delete_capa, delete_all_capas, create_department, get_departments, 
     get_department_by_id, update_department, delete_department,
     create_evaluation_category, get_evaluation_categories, get_evaluation_category_by_id,
     update_evaluation_category, delete_evaluation_category,
@@ -121,6 +122,65 @@ async def signin(login_request: dict = Body(...), db: Session = Depends(get_db))
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"خطأ في معالجة الطلب: {str(e)}"
+        )
+
+@app.post("/auth/google")
+async def google_auth(google_data: dict = Body(...), db: Session = Depends(get_db)):
+    try:
+        # Extract user data from Google response
+        email = google_data.get("email")
+        first_name = google_data.get("first_name", "")
+        last_name = google_data.get("last_name", "")
+        username = google_data.get("username", email.split("@")[0])
+        
+        if not email:
+            raise HTTPException(
+                status_code=400,
+                detail="البريد الإلكتروني مطلوب"
+            )
+        
+        # Check if user already exists
+        db_user = get_user_by_email(db, email=email)
+        
+        if db_user:
+            # User exists, generate token and return
+            access_token = create_access_token(data={"sub": db_user.email})
+            return {
+                "access_token": access_token, 
+                "token_type": "bearer", 
+                "user": db_user,
+                "is_new_user": False
+            }
+        else:
+            # Create new user
+            user_data = UserCreate(
+                username=username,
+                email=email,
+                password="",  # No password for Google users
+                first_name=first_name,
+                last_name=last_name,
+                role="assessor",  # Default role
+                department="",
+                phone="",
+                position=""
+            )
+            
+            # Create user with empty password (Google users don't need password)
+            hashed_password = get_password_hash("google_user_no_password")
+            db_user = create_user(db, user_data, hashed_password)
+            
+            access_token = create_access_token(data={"sub": db_user.email})
+            return {
+                "access_token": access_token, 
+                "token_type": "bearer", 
+                "user": db_user,
+                "is_new_user": True
+            }
+            
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"خطأ في معالجة طلب جوجل: {str(e)}"
         )
 
 @app.get("/auth/me", response_model=UserResponse)
@@ -280,25 +340,28 @@ async def finalize_evaluation_endpoint(round_id: int, payload: dict = Body(...),
         from models_updated import EvaluationItem
         created_capas = []
         try:
+            # Automatic CAPA creation is temporarily DISABLED to avoid DB constraint failures.
+            # Instead, prepare draft CAPA payloads and return them to the frontend so users
+            # can review and explicitly create/save CAPAs from the UI.
             for ev in evaluations:
                 status = ev.get('status')
-                # create CAPA for not_applied or partial items
+                # prepare draft CAPA for not_applied or partial items
                 if status in ('not_applied', 'partial'):
                     item_id = ev.get('item_id')
                     item = db.query(EvaluationItem).filter(EvaluationItem.id == item_id).first()
                     if not item:
-                        print(f"Evaluation item {item_id} not found, skipping CAPA creation")
+                        print(f"Evaluation item {item_id} not found, skipping CAPA draft")
                         continue
-                    
+
                     item_title = item.title
                     comment = ev.get('comments') or ''
-                    
-                    # Get department managers for automatic assignment
+
+                    # Get department managers for suggested assignment
                     from crud import get_department_manager_ids
                     manager_ids = get_department_manager_ids(db, updated_round.department)
-                    assigned_to_id = manager_ids[0] if manager_ids else None  # Assign to first manager
+                    suggested_assigned_to_id = manager_ids[0] if manager_ids else None
 
-                    # Calculate target date based on risk level (7-30 days)
+                    # Calculate suggested target date based on risk level (7-30 days)
                     risk_days = {
                         'CRITICAL': 7,
                         'MAJOR': 14,
@@ -306,41 +369,34 @@ async def finalize_evaluation_endpoint(round_id: int, payload: dict = Body(...),
                     }
                     target_days = risk_days.get(item.risk_level, 14)
                     target_date = datetime.utcnow() + timedelta(days=target_days)
-                    
-                    # Determine priority based on risk level
+
+                    # Determine suggested priority based on risk level
                     priority_map = {
                         'CRITICAL': 'urgent',
                         'MAJOR': 'high',
                         'MINOR': 'medium'
                     }
                     priority = priority_map.get(item.risk_level, 'medium')
-                    
-                    # Build CAPA payload
-                    capa_payload = CapaCreate(
-                        title=f"عدم الامتثال: {item_title}",
-                        description=f"الجولة: {updated_round.title}\nرمز العنصر: {item.code}\nالعنوان: {item_title}\nوصف العنصر: {item.description or 'لا يوجد وصف'}\nملاحظات التقييم: {comment}\n\nمطلوب: تطوير خطة تصحيحية لضمان الامتثال الكامل لهذا العنصر.",
-                        round_id=round_id,
-                        department=updated_round.department,
-                        priority=priority,
-                        assigned_to=None,  # Will be set by create_capa based on assigned_to_id
-                        assigned_to_id=assigned_to_id,
-                        evaluation_item_id=item_id,
-                        target_date=target_date,
-                        risk_score=8 if item.risk_level == 'CRITICAL' else (5 if item.risk_level == 'MAJOR' else 3)
-                    )
-                    try:
-                        db_capa = create_capa(db, capa_payload, current_user.id)
-                        created_capas.append({
-                            'capa_id': db_capa.id,
-                            'item_id': item_id,
-                            'item_title': item_title,
-                            'assigned_to_id': assigned_to_id
-                        })
-                        print(f"✅ Created CAPA {db_capa.id} for evaluation item {item_id}: {item_title}")
-                    except Exception as e:
-                        print(f"❌ Failed to create CAPA for item {item_id}: {e}")
+
+                    # Build draft CAPA payload (not saved to DB)
+                    draft_payload = {
+                        'title': f"عدم الامتثال: {item_title}",
+                        'description': f"الجولة: {updated_round.title}\nرمز العنصر: {item.code}\nالعنوان: {item_title}\nوصف العنصر: {item.description or 'لا يوجد وصف'}\nملاحظات التقييم: {comment}\n\nمطلوب: تطوير خطة تصحيحية لضمان الامتثال الكامل لهذا العنصر.",
+                        'round_id': round_id,
+                        'department': updated_round.department,
+                        'priority': priority,
+                        'assigned_to_id': suggested_assigned_to_id,
+                        'evaluation_item_id': item_id,
+                        'target_date': target_date,
+                        'risk_score': 8 if item.risk_level == 'CRITICAL' else (5 if item.risk_level == 'MAJOR' else 3)
+                    }
+
+                    created_capas.append(draft_payload)
+
+            if created_capas:
+                print("Automatic CAPA creation is disabled; returning draft CAPA payloads for frontend review.")
         except Exception as e:
-            print(f"❌ Error while creating CAPAs: {e}")
+            print(f"❌ Error while preparing CAPA drafts: {e}")
 
         # Round status is already set to completed by create_evaluation_results
         
@@ -394,6 +450,30 @@ async def get_all_capas_unfiltered_endpoint(skip: int = 0, limit: int = 100, db:
     
     capas = get_all_capas_unfiltered(db, skip=skip, limit=limit)
     return capas
+
+@app.get("/capa/{capa_id}", response_model=CapaResponse)
+async def get_capa_by_id_endpoint(capa_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    """Get a single CAPA by ID with evaluation item details"""
+    capa = get_capa_by_id(db, capa_id)
+    if not capa:
+        raise HTTPException(status_code=404, detail="خطة التصحيح غير موجودة")
+    
+    return capa
+
+@app.patch("/capa/{capa_id}", response_model=CapaResponse)
+async def update_capa_endpoint(capa_id: int, capa_data: CapaCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    """Update a CAPA by ID"""
+    # Check if CAPA exists
+    existing_capa = get_capa_by_id(db, capa_id)
+    if not existing_capa:
+        raise HTTPException(status_code=404, detail="خطة التصحيح غير موجودة")
+    
+    # Update the CAPA
+    updated_capa = update_capa(db, capa_id, capa_data)
+    if not updated_capa:
+        raise HTTPException(status_code=500, detail="فشل في تحديث خطة التصحيح")
+    
+    return updated_capa
 
 @app.delete("/capa/all")
 async def delete_all_capas_endpoint(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
@@ -1038,6 +1118,580 @@ async def get_round_capa_summary_endpoint(
     except Exception as e:
         print(f"Error getting round CAPA summary: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# Enhanced CAPA endpoints with new features
+@app.post("/api/capas", response_model=dict)
+async def create_enhanced_capa(
+    capa: CapaCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Create a new enhanced CAPA plan"""
+    # Check permissions - only quality managers and super admins can create CAPAs
+    if current_user.role not in ["quality_manager", "super_admin"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Only quality managers and super admins can create CAPA plans"
+        )
+    
+    # Convert Pydantic models to JSON strings for database storage
+    import json
+    import datetime
+
+    def safe_serialize_actions(actions):
+        out = []
+        for a in actions:
+            if hasattr(a, 'dict'):
+                item = a.dict()
+            elif hasattr(a, 'model_dump'):
+                item = a.model_dump()
+            else:
+                item = dict(a) if isinstance(a, (list, tuple)) else a
+
+            # Convert datetime objects to isoformat
+            for k, v in list(item.items()):
+                if isinstance(v, datetime.datetime):
+                    item[k] = v.isoformat()
+            out.append(item)
+        return json.dumps(out)
+
+    corrective_actions_json = safe_serialize_actions(capa.corrective_actions or [])
+    preventive_actions_json = safe_serialize_actions(capa.preventive_actions or [])
+    verification_steps_json = safe_serialize_actions(capa.verification_steps or [])
+    
+    # Create CAPA data dict
+    capa_data = {
+        "title": capa.title,
+        "description": capa.description,
+        "round_id": capa.round_id,
+        "department": capa.department,
+        "assigned_to_id": capa.assigned_to_id,
+        "root_cause": capa.root_cause,
+        "corrective_actions": corrective_actions_json,
+        "preventive_actions": preventive_actions_json,
+        "verification_steps": verification_steps_json,
+        "severity": capa.severity,
+        "estimated_cost": capa.estimated_cost,
+        "sla_days": capa.sla_days,
+    }
+    
+    # Create CAPA in database
+    db_capa = create_capa(db, capa_data, current_user.id)
+    
+    # Create audit log
+    create_audit_log(db, {
+        "user_id": current_user.id,
+        "action": "create_capa",
+        "entity_type": "capa",
+        "entity_id": db_capa.id,
+        "new_values": json.dumps({"title": db_capa.title, "department": db_capa.department})
+    })
+    
+    return {
+        "status": "success",
+        "message": "CAPA plan created successfully",
+        "capa_id": db_capa.id,
+        "capa": {
+            "id": db_capa.id,
+            "title": db_capa.title,
+            "description": db_capa.description,
+            "department": db_capa.department,
+            "severity": db_capa.severity,
+            "verification_status": db_capa.verification_status,
+            "created_at": db_capa.created_at
+        }
+    }
+
+@app.get("/api/capas/{capa_id}", response_model=dict)
+async def get_enhanced_capa(
+    capa_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get a specific enhanced CAPA plan by ID"""
+    capa = get_capa_by_id(db, capa_id)
+    if not capa:
+        raise HTTPException(status_code=404, detail="CAPA plan not found")
+    
+    # Serialize JSON fields
+    import json
+    try:
+        corrective_actions = json.loads(capa.corrective_actions) if capa.corrective_actions else []
+    except (json.JSONDecodeError, TypeError):
+        corrective_actions = []
+    
+    try:
+        preventive_actions = json.loads(capa.preventive_actions) if capa.preventive_actions else []
+    except (json.JSONDecodeError, TypeError):
+        preventive_actions = []
+    
+    try:
+        verification_steps = json.loads(capa.verification_steps) if capa.verification_steps else []
+    except (json.JSONDecodeError, TypeError):
+        verification_steps = []
+    
+    try:
+        status_history = json.loads(capa.status_history) if capa.status_history else []
+    except (json.JSONDecodeError, TypeError):
+        status_history = []
+    
+    return {
+        "status": "success",
+        "capa": {
+            "id": capa.id,
+            "title": capa.title,
+            "description": capa.description,
+            "round_id": capa.round_id,
+            "department": capa.department,
+            "priority": capa.priority,
+            "status": capa.status,
+            "assigned_to": capa.assigned_to,
+            "assigned_to_id": capa.assigned_to_id,
+            "evaluation_item_id": capa.evaluation_item_id,
+            "target_date": capa.target_date,
+            "risk_score": capa.risk_score,
+            "root_cause": capa.root_cause,
+            "corrective_actions": corrective_actions,
+            "preventive_actions": preventive_actions,
+            "verification_steps": verification_steps,
+            "verification_status": capa.verification_status,
+            "severity": capa.severity,
+            "estimated_cost": float(capa.estimated_cost) if capa.estimated_cost else None,
+            "sla_days": capa.sla_days,
+            "escalation_level": capa.escalation_level,
+            "closed_at": capa.closed_at,
+            "verified_at": capa.verified_at,
+            "status_history": status_history,
+            "created_by_id": capa.created_by_id,
+            "created_at": capa.created_at,
+        }
+    }
+
+@app.get("/api/capas", response_model=dict)
+async def get_enhanced_capas(
+    skip: int = 0,
+    limit: int = 100,
+    department: Optional[str] = None,
+    status: Optional[str] = None,
+    severity: Optional[int] = None,
+    verification_status: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get enhanced CAPA plans with optional filtering"""
+    # Build query
+    from models_updated import Capa
+    query = db.query(Capa)
+    
+    # Apply filters
+    if department:
+        query = query.filter(Capa.department == department)
+    if status:
+        query = query.filter(Capa.status == status)
+    if severity:
+        query = query.filter(Capa.severity == severity)
+    if verification_status:
+        query = query.filter(Capa.verification_status == verification_status)
+    
+    # Get total count
+    total_count = query.count()
+    
+    # Apply pagination
+    capas = query.offset(skip).limit(limit).all()
+    
+    # Serialize results
+    import json
+    serialized_capas = []
+    for capa in capas:
+        try:
+            corrective_actions = json.loads(capa.corrective_actions) if capa.corrective_actions else []
+        except (json.JSONDecodeError, TypeError):
+            corrective_actions = []
+        
+        try:
+            preventive_actions = json.loads(capa.preventive_actions) if capa.preventive_actions else []
+        except (json.JSONDecodeError, TypeError):
+            preventive_actions = []
+        
+        try:
+            verification_steps = json.loads(capa.verification_steps) if capa.verification_steps else []
+        except (json.JSONDecodeError, TypeError):
+            verification_steps = []
+        
+        serialized_capas.append({
+            "id": capa.id,
+            "title": capa.title,
+            "description": capa.description,
+            "department": capa.department,
+            "priority": capa.priority,
+            "status": capa.status,
+            "verification_status": capa.verification_status,
+            "severity": capa.severity,
+            "target_date": capa.target_date,
+            "escalation_level": capa.escalation_level,
+            "corrective_actions": corrective_actions,
+            "preventive_actions": preventive_actions,
+            "verification_steps": verification_steps,
+            "created_at": capa.created_at,
+        })
+    
+    return {
+        "status": "success",
+        "capas": serialized_capas,
+        "total_count": total_count,
+        "skip": skip,
+        "limit": limit
+    }
+
+@app.get("/api/capas/dashboard/stats", response_model=dict)
+async def get_capa_dashboard_stats(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get CAPA dashboard statistics"""
+    # Execute the view query
+    result = db.execute("SELECT * FROM capa_dashboard_stats").fetchone()
+    
+    if not result:
+        return {
+            "status": "success",
+            "stats": {
+                "total_capas": 0,
+                "pending_capas": 0,
+                "in_review_capas": 0,
+                "verified_capas": 0,
+                "rejected_capas": 0,
+                "overdue_capas": 0,
+                "escalated_capas": 0,
+                "avg_severity": 0,
+                "avg_escalation_level": 0
+            }
+        }
+    
+    return {
+        "status": "success",
+        "stats": {
+            "total_capas": result[0],
+            "pending_capas": result[1],
+            "in_review_capas": result[2],
+            "verified_capas": result[3],
+            "rejected_capas": result[4],
+            "low_severity_capas": result[5],
+            "medium_low_severity_capas": result[6],
+            "medium_severity_capas": result[7],
+            "high_severity_capas": result[8],
+            "critical_severity_capas": result[9],
+            "overdue_capas": result[10],
+            "escalated_capas": result[11],
+            "avg_severity": float(result[12]) if result[12] else 0,
+            "avg_escalation_level": float(result[13]) if result[13] else 0
+        }
+    }
+
+# Reports endpoints
+@app.get("/api/reports/dashboard/stats", response_model=dict)
+async def get_reports_dashboard_stats(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get comprehensive dashboard statistics for reports"""
+    try:
+        # Get rounds statistics
+        total_rounds = db.query(Round).count()
+        completed_rounds = db.query(Round).filter(Round.status == "completed").count()
+        in_progress_rounds = db.query(Round).filter(Round.status == "in_progress").count()
+        pending_rounds = db.query(Round).filter(Round.status == "pending_review").count()
+        overdue_rounds = db.query(Round).filter(Round.status == "overdue").count()
+        
+        # Get CAPA statistics
+        total_capas = db.query(Capa).count()
+        pending_capas = db.query(Capa).filter(Capa.status == "pending").count()
+        in_progress_capas = db.query(Capa).filter(Capa.status == "in_progress").count()
+        implemented_capas = db.query(Capa).filter(Capa.status == "implemented").count()
+        
+        # Get departments statistics
+        total_departments = db.query(Department).count()
+        active_departments = db.query(Department).filter(Department.is_active == True).count()
+        
+        # Get users statistics
+        total_users = db.query(User).count()
+        active_users = db.query(User).filter(User.is_active == True).count()
+        
+        # Calculate compliance rate (based on completed rounds with compliance percentage)
+        completed_rounds_with_compliance = db.query(Round).filter(
+            Round.status == "completed",
+            Round.compliance_percentage.isnot(None)
+        ).all()
+        
+        if completed_rounds_with_compliance:
+            avg_compliance = sum(round.compliance_percentage for round in completed_rounds_with_compliance) / len(completed_rounds_with_compliance)
+        else:
+            avg_compliance = 0
+        
+        return {
+            "rounds": {
+                "total": total_rounds,
+                "completed": completed_rounds,
+                "in_progress": in_progress_rounds,
+                "pending": pending_rounds,
+                "overdue": overdue_rounds
+            },
+            "capas": {
+                "total": total_capas,
+                "pending": pending_capas,
+                "in_progress": in_progress_capas,
+                "implemented": implemented_capas
+            },
+            "departments": {
+                "total": total_departments,
+                "active": active_departments
+            },
+            "users": {
+                "total": total_users,
+                "active": active_users
+            },
+            "compliance_rate": round(avg_compliance, 2)
+        }
+    except Exception as e:
+        print(f"Error getting reports dashboard stats: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب إحصائيات التقارير: {str(e)}")
+
+@app.get("/api/reports/compliance-trends", response_model=dict)
+async def get_compliance_trends(
+    months: int = 6,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get compliance trends over time"""
+    try:
+        from datetime import datetime, timedelta
+        from sqlalchemy import extract
+        
+        # Get data for the last N months
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=months * 30)
+        
+        # Get completed rounds with compliance data grouped by month
+        monthly_data = db.query(
+            extract('year', Round.created_at).label('year'),
+            extract('month', Round.created_at).label('month'),
+            func.avg(Round.compliance_percentage).label('avg_compliance'),
+            func.count(Round.id).label('rounds_count')
+        ).filter(
+            Round.status == "completed",
+            Round.compliance_percentage.isnot(None),
+            Round.created_at >= start_date
+        ).group_by(
+            extract('year', Round.created_at),
+            extract('month', Round.created_at)
+        ).order_by(
+            extract('year', Round.created_at),
+            extract('month', Round.created_at)
+        ).all()
+        
+        # Format data for frontend
+        trends_data = []
+        month_names = [
+            "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+            "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+        ]
+        
+        for data in monthly_data:
+            trends_data.append({
+                "month": month_names[int(data.month) - 1],
+                "compliance": round(float(data.avg_compliance), 2),
+                "rounds": int(data.rounds_count)
+            })
+        
+        return {"trends": trends_data}
+    except Exception as e:
+        print(f"Error getting compliance trends: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب اتجاهات الامتثال: {str(e)}")
+
+@app.get("/api/reports/department-performance", response_model=dict)
+async def get_department_performance(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get department performance statistics"""
+    try:
+        # Get rounds by department with compliance data
+        dept_performance = db.query(
+            Round.department,
+            func.avg(Round.compliance_percentage).label('avg_compliance'),
+            func.count(Round.id).label('rounds_count'),
+            func.count(Capa.id).label('capas_count')
+        ).outerjoin(Capa, Round.id == Capa.round_id).filter(
+            Round.status == "completed",
+            Round.compliance_percentage.isnot(None)
+        ).group_by(Round.department).all()
+        
+        # Format data for frontend
+        performance_data = []
+        for dept in dept_performance:
+            performance_data.append({
+                "name": dept.department,
+                "compliance": round(float(dept.avg_compliance), 2),
+                "rounds": int(dept.rounds_count),
+                "capa": int(dept.capas_count)
+            })
+        
+        return {"departments": performance_data}
+    except Exception as e:
+        print(f"Error getting department performance: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب أداء الأقسام: {str(e)}")
+
+@app.get("/api/reports/rounds-by-type", response_model=dict)
+async def get_rounds_by_type(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get rounds distribution by type"""
+    try:
+        # Get rounds by type
+        rounds_by_type = db.query(
+            Round.round_type,
+            func.count(Round.id).label('count')
+        ).group_by(Round.round_type).all()
+        
+        # Map round types to Arabic names
+        type_mapping = {
+            "patient_safety": "سلامة المرضى",
+            "infection_control": "مكافحة العدوى",
+            "hygiene": "النظافة",
+            "medication_safety": "سلامة الأدوية",
+            "equipment_safety": "سلامة المعدات",
+            "environmental": "البيئة",
+            "general": "عام"
+        }
+        
+        # Define colors for each type
+        colors = {
+            "patient_safety": "#3b82f6",
+            "infection_control": "#ef4444",
+            "hygiene": "#10b981",
+            "medication_safety": "#f59e0b",
+            "equipment_safety": "#8b5cf6",
+            "environmental": "#06b6d4",
+            "general": "#6b7280"
+        }
+        
+        # Format data for frontend
+        type_data = []
+        for round_type, count in rounds_by_type:
+            type_data.append({
+                "name": type_mapping.get(round_type, round_type),
+                "value": int(count),
+                "color": colors.get(round_type, "#6b7280")
+            })
+        
+        return {"round_types": type_data}
+    except Exception as e:
+        print(f"Error getting rounds by type: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب توزيع الجولات: {str(e)}")
+
+@app.get("/api/reports/capa-status-distribution", response_model=dict)
+async def get_capa_status_distribution(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get CAPA status distribution"""
+    try:
+        # Get CAPAs by status
+        capa_status = db.query(
+            Capa.status,
+            func.count(Capa.id).label('count')
+        ).group_by(Capa.status).all()
+        
+        # Map status to Arabic names and colors
+        status_mapping = {
+            "pending": "معلقة",
+            "assigned": "مخصصة",
+            "in_progress": "قيد التنفيذ",
+            "implemented": "منفذة",
+            "verification": "قيد التحقق",
+            "verified": "محققة",
+            "rejected": "مرفوضة",
+            "closed": "مغلقة"
+        }
+        
+        colors = {
+            "pending": "#f59e0b",
+            "assigned": "#3b82f6",
+            "in_progress": "#3b82f6",
+            "implemented": "#10b981",
+            "verification": "#8b5cf6",
+            "verified": "#10b981",
+            "rejected": "#ef4444",
+            "closed": "#6b7280"
+        }
+        
+        # Format data for frontend
+        status_data = []
+        for status, count in capa_status:
+            status_data.append({
+                "name": status_mapping.get(status, status),
+                "value": int(count),
+                "color": colors.get(status, "#6b7280")
+            })
+        
+        return {"capa_status": status_data}
+    except Exception as e:
+        print(f"Error getting CAPA status distribution: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب توزيع الخطط التصحيحية: {str(e)}")
+
+@app.get("/api/reports/monthly-rounds", response_model=dict)
+async def get_monthly_rounds(
+    months: int = 6,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get monthly rounds statistics"""
+    try:
+        from datetime import datetime, timedelta
+        from sqlalchemy import extract
+        
+        # Get data for the last N months
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=months * 30)
+        
+        # Get monthly rounds data
+        monthly_data = db.query(
+            extract('year', Round.created_at).label('year'),
+            extract('month', Round.created_at).label('month'),
+            func.count(Round.id).label('scheduled'),
+            func.count(db.case([(Round.status == "completed", 1)])).label('completed'),
+            func.count(db.case([(Round.status == "overdue", 1)])).label('overdue')
+        ).filter(
+            Round.created_at >= start_date
+        ).group_by(
+            extract('year', Round.created_at),
+            extract('month', Round.created_at)
+        ).order_by(
+            extract('year', Round.created_at),
+            extract('month', Round.created_at)
+        ).all()
+        
+        # Format data for frontend
+        month_names = [
+            "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+            "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+        ]
+        
+        monthly_rounds = []
+        for data in monthly_data:
+            monthly_rounds.append({
+                "month": month_names[int(data.month) - 1],
+                "scheduled": int(data.scheduled),
+                "completed": int(data.completed),
+                "overdue": int(data.overdue)
+            })
+        
+        return {"monthly_rounds": monthly_rounds}
+    except Exception as e:
+        print(f"Error getting monthly rounds: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب الجولات الشهرية: {str(e)}")
 
 
 if __name__ == "__main__":

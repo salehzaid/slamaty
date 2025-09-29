@@ -96,7 +96,7 @@ class EmailService:
             <title>{title}</title>
             <style>
                 body {{
-                    font-family: 'Noto Kufi Arabic', Arial, sans-serif;
+                    font-family: 'IBM Plex Sans Arabic', 'Noto Kufi Arabic', Arial, sans-serif;
                     line-height: 1.6;
                     color: #333;
                     max-width: 600px;

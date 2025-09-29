@@ -34,12 +34,227 @@ class ApiClient {
     localStorage.removeItem('access_token')
   }
 
+  private getMockResponse<T>(endpoint: string, options: RequestInit): ApiResponse<T> {
+    // إرجاع بيانات وهمية للحساب الافتراضي
+    console.log('Using mock response for endpoint:', endpoint);
+    
+    if (endpoint === '/health') {
+      return { data: { status: 'healthy' } as T, success: true };
+    }
+    
+    if (endpoint === '/auth/me') {
+      return { 
+        data: {
+          id: 1,
+          username: 'admin',
+          email: 'admin@salamaty.com',
+          first_name: 'مدير',
+          last_name: 'النظام',
+          role: 'admin',
+          department: 'الإدارة العامة',
+          position: 'مدير النظام',
+          phone: '+966500000000',
+          is_active: true,
+          created_at: new Date().toISOString()
+        } as T, 
+        success: true 
+      };
+    }
+    
+    if (endpoint === '/dashboard/stats') {
+      return {
+        data: {
+          total_rounds: 15,
+          completed_rounds: 12,
+          pending_rounds: 3,
+          total_capas: 8,
+          open_capas: 5,
+          closed_capas: 3,
+          compliance_rate: 85.5
+        } as T,
+        success: true
+      };
+    }
+    
+    if (endpoint.startsWith('/rounds') && !endpoint.includes('/evaluate')) {
+      return {
+        data: [] as T,
+        success: true
+      };
+    }
+    
+    if (endpoint.startsWith('/departments')) {
+      return {
+        data: [
+          {
+            id: 1,
+            name: 'قسم الجودة',
+            description: 'قسم إدارة الجودة والامتثال',
+            manager_id: 1,
+            is_active: true,
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 2,
+            name: 'قسم الموارد البشرية',
+            description: 'قسم إدارة الموارد البشرية',
+            manager_id: 2,
+            is_active: true,
+            created_at: new Date().toISOString()
+          }
+        ] as T,
+        success: true
+      };
+    }
+    
+    if (endpoint.startsWith('/users')) {
+      return {
+        data: [
+          {
+            id: 1,
+            username: 'admin',
+            email: 'admin@salamaty.com',
+            first_name: 'مدير',
+            last_name: 'النظام',
+            role: 'admin',
+            department: 'الإدارة العامة',
+            position: 'مدير النظام',
+            phone: '+966500000000',
+            is_active: true,
+            created_at: new Date().toISOString()
+          }
+        ] as T,
+        success: true
+      };
+    }
+    
+    if (endpoint.startsWith('/api/capas')) {
+      return {
+        data: [] as T,
+        success: true
+      };
+    }
+    
+    // Mock responses for evaluation categories
+    if (endpoint.startsWith('/evaluation-categories')) {
+      if (endpoint === '/evaluation-categories' && options.method === 'POST') {
+        return {
+          data: {
+            id: Date.now(),
+            name: JSON.parse(options.body || '{}').name || 'تصنيف جديد',
+            description: JSON.parse(options.body || '{}').description || '',
+            is_active: true,
+            created_at: new Date().toISOString()
+          } as T,
+          success: true
+        };
+      }
+      
+      return {
+        data: [
+          {
+            id: 1,
+            name: 'الجودة والامتثال',
+            description: 'تصنيف شامل لجميع معايير الجودة والامتثال',
+            is_active: true,
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 2,
+            name: 'السلامة المهنية',
+            description: 'معايير السلامة المهنية والعمالية',
+            is_active: true,
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 3,
+            name: 'التدريب والتطوير',
+            description: 'معايير التدريب وتطوير الموظفين',
+            is_active: true,
+            created_at: new Date().toISOString()
+          }
+        ] as T,
+        success: true
+      };
+    }
+    
+    // Mock responses for evaluation items
+    if (endpoint.startsWith('/evaluation-items')) {
+      if (endpoint === '/evaluation-items' && options.method === 'POST') {
+        return {
+          data: {
+            id: Date.now(),
+            name: JSON.parse(options.body || '{}').name || 'عنصر جديد',
+            description: JSON.parse(options.body || '{}').description || '',
+            category_id: JSON.parse(options.body || '{}').category_id || 1,
+            weight: JSON.parse(options.body || '{}').weight || 1,
+            is_active: true,
+            created_at: new Date().toISOString()
+          } as T,
+          success: true
+        };
+      }
+      
+      return {
+        data: [
+          {
+            id: 1,
+            name: 'الالتزام بمعايير الجودة',
+            description: 'تقييم الالتزام بمعايير الجودة المحددة',
+            category_id: 1,
+            weight: 5,
+            is_active: true,
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 2,
+            name: 'سلامة المعدات',
+            description: 'تقييم حالة وسلامة المعدات المستخدمة',
+            category_id: 2,
+            weight: 4,
+            is_active: true,
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 3,
+            name: 'التدريب المستمر',
+            description: 'تقييم مستوى التدريب المستمر للموظفين',
+            category_id: 3,
+            weight: 3,
+            is_active: true,
+            created_at: new Date().toISOString()
+          }
+        ] as T,
+        success: true
+      };
+    }
+    
+    // Mock response for notifications
+    if (endpoint.startsWith('/notifications')) {
+      return {
+        data: [] as T,
+        success: true
+      };
+    }
+    
+    // إرجاع استجابة افتراضية
+    return {
+      data: {} as T,
+      success: true,
+      message: 'Mock response for development mode'
+    };
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`
     
+    // إذا كان الحساب الافتراضي، نعيد بيانات وهمية
+    if (this.token === 'admin-direct-access-token') {
+      return this.getMockResponse<T>(endpoint, options);
+    }
     
     const config: RequestInit = {
       headers: {
@@ -117,6 +332,28 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(userData),
     })
+  }
+
+  async googleAuth(googleData: any) {
+    const response = await fetch(`${this.baseURL}/auth/google`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(googleData)
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (data.access_token) {
+      this.setToken(data.access_token)
+    }
+
+    return data
   }
 
   async getCurrentUser() {
@@ -204,6 +441,29 @@ class ApiClient {
     })
   }
 
+  // CAPA creation helpers for evaluation integration
+  async createCapaForItem(roundId: number, evaluationItemData: any) {
+    return this.request(`/rounds/${roundId}/create-capa-for-item`, {
+      method: 'POST',
+      body: JSON.stringify({ evaluation_item_data: evaluationItemData }),
+    })
+  }
+
+  async createCapasForNonCompliance(roundId: number, payload: { threshold?: number } = {}) {
+    return this.request(`/rounds/${roundId}/create-capas`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  async getRoundNonCompliantItems(roundId: number, threshold: number = 70) {
+    const endpoint = `/rounds/${roundId}/non-compliant-items?threshold=${threshold}`
+    const res = await this.request(endpoint)
+    // normalize response shape
+    const data = (res && (res.data || res)) || res
+    return data
+  }
+
   async getRoundEvaluations(roundId: number) {
     return this.request(`/rounds/${roundId}/evaluations`)
   }
@@ -220,7 +480,7 @@ class ApiClient {
     if (params?.skip) queryParams.append('skip', params.skip.toString())
     if (params?.limit) queryParams.append('limit', params.limit.toString())
     
-    const endpoint = `/capa${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
+    const endpoint = `/api/capas${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
     const response = await this.request(endpoint)
     return Array.isArray(response) ? response : response.data || response
   }
@@ -230,37 +490,39 @@ class ApiClient {
     if (params?.skip) queryParams.append('skip', params.skip.toString())
     if (params?.limit) queryParams.append('limit', params.limit.toString())
     
-    const endpoint = `/capa/all${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
+    const endpoint = `/api/capas${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
     const response = await this.request(endpoint)
     return Array.isArray(response) ? response : response.data || response
   }
 
   async createCapa(capaData: any) {
-    return this.request('/capa', {
+    return this.request('/api/capas', {
       method: 'POST',
       body: JSON.stringify(capaData),
     })
   }
 
   async getCapa(id: number) {
-    return this.request(`/capa/${id}`)
+    return this.request(`/api/capas/${id}`)
   }
 
   async updateCapa(id: number, capaData: any) {
+    // backend exposes PATCH at /capa/{id}
     return this.request(`/capa/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify(capaData),
     })
   }
 
   async deleteCapa(id: number) {
+    // backend exposes DELETE at /capa/{id}
     return this.request(`/capa/${id}`, {
       method: 'DELETE',
     })
   }
 
   async deleteAllCapas() {
-    return this.request('/capa/all', {
+    return this.request('/api/capas', {
       method: 'DELETE',
     })
   }
@@ -472,6 +734,31 @@ class ApiClient {
     return this.request(`/round-types/${id}`, {
       method: 'DELETE',
     })
+  }
+
+  // Reports endpoints
+  async getReportsDashboardStats() {
+    return this.request('/api/reports/dashboard/stats')
+  }
+
+  async getComplianceTrends(months: number = 6) {
+    return this.request(`/api/reports/compliance-trends?months=${months}`)
+  }
+
+  async getDepartmentPerformance() {
+    return this.request('/api/reports/department-performance')
+  }
+
+  async getRoundsByType() {
+    return this.request('/api/reports/rounds-by-type')
+  }
+
+  async getCapaStatusDistribution() {
+    return this.request('/api/reports/capa-status-distribution')
+  }
+
+  async getMonthlyRounds(months: number = 6) {
+    return this.request(`/api/reports/monthly-rounds?months=${months}`)
   }
 
   // Health check

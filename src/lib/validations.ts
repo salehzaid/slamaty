@@ -60,12 +60,17 @@ export const capaCreateSchema = z.object({
   rootCauseAnalysis: z.string().optional(),
   contributingFactors: z.array(z.string()).optional(),
   actions: z.array(z.object({
-    action: z.string().min(1),
+    action: z.string().min(1, "الإجراء مطلوب"),
     responsible: z.string().optional(),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
     resources: z.string().optional(),
   })).optional(),
+  // Additional fields that might be needed
+  priority: z.enum(["low", "medium", "high"]).optional(),
+  targetDate: z.date().optional(),
+  assignedTo: z.string().optional(),
+  status: z.enum(["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"]).optional(),
 })
 
 // Department validation schemas

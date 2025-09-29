@@ -53,8 +53,10 @@ export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({ ch
   const loadNotifications = useCallback(async () => {
     try {
       setIsLoading(true)
+      // use apiClient.get which returns { data } wrapper
       const response = await apiClient.get('/notifications')
-      const apiNotifications = response.data.map((notification: any) => ({
+      const raw = response?.data || response || []
+      const apiNotifications = (raw || []).map((notification: any) => ({
         ...notification,
         unread: notification.status === 'unread',
         createdAt: new Date(notification.created_at),

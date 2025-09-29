@@ -114,6 +114,14 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = ({ onLogout }) => {
       path: '/capa'
     },
     {
+      id: 'capa-enhanced',
+      label: 'الخطط التصحيحية المحسنة',
+      icon: Shield,
+      badge: 'NEW',
+      color: 'text-orange-600',
+      path: '/capa-enhanced'
+    },
+    {
       id: 'reports',
       label: 'التقارير',
       icon: BarChart3,

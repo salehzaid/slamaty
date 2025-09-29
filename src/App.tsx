@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { EvaluationProvider } from './context/EvaluationContext';
+// import { EvaluationProvider } from './context/EvaluationContext';
 import { NotificationsProvider } from './context/NotificationsContext';
 import { LayoutProvider } from './context/LayoutContext';
 import { RTLProvider } from './components/RTLProvider';
@@ -10,8 +10,11 @@ import AnimatedSidebar from './components/AnimatedSidebar';
 import MainContent from './components/MainContent';
 import SimpleDashboard from './components/SimpleDashboard';
 import LoginPage from './components/LoginPage';
+import RegisterPage from './components/RegisterPage';
+import TestRegisterPage from './components/TestRegisterPage';
 import CapaManagement from './components/pages/CapaManagement';
 import CapaFormPage from '@/components/pages/CapaFormPage';
+import EnhancedCapaManagement from './components/pages/EnhancedCapaManagement';
 import DepartmentsManagement from './components/pages/DepartmentsManagement';
 import DepartmentFormPage from './components/pages/DepartmentFormPage';
 import ReportsPage from './components/pages/ReportsPage';
@@ -39,9 +42,23 @@ import TestRoundsData from './components/TestRoundsData';
 import TestCreateRound from './components/TestCreateRound';
 import TestApi from './components/TestApi';
 import LayoutTestPage from './components/LayoutTestPage';
+import AdminModeNotification from './components/AdminModeNotification';
 
 const AppContent: React.FC = () => {
-  const { isAuthenticated, logout, isLoading } = useAuth();
+  const auth = useAuth();
+  
+  if (!auth) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { isAuthenticated, logout, isLoading } = auth;
 
   if (isLoading) {
     return (
@@ -55,12 +72,22 @@ const AppContent: React.FC = () => {
   }
 
   if (!isAuthenticated) {
-    return <LoginPage />;
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900" dir="rtl">
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/test-register" element={<TestRegisterPage />} />
+          <Route path="*" element={<LoginPage />} />
+        </Routes>
+      </div>
+    );
   }
 
   
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900" dir="rtl">
+      <AdminModeNotification />
       <AnimatedSidebar onLogout={logout} />
       <MainContent onLogout={logout}>
         <Routes>
@@ -76,6 +103,7 @@ const AppContent: React.FC = () => {
             <Route path="/capa" element={<CapaManagement />} />
             <Route path="/capa/new" element={<CapaFormPage />} />
             <Route path="/capa/edit/:id" element={<CapaFormPage />} />
+            <Route path="/capa-enhanced" element={<EnhancedCapaManagement />} />
             <Route path="/my-rounds" element={<MyRoundsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/departments" element={<DepartmentsManagement />} />

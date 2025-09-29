@@ -5,6 +5,7 @@ import { apiClient } from '../lib/api';
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
+  loginAsAdmin: () => void;
   logout: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -35,13 +36,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('access_token');
       }
     } else {
-      // تحديث apiClient حتى لو لم يكن هناك رمز مميز
-      apiClient.clearToken();
+      // لا يوجد مستخدم مسجل دخول - عرض صفحة تسجيل الدخول
+      setUser(null);
     }
     
     setIsLoading(false);
-
-    // No auto-login - all authentication must go through API
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -78,6 +77,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginAsAdmin = () => {
+    const defaultAdminUser: User = {
+      id: 1,
+      username: 'admin',
+      email: 'admin@salamaty.com',
+      first_name: 'مدير',
+      last_name: 'النظام',
+      role: 'admin',
+      department: 'الإدارة العامة',
+      position: 'مدير النظام',
+      phone: '+966500000000',
+      is_active: true,
+      created_at: new Date().toISOString()
+    };
+    
+    const defaultToken = 'admin-direct-access-token';
+    
+    setUser(defaultAdminUser);
+    localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
+    localStorage.setItem('access_token', defaultToken);
+    apiClient.setToken(defaultToken);
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('sallamaty_user');
@@ -92,6 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value = {
     user,
     login,
+    loginAsAdmin,
     logout,
     isAuthenticated: !!user,
     isLoading,

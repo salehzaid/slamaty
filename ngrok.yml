@@ -1,0 +1,8 @@
+version: "2"
+authtoken: 32p3hJM2WnH7gJfcO8tBirHFjFB_2HRBFXMuoCkGUHnmst2yT
+tunnels:
+  frontend:
+    addr: 5174
+    proto: http
+    inspect: false
+    host_header: localhost:5174

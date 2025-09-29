@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
 from typing import List, Optional
-from models_updated import User, Round, Capa, Department, EvaluationResult, Notification, UserNotificationSettings, NotificationType, NotificationStatus, RoundTypeSettings
+from models_updated import User, Round, Capa, Department, EvaluationResult, Notification, UserNotificationSettings, NotificationType, NotificationStatus, RoundTypeSettings, CapaStatus, VerificationStatus
 from schemas import UserCreate, RoundCreate, CapaCreate, DepartmentCreate
 # from auth import get_password_hash
 import json
@@ -359,34 +359,74 @@ def get_department_manager_ids(db: Session, department_name: str):
         print(f"Error getting department manager IDs: {e}")
         return []
 
-def create_capa(db: Session, capa: CapaCreate, created_by_id: int):
+def create_capa(db: Session, capa_data: dict, created_by_id: int):
+    # Accept either a dict or a Pydantic model (CapaCreate). Normalize to dict.
+    if hasattr(capa_data, 'dict') and callable(getattr(capa_data, 'dict')):
+        try:
+            capa_data = capa_data.dict()
+        except Exception:
+            # Pydantic v2 uses model_dump
+            capa_data = capa_data.model_dump()
+
     # Set default values for all removed fields
-    department = "عام"  # Default department
+    department = capa_data.get("department", "عام")  # Use provided department or default
     priority = "medium"  # Default priority
     assigned_to = "لم يتم تعيين مسؤول"  # Default assignment
-    assigned_to_id = None
+    assigned_to_id = capa_data.get("assigned_to_id")
     risk_score = None
-    evaluation_item_id = None  # No evaluation item linkage
+    evaluation_item_id = capa_data.get('evaluation_item_id') if capa_data.get('evaluation_item_id') is not None else None  # Link to evaluation item if provided
     
-    # Set default target date to 30 days from now
+    # Set default target date to 30 days from now unless provided
     from datetime import datetime, timedelta
-    target_date = datetime.now() + timedelta(days=30)
+    if capa_data.get('target_date'):
+        target_date = capa_data.get('target_date')
+        # ensure datetime if string provided
+        if isinstance(target_date, str):
+            try:
+                from dateutil import parser
+                target_date = parser.parse(target_date)
+            except Exception:
+                from datetime import datetime, timedelta as _td
+                target_date = datetime.now() + _td(days=30)
+    else:
+        target_date = datetime.now() + timedelta(days=30)
     
-    from models_updated import CapaStatus
-    
+    from models_updated import CapaStatus, VerificationStatus
+
+    # Normalize verification_status input if provided (store lowercase to match DB check)
+    input_ver_status = capa_data.get('verification_status')
+    if input_ver_status:
+        try:
+            ver_status_norm = str(input_ver_status).lower()
+        except Exception:
+            ver_status_norm = str(VerificationStatus.PENDING.value).lower()
+    else:
+        ver_status_norm = str(VerificationStatus.PENDING.value).lower()
+
     db_capa = Capa(
-        title=capa.title,
-        description=capa.description,
-        round_id=capa.round_id,
+        title=capa_data["title"],
+        description=capa_data["description"],
+        round_id=capa_data.get("round_id"),
         department=department,
         priority=priority,
-        status=CapaStatus.PENDING.value,  # Use enum value
+        status=CapaStatus.PENDING.value,  # Use enum value (matches DB constraint)
         assigned_to=assigned_to,
         assigned_to_id=assigned_to_id,
         evaluation_item_id=evaluation_item_id,
         target_date=target_date,
         risk_score=risk_score,
-        created_by_id=created_by_id
+        created_by_id=created_by_id,
+        # New CAPA improvement fields
+        root_cause=capa_data.get("root_cause"),
+        corrective_actions=capa_data.get("corrective_actions", "[]"),
+        preventive_actions=capa_data.get("preventive_actions", "[]"),
+        verification_steps=capa_data.get("verification_steps", "[]"),
+        verification_status=ver_status_norm,
+        severity=capa_data.get("severity", 3),
+        estimated_cost=capa_data.get("estimated_cost"),
+        status_history="[]",
+        sla_days=capa_data.get("sla_days", 14),
+        escalation_level=0
     )
     db.add(db_capa)
     db.commit()
@@ -402,7 +442,7 @@ def create_capa(db: Session, capa: CapaCreate, created_by_id: int):
         created_by_name = f"{creator.first_name} {creator.last_name}" if creator else "مستخدم غير معروف"
         
         # Get department managers user IDs for notifications
-        manager_ids = get_department_manager_ids(db, capa.department)
+        manager_ids = get_department_manager_ids(db, department)
         
         if manager_ids:
             # Send notification to each manager
@@ -417,7 +457,7 @@ def create_capa(db: Session, capa: CapaCreate, created_by_id: int):
                 )
                 print(f"📧 Sent CAPA notification to manager ID: {manager_id}")
         else:
-            print(f"⚠️ No managers found for department: {capa.department}")
+            print(f"⚠️ No managers found for department: {department}")
         
     except Exception as e:
         print(f"⚠️ Failed to send CAPA notifications: {e}")
@@ -486,13 +526,98 @@ def get_all_capas_unfiltered(db: Session, skip: int = 0, limit: int = 100):
     ).offset(skip).limit(limit).all()
 
 def get_capa_by_id(db: Session, capa_id: int):
-    return db.query(Capa).filter(Capa.id == capa_id).first()
+    """Get a CAPA by ID with evaluation item details if linked"""
+    capa = db.query(Capa).options(
+        joinedload(Capa.assigned_manager),
+        joinedload(Capa.creator)
+    ).filter(Capa.id == capa_id).first()
+    
+    if not capa:
+        return None
+    
+    # Add evaluation item details if available
+    if capa.evaluation_item_id and EVALUATION_MODELS_AVAILABLE:
+        try:
+            from models_updated import EvaluationItem
+            evaluation_item = db.query(EvaluationItem).filter(EvaluationItem.id == capa.evaluation_item_id).first()
+            if evaluation_item:
+                # Add evaluation item details to the capa object
+                capa.evaluation_item_title = evaluation_item.title
+                capa.evaluation_item_code = evaluation_item.code
+                capa.evaluation_item_category = evaluation_item.category_name
+            else:
+                capa.evaluation_item_title = None
+                capa.evaluation_item_code = None
+                capa.evaluation_item_category = None
+        except Exception as e:
+            print(f"Error loading evaluation item details: {e}")
+            capa.evaluation_item_title = None
+            capa.evaluation_item_code = None
+            capa.evaluation_item_category = None
+    else:
+        capa.evaluation_item_title = None
+        capa.evaluation_item_code = None
+        capa.evaluation_item_category = None
+    
+    return capa
 
 def get_capas_by_department(db: Session, department: str):
     return db.query(Capa).filter(Capa.department == department).all()
 
 def get_capas_by_status(db: Session, status: str):
     return db.query(Capa).filter(Capa.status == status).all()
+
+def update_capa(db: Session, capa_id: int, capa_data: dict):
+    """Update a CAPA by ID"""
+    db_capa = db.query(Capa).filter(Capa.id == capa_id).first()
+    if not db_capa:
+        return None
+    
+    # Update basic fields if provided
+    if 'title' in capa_data and capa_data['title'] is not None:
+        db_capa.title = capa_data['title']
+    if 'description' in capa_data and capa_data['description'] is not None:
+        db_capa.description = capa_data['description']
+    if 'priority' in capa_data and capa_data['priority'] is not None:
+        db_capa.priority = capa_data['priority']
+    if 'target_date' in capa_data and capa_data['target_date'] is not None:
+        db_capa.target_date = capa_data['target_date']
+    if 'assigned_to' in capa_data and capa_data['assigned_to'] is not None:
+        db_capa.assigned_to = capa_data['assigned_to']
+    if 'assigned_to_id' in capa_data and capa_data['assigned_to_id'] is not None:
+        db_capa.assigned_to_id = capa_data['assigned_to_id']
+    if 'status' in capa_data and capa_data['status'] is not None:
+        db_capa.status = capa_data['status']
+    
+    # Update new CAPA improvement fields
+    if 'root_cause' in capa_data and capa_data['root_cause'] is not None:
+        db_capa.root_cause = capa_data['root_cause']
+    if 'corrective_actions' in capa_data and capa_data['corrective_actions'] is not None:
+        db_capa.corrective_actions = capa_data['corrective_actions']
+    if 'preventive_actions' in capa_data and capa_data['preventive_actions'] is not None:
+        db_capa.preventive_actions = capa_data['preventive_actions']
+    if 'verification_steps' in capa_data and capa_data['verification_steps'] is not None:
+        db_capa.verification_steps = capa_data['verification_steps']
+    if 'verification_status' in capa_data and capa_data['verification_status'] is not None:
+        db_capa.verification_status = capa_data['verification_status']
+    if 'severity' in capa_data and capa_data['severity'] is not None:
+        db_capa.severity = capa_data['severity']
+    if 'estimated_cost' in capa_data and capa_data['estimated_cost'] is not None:
+        db_capa.estimated_cost = capa_data['estimated_cost']
+    if 'sla_days' in capa_data and capa_data['sla_days'] is not None:
+        db_capa.sla_days = capa_data['sla_days']
+    if 'escalation_level' in capa_data and capa_data['escalation_level'] is not None:
+        db_capa.escalation_level = capa_data['escalation_level']
+    if 'closed_at' in capa_data and capa_data['closed_at'] is not None:
+        db_capa.closed_at = capa_data['closed_at']
+    if 'verified_at' in capa_data and capa_data['verified_at'] is not None:
+        db_capa.verified_at = capa_data['verified_at']
+    if 'status_history' in capa_data and capa_data['status_history'] is not None:
+        db_capa.status_history = capa_data['status_history']
+    
+    db.commit()
+    db.refresh(db_capa)
+    return db_capa
 
 def delete_capa(db: Session, capa_id: int):
     """Delete a CAPA by ID"""

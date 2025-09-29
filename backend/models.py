@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey, Enum as SQLEnum
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey, Enum as SQLEnum, SmallInteger, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
@@ -39,6 +39,12 @@ class CapaStatus(str, enum.Enum):
     VERIFIED = "verified"
     REJECTED = "rejected"
     CLOSED = "closed"
+
+class VerificationStatus(str, enum.Enum):
+    PENDING = "pending"
+    IN_REVIEW = "in_review"
+    VERIFIED = "verified"
+    REJECTED = "rejected"
 
 class User(Base):
     __tablename__ = "users"
@@ -117,6 +123,20 @@ class Capa(Base):
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     risk_score = Column(Integer)
+    
+    # New CAPA improvement fields
+    root_cause = Column(Text, nullable=True)
+    corrective_actions = Column(Text, default='[]')  # JSONB stored as text
+    preventive_actions = Column(Text, default='[]')  # JSONB stored as text
+    verification_steps = Column(Text, default='[]')  # JSONB stored as text
+    verification_status = Column(SQLEnum(VerificationStatus), default=VerificationStatus.PENDING)
+    severity = Column(SmallInteger, default=3)  # 1-5 scale
+    estimated_cost = Column(Numeric, nullable=True)
+    status_history = Column(Text, default='[]')  # JSONB stored as text
+    sla_days = Column(Integer, default=14)
+    escalation_level = Column(Integer, default=0)
+    closed_at = Column(DateTime(timezone=True), nullable=True)
+    verified_at = Column(DateTime(timezone=True), nullable=True)
     
     # Relationships
     round = relationship("Round", back_populates="capas")

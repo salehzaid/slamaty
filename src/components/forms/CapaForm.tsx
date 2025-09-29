@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { capaCreateSchema, CapaCreateForm } from '@/lib/validations'
@@ -17,6 +17,7 @@ interface CapaFormProps {
   title?: string
   description?: string
   onCancel?: () => void
+  isReadOnlyTitle?: boolean
 }
 
 const CapaForm: React.FC<CapaFormProps> = ({
@@ -25,7 +26,8 @@ const CapaForm: React.FC<CapaFormProps> = ({
   initialData,
   title = "خطة تصحيحية لعنصر التقييم",
   description = "قم بإنشاء خطة تصحيحية لعنصر التقييم الذي يحتاج إلى تحسين",
-  onCancel
+  onCancel,
+  isReadOnlyTitle = false
 }) => {
   const {
     register,
@@ -33,11 +35,24 @@ const CapaForm: React.FC<CapaFormProps> = ({
     formState: { errors },
     setValue,
     watch,
-    control
+    control,
+    reset
   } = useForm<CapaCreateForm>({
     resolver: zodResolver(capaCreateSchema),
     defaultValues: initialData
   })
+
+  // Update form values when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      reset(initialData)
+    }
+  }, [initialData, reset])
+
+  // Get evaluation item details from initial data
+  const evaluationItemTitle = (initialData as any)?.evaluation_item_title
+  const evaluationItemCode = (initialData as any)?.evaluation_item_code
+  const evaluationItemCategory = (initialData as any)?.evaluation_item_category
 
   const { fields: actionFields, append, remove } = useFieldArray({
     control,
@@ -55,6 +70,37 @@ const CapaForm: React.FC<CapaFormProps> = ({
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
+        {/* Show evaluation item information if available */}
+        {evaluationItemTitle && (
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <FileText className="w-5 h-5 text-blue-600" />
+              <span className="font-semibold text-blue-900">عنصر التقييم المرتبط</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <span className="text-sm font-medium text-blue-700">اسم العنصر:</span>
+                <p className="text-blue-900 font-semibold text-lg">{evaluationItemTitle}</p>
+              </div>
+              {evaluationItemCode && (
+                <div>
+                  <span className="text-sm font-medium text-blue-700">كود العنصر:</span>
+                  <p className="text-blue-800">{evaluationItemCode}</p>
+                </div>
+              )}
+              {evaluationItemCategory && (
+                <div>
+                  <span className="text-sm font-medium text-blue-700">الفئة:</span>
+                  <p className="text-blue-800">{evaluationItemCategory}</p>
+                </div>
+              )}
+            </div>
+            <div className="mt-3 text-sm text-blue-600">
+              💡 سيتم استخدام اسم العنصر كعنوان للخطة التصحيحية تلقائياً
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit((data) => {
           try {
             // Send the data directly since we removed the complex fields
@@ -83,15 +129,21 @@ const CapaForm: React.FC<CapaFormProps> = ({
               </Label>
               <Input
                 id="title"
-                {...register('title')}
+                {...register('title', { 
+                  required: "عنوان الخطة التصحيحية مطلوب",
+                  minLength: { value: 5, message: "العنوان يجب أن يكون 5 أحرف على الأقل" }
+                })}
                 placeholder="اسم العنصر أو عنوان الخطة التصحيحية"
                 className={errors.title ? 'border-red-500' : ''}
+                readOnly={isReadOnlyTitle}
+                disabled={isReadOnlyTitle}
               />
               {errors.title && (
                 <p className="text-sm text-red-500">{errors.title.message}</p>
               )}
               <p className="text-xs text-gray-500">
-                {initialData?.title ? 'تم تعبئة العنوان تلقائياً من اسم العنصر' : 'أدخل عنوان الخطة التصحيحية'}
+                {isReadOnlyTitle ? 'تم تعبئة العنوان تلقائياً من اسم عنصر التقييم (غير قابل للتعديل)' : 
+                 initialData?.title ? 'تم تعبئة العنوان تلقائياً من اسم العنصر' : 'أدخل عنوان الخطة التصحيحية'}
               </p>
             </div>
 
@@ -102,7 +154,10 @@ const CapaForm: React.FC<CapaFormProps> = ({
               </Label>
               <Textarea
                 id="description"
-                {...register('description')}
+                {...register('description', {
+                  required: "الملاحظة مطلوبة",
+                  minLength: { value: 10, message: "الملاحظة يجب أن تكون 10 أحرف على الأقل" }
+                })}
                 placeholder="الملاحظة المسجلة على العنصر أو وصف المشكلة"
                 rows={4}
                 className={errors.description ? 'border-red-500' : ''}
@@ -138,13 +193,23 @@ const CapaForm: React.FC<CapaFormProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {['نقص في التدريب','عدم وضوح الإجراءات','نقص في الموارد','ضعف في الإشراف','مشاكل في النظام'].map((factor) => (
                   <label key={factor} className="inline-flex items-center gap-2">
-                    <input type="checkbox" value={factor} {...register('contributingFactors')} />
+                    <input 
+                      type="checkbox" 
+                      value={factor} 
+                      {...register('contributingFactors')}
+                      className="rounded"
+                    />
                     <span>{factor}</span>
                   </label>
                 ))}
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" value="أخرى" {...register('contributingFactors')} />
-                  <Input placeholder="أخرى" {...register('contributingFactors')} />
+                  <input 
+                    type="checkbox" 
+                    value="أخرى" 
+                    {...register('contributingFactors')}
+                    className="rounded"
+                  />
+                  <Input placeholder="أخرى" className="flex-1" />
                 </div>
               </div>
             </div>

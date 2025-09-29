@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime
-from models_updated import UserRole, RoundStatus, RoundType, CapaStatus, NotificationType, NotificationStatus
+from models_updated import UserRole, RoundStatus, RoundType, CapaStatus, VerificationStatus, NotificationType, NotificationStatus
 
 # User schemas
 class UserBase(BaseModel):
@@ -73,12 +73,62 @@ class RoundResponse(RoundBase):
         from_attributes = True
 
 # CAPA schemas
+class ActionItem(BaseModel):
+    task: str
+    due_date: Optional[datetime] = None
+    assigned_to_id: Optional[int] = None
+    status: str = "open"
+    completed_at: Optional[datetime] = None
+    notes: Optional[str] = None
+
+class VerificationStep(BaseModel):
+    step: str
+    required: bool = True
+    completed: bool = False
+    completed_at: Optional[datetime] = None
+    completed_by_id: Optional[int] = None
+    notes: Optional[str] = None
+
+class StatusHistoryItem(BaseModel):
+    timestamp: datetime
+    user_id: int
+    from_status: Optional[str] = None
+    to_status: str
+    note: Optional[str] = None
+
 class CapaBase(BaseModel):
     title: str
     description: str
+    root_cause: Optional[str] = None
+    corrective_actions: List[ActionItem] = []
+    preventive_actions: List[ActionItem] = []
+    verification_steps: List[VerificationStep] = []
+    severity: int = 3
+    estimated_cost: Optional[float] = None
+    sla_days: int = 14
 
 class CapaCreate(CapaBase):
     round_id: Optional[int] = None
+    department: str
+    assigned_to_id: Optional[int] = None
+
+class CapaUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    root_cause: Optional[str] = None
+    corrective_actions: Optional[List[ActionItem]] = None
+    preventive_actions: Optional[List[ActionItem]] = None
+    verification_steps: Optional[List[VerificationStep]] = None
+    severity: Optional[int] = None
+    estimated_cost: Optional[float] = None
+    sla_days: Optional[int] = None
+    assigned_to_id: Optional[int] = None
+    status: Optional[CapaStatus] = None
+    verification_status: Optional[VerificationStatus] = None
+
+class CapaVerify(BaseModel):
+    verification_steps: List[VerificationStep]
+    notes: Optional[str] = None
 
 class CapaResponse(CapaBase):
     id: int
@@ -91,10 +141,19 @@ class CapaResponse(CapaBase):
     target_date: datetime
     risk_score: Optional[int] = None
     status: CapaStatus
+    verification_status: VerificationStatus
+    escalation_level: int = 0
+    closed_at: Optional[datetime] = None
+    verified_at: Optional[datetime] = None
+    status_history: List[StatusHistoryItem] = []
     created_by_id: int
     created_at: datetime
     assigned_manager: Optional[UserResponse] = None  # Details of the assigned manager
     creator: Optional[UserResponse] = None  # Details of the creator
+    # Evaluation item details
+    evaluation_item_title: Optional[str] = None
+    evaluation_item_code: Optional[str] = None
+    evaluation_item_category: Optional[str] = None
     
     class Config:
         from_attributes = True

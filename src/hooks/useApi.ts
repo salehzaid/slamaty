@@ -71,5 +71,6 @@ export function useApiMutation<T, P = any>(
   return {
     ...state,
     mutate,
+    mutateAsync: mutate, // Add mutateAsync alias
   }
 }
