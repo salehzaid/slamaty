@@ -42,8 +42,11 @@ from crud import (
 )
 from reminder_service import get_reminder_service
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+# Create database tables (lazy, don't block startup on failure)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"[Startup] Skipping create_all due to error: {e}")
 
 app = FastAPI(
     title="نظام سلامتي",
@@ -1700,27 +1703,27 @@ if __name__ == "__main__":
     _port = int(_os.getenv("PORT", "8000"))
     uvicorn.run(app, host="0.0.0.0", port=_port)
 
-# Add static file serving for frontend
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
 
-# Mount static files
-if os.path.exists("../dist"):
-    app.mount("/static", StaticFiles(directory="../dist"), name="static")
+# Resolve dist directory relative to this file so it works in Docker
+DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist"))
+
+# Mount static files if built
+if os.path.exists(DIST_DIR):
+    app.mount("/static", StaticFiles(directory=DIST_DIR), name="static")
 
 @app.get("/", response_class=FileResponse)
 async def serve_frontend():
-    """Serve the frontend application"""
-    if os.path.exists("../dist/index.html"):
-        return FileResponse("../dist/index.html")
-    else:
-        return {"message": "Frontend not built. Please run 'npm run build' first."}
+    index_path = os.path.join(DIST_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"message": "Frontend not built. Please run 'npm run build' first."}
 
 @app.get("/{path:path}")
 async def serve_frontend_routes(path: str):
-    """Serve frontend routes (for React Router)"""
-    if os.path.exists("../dist/index.html"):
-        return FileResponse("../dist/index.html")
-    else:
-        return {"message": "Frontend not built. Please run 'npm run build' first."}
+    index_path = os.path.join(DIST_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"message": "Frontend not built. Please run 'npm run build' first."}
