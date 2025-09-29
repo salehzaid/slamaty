@@ -1,13 +1,19 @@
+[providers]
+python = "3.11"
+node = "18"
+
 [phases.setup]
-nixPkgs = ["python311", "pip"]
+nixPkgs = ["python311", "pip", "nodejs_18", "npm-9_x"]
 
 [phases.install]
 cmds = [
+  "npm ci",
   "pip install -r requirements.txt"
 ]
 
 [phases.build]
 cmds = [
+  "npm run build",
   "cd backend && python -c 'from database import engine; from models_updated import Base; Base.metadata.create_all(bind=engine)'"
 ]
 
