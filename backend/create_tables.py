@@ -33,8 +33,9 @@ def create_database_tables():
         
         print("📋 جاري إنشاء الجداول...")
         
-        # قراءة وتنفيذ سكريبت SQL
-        with open('create_database.sql', 'r', encoding='utf-8') as file:
+        # قراءة وتنفيذ سكريبت SQL من نفس مجلد الملف
+        sql_path = os.path.join(os.path.dirname(__file__), 'create_database.sql')
+        with open(sql_path, 'r', encoding='utf-8') as file:
             sql_script = file.read()
         
         # تقسيم السكريبت إلى أوامر منفصلة
