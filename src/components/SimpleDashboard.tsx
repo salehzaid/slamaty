@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, FileText, Calendar, TrendingUp, Loader2 } from 'lucide-react'
+import { Users, FileText, Calendar, TrendingUp } from 'lucide-react'
 import { apiClient } from '@/lib/api'
 import PageWrapper from './PageWrapper'
 
@@ -67,7 +67,7 @@ const SimpleDashboard: React.FC = () => {
       <div className="p-6 space-y-6 bg-white dark:bg-slate-900 min-h-screen">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+            <span className="h-8 w-8 inline-block border-2 border-current border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-gray-600 dark:text-gray-300">جاري تحميل البيانات...</p>
           </div>
         </div>

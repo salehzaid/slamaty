@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { apiClient } from '@/lib/api'
 import { UserCreateForm } from '@/lib/validations'
 import { UserRole } from '@/types'
-import { UserPlus, Loader2, Eye, EyeOff, ArrowRight, ArrowLeft } from 'lucide-react'
+import { UserPlus, Eye, EyeOff, ArrowRight, ArrowLeft } from 'lucide-react'
 
 // Google OAuth configuration
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '1029670330917-12p1s3hoekm9jsbsogbd5041pd95lhnc.apps.googleusercontent.com'
@@ -411,7 +411,7 @@ const RegisterPage: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 ml-2 animate-spin" />
+                    <span className="w-5 h-5 ml-2 inline-block border-2 border-current border-t-transparent rounded-full animate-spin" />
                     جاري إنشاء الحساب...
                   </>
                 ) : (

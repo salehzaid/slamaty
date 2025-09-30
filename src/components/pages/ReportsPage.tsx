@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Download, Filter, Calendar, BarChart3, PieChart, TrendingUp, FileText, Users, Building2, Loader2 } from 'lucide-react'
+import { Download, Filter, Calendar, BarChart3, PieChart, TrendingUp, FileText, Users, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -151,7 +151,7 @@ const ReportsPage: React.FC = () => {
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <span className="w-8 h-8 inline-block border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
           <span className="mr-2 text-gray-600">جاري تحميل البيانات...</span>
         </div>
       )}

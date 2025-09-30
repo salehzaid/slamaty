@@ -51,6 +51,10 @@ export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({ ch
 
   // Load notifications from API
   const loadNotifications = useCallback(async () => {
+    // Skip loading if user is not authenticated
+    if (!apiClient.isAuthenticated()) {
+      return
+    }
     try {
       setIsLoading(true)
       // use apiClient.get which returns { data } wrapper

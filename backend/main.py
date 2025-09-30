@@ -123,28 +123,29 @@ async def signin(login_request: dict = Body(...), db: Session = Depends(get_db))
         username = login_request.get("username")
         email = login_request.get("email")
         password = login_request.get("password")
-        
+
         # البحث بـ username أولاً، ثم email
         user = None
         if username:
             user = get_user_by_username(db, username=username)
         elif email:
             user = get_user_by_email(db, email=email)
-            
+
         if not user or not verify_password(password, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="خطأ في اسم المستخدم أو كلمة المرور",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        
+
         access_token = create_access_token(data={"sub": user.email})
         return {"access_token": access_token, "token_type": "bearer", "user": user}
+    except HTTPException:
+        # Preserve intended HTTP errors like 401
+        raise
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"خطأ في معالجة الطلب: {str(e)}"
-        )
+        # Unexpected error -> 500 rather than masking as 400
+        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
 @app.post("/auth/google")
 async def google_auth(google_data: dict = Body(...), db: Session = Depends(get_db)):
@@ -358,67 +359,15 @@ async def finalize_evaluation_endpoint(round_id: int, payload: dict = Body(...),
         if updated_round is None:
             raise HTTPException(status_code=400, detail="Evaluation models unavailable or round not found")
         
-        # Create CAPA items for any evaluations that are not fully applied
-        from models_updated import EvaluationItem
+        # Create CAPA items in DB for evaluations not fully applied
         created_capas = []
         try:
-            # Automatic CAPA creation is temporarily DISABLED to avoid DB constraint failures.
-            # Instead, prepare draft CAPA payloads and return them to the frontend so users
-            # can review and explicitly create/save CAPAs from the UI.
-            for ev in evaluations:
-                status = ev.get('status')
-                # prepare draft CAPA for not_applied or partial items
-                if status in ('not_applied', 'partial'):
-                    item_id = ev.get('item_id')
-                    item = db.query(EvaluationItem).filter(EvaluationItem.id == item_id).first()
-                    if not item:
-                        print(f"Evaluation item {item_id} not found, skipping CAPA draft")
-                        continue
-
-                    item_title = item.title
-                    comment = ev.get('comments') or ''
-
-                    # Get department managers for suggested assignment
-                    from crud import get_department_manager_ids
-                    manager_ids = get_department_manager_ids(db, updated_round.department)
-                    suggested_assigned_to_id = manager_ids[0] if manager_ids else None
-
-                    # Calculate suggested target date based on risk level (7-30 days)
-                    risk_days = {
-                        'CRITICAL': 7,
-                        'MAJOR': 14,
-                        'MINOR': 30
-                    }
-                    target_days = risk_days.get(item.risk_level, 14)
-                    target_date = datetime.utcnow() + timedelta(days=target_days)
-
-                    # Determine suggested priority based on risk level
-                    priority_map = {
-                        'CRITICAL': 'urgent',
-                        'MAJOR': 'high',
-                        'MINOR': 'medium'
-                    }
-                    priority = priority_map.get(item.risk_level, 'medium')
-
-                    # Build draft CAPA payload (not saved to DB)
-                    draft_payload = {
-                        'title': f"عدم الامتثال: {item_title}",
-                        'description': f"الجولة: {updated_round.title}\nرمز العنصر: {item.code}\nالعنوان: {item_title}\nوصف العنصر: {item.description or 'لا يوجد وصف'}\nملاحظات التقييم: {comment}\n\nمطلوب: تطوير خطة تصحيحية لضمان الامتثال الكامل لهذا العنصر.",
-                        'round_id': round_id,
-                        'department': updated_round.department,
-                        'priority': priority,
-                        'assigned_to_id': suggested_assigned_to_id,
-                        'evaluation_item_id': item_id,
-                        'target_date': target_date,
-                        'risk_score': 8 if item.risk_level == 'CRITICAL' else (5 if item.risk_level == 'MAJOR' else 3)
-                    }
-
-                    created_capas.append(draft_payload)
-
-            if created_capas:
-                print("Automatic CAPA creation is disabled; returning draft CAPA payloads for frontend review.")
+            from crud import create_capas_for_round_non_compliance
+            capa_result = create_capas_for_round_non_compliance(db, round_id, current_user.id, threshold=70)
+            if capa_result and capa_result.get('created_capas'):
+                created_capas = capa_result['created_capas']
         except Exception as e:
-            print(f"❌ Error while preparing CAPA drafts: {e}")
+            print(f"❌ Error while creating CAPAs on finalize: {e}")
 
         # Round status is already set to completed by create_evaluation_results
         

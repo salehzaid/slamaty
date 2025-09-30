@@ -316,7 +316,12 @@ class ApiClient {
     })
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      let detail = ''
+      try {
+        const text = await response.text()
+        detail = text
+      } catch (_) {}
+      throw new Error(`HTTP error! status: ${response.status}${detail ? `, message: ${detail}` : ''}`)
     }
 
     const data = await response.json()

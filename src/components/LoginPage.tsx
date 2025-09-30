@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/context/AuthContext'
 import { apiClient } from '@/lib/api'
-import { UserPlus, Loader2, ArrowLeft } from 'lucide-react'
+import { UserPlus, ArrowLeft } from 'lucide-react'
 import LoginForm from './forms/LoginForm'
 import { UserLoginForm } from '@/lib/validations'
 
@@ -112,17 +112,18 @@ const LoginPage: React.FC = () => {
       setSuccess('')
       
       console.log('Attempting login with:', data)
-      const success = await login(data.email, data.password)
-      console.log('Login success:', success)
+      const result = await login(data.email, data.password)
+      console.log('Login result:', result)
       
-      if (success) {
+      if (result && (result as any).success) {
         console.log('Login successful, redirecting to dashboard')
         setSuccess('تم تسجيل الدخول بنجاح!')
         setTimeout(() => {
           navigate('/')
         }, 1000)
       } else {
-        setError('فشل في تسجيل الدخول - تحقق من البيانات')
+        const errMsg = (result as any)?.error || 'فشل في تسجيل الدخول - تحقق من البيانات'
+        setError(errMsg)
       }
     } catch (err) {
       console.error('Login error:', err)
@@ -139,17 +140,18 @@ const LoginPage: React.FC = () => {
       setSuccess('')
       
       console.log('Quick login with:', { email, password })
-      const success = await login(email, password)
-      console.log('Quick login success:', success)
+      const result = await login(email, password)
+      console.log('Quick login result:', result)
       
-      if (success) {
+      if (result && (result as any).success) {
         console.log('Quick login successful, redirecting to dashboard')
         setSuccess('تم تسجيل الدخول بنجاح!')
         setTimeout(() => {
           navigate('/')
         }, 1000)
       } else {
-        setError('فشل في تسجيل الدخول - تحقق من البيانات')
+        const errMsg = (result as any)?.error || 'فشل في تسجيل الدخول - تحقق من البيانات'
+        setError(errMsg)
       }
     } catch (err) {
       console.error('Quick login error:', err)
@@ -278,7 +280,7 @@ const LoginPage: React.FC = () => {
           >
             {autoRegLoading ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <span className="w-4 h-4 mr-2 inline-block border-2 border-current border-t-transparent rounded-full animate-spin" />
                 جاري إنشاء حساب...
               </>
             ) : (

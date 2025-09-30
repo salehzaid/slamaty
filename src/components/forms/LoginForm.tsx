@@ -117,7 +117,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-5 h-5 ml-2 animate-spin" />
+                <span className="w-5 h-5 ml-2 inline-block border-2 border-current border-t-transparent rounded-full animate-spin" />
                 جاري تسجيل الدخول...
               </>
             ) : (

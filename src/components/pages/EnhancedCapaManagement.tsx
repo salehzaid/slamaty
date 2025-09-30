@@ -98,111 +98,8 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
   const [selectedCapa, setSelectedCapa] = useState<CapaData | null>(null)
   const [isEditing, setIsEditing] = useState(false)
 
-  // Mock data for demonstration
-  const mockCapas: CapaData[] = [
-    {
-      id: 1,
-      title: "تحسين إجراءات التعقيم في غرفة العمليات",
-      description: "تطوير وتحسين إجراءات التعقيم في غرفة العمليات لضمان أعلى معايير السلامة",
-      department: "العمليات",
-      priority: "high",
-      status: "in_progress",
-      verification_status: "in_review",
-      severity: 4,
-      target_date: "2025-02-15",
-      escalation_level: 0,
-      corrective_actions: [
-        {
-          task: "مراجعة بروتوكولات التعقيم الحالية",
-          due_date: "2025-01-30",
-          assigned_to_id: 1,
-          status: "completed",
-          completed_at: "2025-01-25",
-          notes: "تم الانتهاء من المراجعة"
-        },
-        {
-          task: "تدريب الفريق على الإجراءات الجديدة",
-          due_date: "2025-02-10",
-          assigned_to_id: 2,
-          status: "in_progress",
-          notes: "قيد التنفيذ"
-        }
-      ],
-      preventive_actions: [
-        {
-          task: "وضع نظام مراقبة دوري",
-          due_date: "2025-02-20",
-          assigned_to_id: 3,
-          status: "open",
-          notes: "لم يبدأ بعد"
-        }
-      ],
-      verification_steps: [
-        {
-          step: "فحص عينات من الأسطح",
-          required: true,
-          completed: true,
-          completed_at: "2025-01-20",
-          completed_by_id: 1,
-          notes: "تم الفحص بنجاح"
-        },
-        {
-          step: "مراجعة سجلات التعقيم",
-          required: true,
-          completed: false,
-          notes: "في انتظار المراجعة"
-        }
-      ],
-      created_at: "2025-01-15",
-      assigned_to: "د. أحمد محمد",
-      estimated_cost: 5000,
-      sla_days: 30,
-      root_cause: "عدم وجود بروتوكولات واضحة للتعقيم"
-    },
-    {
-      id: 2,
-      title: "تحسين إدارة الأدوية في الصيدلية",
-      description: "تطوير نظام إدارة الأدوية لضمان عدم انتهاء الصلاحية",
-      department: "الصيدلية",
-      priority: "medium",
-      status: "pending",
-      verification_status: "pending",
-      severity: 3,
-      target_date: "2025-03-01",
-      escalation_level: 0,
-      corrective_actions: [
-        {
-          task: "تطوير نظام تتبع انتهاء الصلاحية",
-          due_date: "2025-02-15",
-          assigned_to_id: 4,
-          status: "open",
-          notes: "لم يبدأ"
-        }
-      ],
-      preventive_actions: [
-        {
-          task: "تدريب الصيادلة على النظام الجديد",
-          due_date: "2025-02-28",
-          assigned_to_id: 5,
-          status: "open",
-          notes: "في انتظار تطوير النظام"
-        }
-      ],
-      verification_steps: [
-        {
-          step: "اختبار النظام الجديد",
-          required: true,
-          completed: false,
-          notes: "في انتظار التطوير"
-        }
-      ],
-      created_at: "2025-01-20",
-      assigned_to: "صيدلي سارة أحمد",
-      estimated_cost: 3000,
-      sla_days: 40,
-      root_cause: "عدم وجود نظام تتبع فعال للأدوية"
-    }
-  ]
+  // Start with empty; real CAPAs are loaded from API
+  const mockCapas: CapaData[] = []
 
   // Local capas list state so we can append newly created CAPAs immediately
   const [capasList, setCapasList] = useState<CapaData[]>(capas && capas.length > 0 ? capas : mockCapas)
@@ -214,10 +111,10 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
   const fetchCapas = async () => {
     try {
       const res = await apiClient.getCapas()
-      // apiClient.getCapas may return array or wrapped object
-      const data = Array.isArray(res) ? res : (res && (res.data || res))
-      if (Array.isArray(data)) {
-        setCapasList(data as any)
+      // apiClient.getCapas may return array or an object with { capas }
+      const arr = Array.isArray(res) ? res : ((res && (res.capas || res.data?.capas)) || [])
+      if (Array.isArray(arr)) {
+        setCapasList(arr as any)
       }
     } catch (e) {
       console.error('Failed to fetch CAPAs for dashboard:', e)

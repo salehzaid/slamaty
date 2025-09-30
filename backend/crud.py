@@ -1449,17 +1449,27 @@ def create_capa_from_evaluation_item(db: Session, round_id: int, evaluation_item
             target_date = datetime.now() + timedelta(days=90)
         
         # Create CAPA
+        from models_updated import CapaStatus, VerificationStatus
         db_capa = Capa(
             title=capa_title,
             description=capa_description,
             round_id=round_id,
             department=round_obj.department,
             priority=priority,
-            status='pending',
+            status=CapaStatus.PENDING.value,  # MUST be UPPERCASE to satisfy DB check constraint
             evaluation_item_id=evaluation_item_data.get('item_id'),
             target_date=target_date,
             created_by_id=creator_id,
-            risk_score=100 - score  # Higher risk score for lower evaluation scores
+            risk_score=100 - score,  # Higher risk score for lower evaluation scores
+            # Ensure defaults for enhanced fields
+            verification_status=VerificationStatus.PENDING.value,
+            corrective_actions='[]',
+            preventive_actions='[]',
+            verification_steps='[]',
+            status_history='[]',
+            severity=3,
+            sla_days=14,
+            escalation_level=0
         )
         
         db.add(db_capa)
