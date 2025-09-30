@@ -17,11 +17,26 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
+def _truncate_for_bcrypt(password: str) -> str:
+    """Bcrypt considers only the first 72 bytes. Truncate safely to avoid errors.
+    """
+    try:
+        encoded = password.encode("utf-8")
+    except Exception:
+        # Fallback: if encoding fails, return as-is; verify will fail gracefully
+        return password
+    if len(encoded) <= 72:
+        return password
+    # Truncate by bytes then decode ignoring incomplete trailing bytes
+    return encoded[:72].decode("utf-8", errors="ignore")
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    safe = _truncate_for_bcrypt(plain_password)
+    return pwd_context.verify(safe, hashed_password)
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    safe = _truncate_for_bcrypt(password)
+    return pwd_context.hash(safe)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
