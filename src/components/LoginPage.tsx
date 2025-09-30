@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/context/AuthContext'
@@ -7,103 +7,15 @@ import { UserPlus, ArrowLeft } from 'lucide-react'
 import LoginForm from './forms/LoginForm'
 import { UserLoginForm } from '@/lib/validations'
 
-// Google OAuth configuration
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '1029670330917-12p1s3hoekm9jsbsogbd5041pd95lhnc.apps.googleusercontent.com'
-
-declare global {
-  interface Window {
-    google: any;
-    gapi: any;
-  }
-}
-
 // No predefined users - all authentication through API
 
 const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
   const [autoRegLoading, setAutoRegLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const navigate = useNavigate()
   const { login, loginAsAdmin } = useAuth()
-
-  // Load Google Identity Services
-  useEffect(() => {
-    const loadGoogleScript = () => {
-      if (window.google) return
-
-      // Make handleGoogleSignIn available globally for Google OAuth
-      (window as any).handleGoogleSignIn = handleGoogleSignIn
-
-      const script = document.createElement('script')
-      script.src = 'https://accounts.google.com/gsi/client'
-      script.async = true
-      script.defer = true
-      script.onload = initializeGoogleSignIn
-      document.head.appendChild(script)
-    }
-
-    // Load Google OAuth script with the provided client ID
-    if (GOOGLE_CLIENT_ID) {
-      loadGoogleScript()
-    }
-  }, [])
-
-  const initializeGoogleSignIn = () => {
-    if (window.google && GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'your-google-client-id') {
-      window.google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleSignIn,
-        auto_select: false,
-        cancel_on_tap_outside: true
-      })
-    }
-  }
-
-  const handleGoogleSignIn = async (response: any) => {
-    try {
-      setGoogleLoading(true)
-      setError('')
-      setSuccess('')
-
-      // Decode the JWT token to get user info
-      const payload = JSON.parse(atob(response.credential.split('.')[1]))
-      
-      // Create user data from Google response
-      const googleUserData = {
-        email: payload.email,
-        first_name: payload.given_name || '',
-        last_name: payload.family_name || '',
-        username: payload.email.split('@')[0]
-      }
-
-      // Use Google Auth API
-      const authResponse = await apiClient.googleAuth(googleUserData)
-      
-      if (authResponse.access_token) {
-        // Store user data in localStorage
-        localStorage.setItem('sallamaty_user', JSON.stringify(authResponse.user))
-        localStorage.setItem('access_token', authResponse.access_token)
-        
-        if (authResponse.is_new_user) {
-          setSuccess('تم إنشاء الحساب بنجاح! مرحباً بك في نظام سلامتي.')
-        } else {
-          setSuccess('مرحباً بعودتك! تم تسجيل الدخول بنجاح.')
-        }
-        
-        // Redirect to dashboard
-        setTimeout(() => {
-          navigate('/')
-        }, 1000)
-      }
-    } catch (err) {
-      console.error('Google sign-in error:', err)
-      setError('فشل في تسجيل الدخول باستخدام جوجل: ' + ((err as Error).message || 'خطأ غير معروف'))
-    } finally {
-      setGoogleLoading(false)
-    }
-  }
 
   const handleSubmit = async (data: UserLoginForm) => {
     try {
@@ -256,7 +168,7 @@ const LoginPage: React.FC = () => {
         <LoginForm 
           onSubmit={handleSubmit}
           onQuickLogin={handleQuickLogin}
-          isLoading={loading || googleLoading}
+          isLoading={loading}
           error={error}
         />
 
@@ -276,7 +188,7 @@ const LoginPage: React.FC = () => {
             variant="outline" 
             className="w-full mt-4" 
             onClick={handleAutoRegister}
-            disabled={loading || googleLoading || autoRegLoading}
+            disabled={loading || autoRegLoading}
           >
             {autoRegLoading ? (
               <>

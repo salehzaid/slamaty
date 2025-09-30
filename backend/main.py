@@ -147,64 +147,7 @@ async def signin(login_request: dict = Body(...), db: Session = Depends(get_db))
         # Unexpected error -> 500 rather than masking as 400
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
-@app.post("/auth/google")
-async def google_auth(google_data: dict = Body(...), db: Session = Depends(get_db)):
-    try:
-        # Extract user data from Google response
-        email = google_data.get("email")
-        first_name = google_data.get("first_name", "")
-        last_name = google_data.get("last_name", "")
-        username = google_data.get("username", email.split("@")[0])
-        
-        if not email:
-            raise HTTPException(
-                status_code=400,
-                detail="البريد الإلكتروني مطلوب"
-            )
-        
-        # Check if user already exists
-        db_user = get_user_by_email(db, email=email)
-        
-        if db_user:
-            # User exists, generate token and return
-            access_token = create_access_token(data={"sub": db_user.email})
-            return {
-                "access_token": access_token, 
-                "token_type": "bearer", 
-                "user": db_user,
-                "is_new_user": False
-            }
-        else:
-            # Create new user
-            user_data = UserCreate(
-                username=username,
-                email=email,
-                password="",  # No password for Google users
-                first_name=first_name,
-                last_name=last_name,
-                role="assessor",  # Default role
-                department="",
-                phone="",
-                position=""
-            )
-            
-            # Create user with empty password (Google users don't need password)
-            hashed_password = get_password_hash("google_user_no_password")
-            db_user = create_user(db, user_data, hashed_password)
-            
-            access_token = create_access_token(data={"sub": db_user.email})
-            return {
-                "access_token": access_token, 
-                "token_type": "bearer", 
-                "user": db_user,
-                "is_new_user": True
-            }
-            
-    except Exception as e:
-        raise HTTPException(
-            status_code=400,
-            detail=f"خطأ في معالجة طلب جوجل: {str(e)}"
-        )
+# Google Sign-In endpoint removed
 
 @app.get("/auth/me", response_model=UserResponse)
 async def get_current_user_info(current_user = Depends(get_current_user)):

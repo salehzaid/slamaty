@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
@@ -11,19 +11,10 @@ import { UserCreateForm } from '@/lib/validations'
 import { UserRole } from '@/types'
 import { UserPlus, Eye, EyeOff, ArrowRight, ArrowLeft } from 'lucide-react'
 
-// Google OAuth configuration
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '1029670330917-12p1s3hoekm9jsbsogbd5041pd95lhnc.apps.googleusercontent.com'
-
-declare global {
-  interface Window {
-    google: any;
-    gapi: any;
-  }
-}
 
 const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
+  const [googleLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -44,82 +35,6 @@ const RegisterPage: React.FC = () => {
     position: ''
   })
 
-  // Load Google Identity Services
-  useEffect(() => {
-    const loadGoogleScript = () => {
-      if (window.google) return
-
-      // Make handleGoogleSignIn available globally for Google OAuth
-      (window as any).handleGoogleSignIn = handleGoogleSignIn
-
-      const script = document.createElement('script')
-      script.src = 'https://accounts.google.com/gsi/client'
-      script.async = true
-      script.defer = true
-      script.onload = initializeGoogleSignIn
-      document.head.appendChild(script)
-    }
-
-    // Load Google OAuth script with the provided client ID
-    if (GOOGLE_CLIENT_ID) {
-      loadGoogleScript()
-    }
-  }, [])
-
-  const initializeGoogleSignIn = () => {
-    if (window.google && GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'your-google-client-id') {
-      window.google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleSignIn,
-        auto_select: false,
-        cancel_on_tap_outside: true
-      })
-    }
-  }
-
-  const handleGoogleSignIn = async (response: any) => {
-    try {
-      setGoogleLoading(true)
-      setError('')
-      setSuccess('')
-
-      // Decode the JWT token to get user info
-      const payload = JSON.parse(atob(response.credential.split('.')[1]))
-      
-      // Create user data from Google response
-      const googleUserData = {
-        email: payload.email,
-        first_name: payload.given_name || '',
-        last_name: payload.family_name || '',
-        username: payload.email.split('@')[0]
-      }
-
-      // Use Google Auth API
-      const authResponse = await apiClient.googleAuth(googleUserData)
-      
-      if (authResponse.access_token) {
-        // Store user data in localStorage
-        localStorage.setItem('sallamaty_user', JSON.stringify(authResponse.user))
-        localStorage.setItem('access_token', authResponse.access_token)
-        
-        if (authResponse.is_new_user) {
-          setSuccess('تم إنشاء الحساب بنجاح! مرحباً بك في نظام سلامتي.')
-        } else {
-          setSuccess('مرحباً بعودتك! تم تسجيل الدخول بنجاح.')
-        }
-        
-        // Redirect to dashboard
-        setTimeout(() => {
-          navigate('/')
-        }, 1000)
-      }
-    } catch (err) {
-      console.error('Google sign-in error:', err)
-      setError('فشل في التسجيل باستخدام جوجل: ' + ((err as Error).message || 'خطأ غير معروف'))
-    } finally {
-      setGoogleLoading(false)
-    }
-  }
 
   const handleInputChange = (field: keyof UserCreateForm, value: string) => {
     setFormData(prev => ({
@@ -208,48 +123,7 @@ const RegisterPage: React.FC = () => {
           </CardHeader>
           
           <CardContent>
-            {/* Google Sign In Button */}
-            {GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'your-google-client-id' && (
-              <div className="mb-6">
-                <div
-                  id="g_id_onload"
-                  data-client_id={GOOGLE_CLIENT_ID}
-                  data-callback="handleGoogleSignIn"
-                  data-auto_prompt="false"
-                />
-                <div 
-                  className="g_id_signin"
-                  data-type="standard"
-                  data-size="large"
-                  data-theme="outline"
-                  data-text="sign_in_with"
-                  data-shape="rectangular"
-                  data-logo_alignment="left"
-                />
-              </div>
-            )}
-
-            {/* Google OAuth Setup Message */}
-            {(!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'your-google-client-id') && (
-              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h4 className="text-sm font-medium text-blue-900 mb-2">إعداد Google OAuth:</h4>
-                <p className="text-xs text-blue-700">
-                  لإضافة تسجيل الدخول بحساب جوجل، قم بتحديث <code>GOOGLE_CLIENT_ID</code> في ملف <code>RegisterPage.tsx</code>
-                </p>
-              </div>
-            )}
-
-            {/* Divider */}
-            {GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'your-google-client-id' && (
-              <div className="relative mb-6">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-gray-500">أو</span>
-                </div>
-              </div>
-            )}
+            {/* Google Sign-In removed */}
 
             {/* Registration Form */}
             <form onSubmit={handleSubmit} className="space-y-4">

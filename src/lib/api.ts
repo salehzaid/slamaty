@@ -340,27 +340,7 @@ class ApiClient {
     })
   }
 
-  async googleAuth(googleData: any) {
-    const response = await fetch(`${this.baseURL}/auth/google`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(googleData)
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-
-    if (data.access_token) {
-      this.setToken(data.access_token)
-    }
-
-    return data
-  }
+  // googleAuth removed
 
   async getCurrentUser() {
     return this.request('/auth/me')
