@@ -1,5 +1,6 @@
 #!/bin/bash
-# Build frontend
+# Build frontend with production API URL
+export VITE_API_URL=https://qualityrounds-production.up.railway.app
 npm ci
 npm run build
 
