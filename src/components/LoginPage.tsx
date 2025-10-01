@@ -131,38 +131,7 @@ const LoginPage: React.FC = () => {
           </div>
         )}
 
-        {/* Google Sign In Button */}
-        {GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'your-google-client-id' && (
-          <div className="mb-6">
-            <div
-              id="g_id_onload"
-              data-client_id={GOOGLE_CLIENT_ID}
-              data-callback="handleGoogleSignIn"
-              data-auto_prompt="false"
-            />
-            <div 
-              className="g_id_signin"
-              data-type="standard"
-              data-size="large"
-              data-theme="outline"
-              data-text="sign_in_with"
-              data-shape="rectangular"
-              data-logo_alignment="left"
-            />
-          </div>
-        )}
-
-        {/* Divider */}
-        {GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'your-google-client-id' && (
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">أو</span>
-            </div>
-          </div>
-        )}
+        {/* Google Sign-In removed */}
 
         {/* Login Form */}
         <LoginForm 
@@ -235,7 +204,7 @@ const LoginPage: React.FC = () => {
             variant="outline"
             className="w-full"
             onClick={() => handleQuickLogin('admin@salamaty.com', 'admin123')}
-            disabled={loading || googleLoading}
+            disabled={loading}
           >
             <UserPlus className="w-4 h-4 mr-2" />
             مدير محدث النظام - admin@salamaty.com
