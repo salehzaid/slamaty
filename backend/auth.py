@@ -18,17 +18,30 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 def _truncate_for_bcrypt(password: str) -> str:
-    """Bcrypt considers only the first 72 bytes. Truncate safely to avoid errors.
     """
+    Bcrypt has a maximum password length of 72 bytes.
+    This function safely truncates passwords to ensure they fit within bcrypt's limit.
+    """
+    if not password:
+        return password
+    
     try:
+        # Encode to bytes to check actual byte length
         encoded = password.encode("utf-8")
-    except Exception:
-        # Fallback: if encoding fails, return as-is; verify will fail gracefully
-        return password
-    if len(encoded) <= 72:
-        return password
-    # Truncate by bytes then decode ignoring incomplete trailing bytes
-    return encoded[:72].decode("utf-8", errors="ignore")
+        
+        # If it's already within the limit, return as-is
+        if len(encoded) <= 72:
+            return password
+        
+        # Truncate to 72 bytes and decode back to string
+        # Use 'ignore' to handle any incomplete multi-byte characters at the boundary
+        truncated = encoded[:72].decode("utf-8", errors="ignore")
+        return truncated
+        
+    except Exception as e:
+        # If anything goes wrong, try to return first 72 characters (not bytes)
+        # This is a safe fallback but less precise
+        return password[:72] if len(password) > 72 else password
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     safe = _truncate_for_bcrypt(plain_password)
