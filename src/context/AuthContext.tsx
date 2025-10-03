@@ -16,8 +16,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // 🔧 إعدادات تسجيل الدخول التلقائي
 const AUTO_LOGIN_ENABLED = true; // تسجيل الدخول التلقائي مُفعّل
-const AUTO_LOGIN_EMAIL = 'admin@salamaty.com';
-const AUTO_LOGIN_PASSWORD = '123456';
+const USE_DIRECT_ADMIN_LOGIN = true; // استخدام تسجيل دخول مباشر بدون API
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -44,41 +43,68 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       
-      // 🚀 تسجيل الدخول التلقائي إذا لم يكن هناك مستخدم مسجل
+      // �� تسجيل الدخول التلقائي
       if (AUTO_LOGIN_ENABLED && !storedUser) {
-        console.log('🔄 Auto-login: Attempting to login automatically...');
-        try {
-          const response = await apiClient.login(AUTO_LOGIN_EMAIL, AUTO_LOGIN_PASSWORD);
+        if (USE_DIRECT_ADMIN_LOGIN) {
+          // ⚡ تسجيل دخول فوري ومباشر بدون API
+          console.log('⚡ Direct admin login - instant access');
+          const defaultAdminUser: User = {
+            id: 1,
+            username: 'admin',
+            email: 'admin@salamaty.com',
+            first_name: 'مدير',
+            last_name: 'النظام',
+            role: 'super_admin',
+            department: 'الإدارة العامة',
+            position: 'مدير النظام',
+            phone: '+966500000000',
+            is_active: true,
+            created_at: new Date().toISOString()
+          };
           
-          if (response.access_token) {
-            const user: User = {
-              id: response.user.id,
-              username: response.user.username,
-              email: response.user.email,
-              first_name: response.user.first_name,
-              last_name: response.user.last_name,
-              role: response.user.role,
-              department: response.user.department,
-              position: response.user.position,
-              phone: response.user.phone,
-              is_active: response.user.is_active,
-              created_at: response.user.created_at
-            };
+          const defaultToken = 'admin-direct-access-token';
+          
+          setUser(defaultAdminUser);
+          localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
+          localStorage.setItem('access_token', defaultToken);
+          apiClient.setToken(defaultToken);
+          console.log('✅ Direct admin login successful!');
+        } else {
+          // 🔄 تسجيل دخول عبر API (أبطأ)
+          console.log('🔄 Auto-login: Attempting to login via API...');
+          try {
+            const response = await apiClient.login('admin@salamaty.com', '123456');
             
-            setUser(user);
-            localStorage.setItem('sallamaty_user', JSON.stringify(user));
-            localStorage.setItem('access_token', response.access_token);
-            apiClient.setToken(response.access_token);
-            console.log('✅ Auto-login successful!');
-          } else {
-            console.error('❌ Auto-login failed: No access token');
+            if (response.access_token) {
+              const user: User = {
+                id: response.user.id,
+                username: response.user.username,
+                email: response.user.email,
+                first_name: response.user.first_name,
+                last_name: response.user.last_name,
+                role: response.user.role,
+                department: response.user.department,
+                position: response.user.position,
+                phone: response.user.phone,
+                is_active: response.user.is_active,
+                created_at: response.user.created_at
+              };
+              
+              setUser(user);
+              localStorage.setItem('sallamaty_user', JSON.stringify(user));
+              localStorage.setItem('access_token', response.access_token);
+              apiClient.setToken(response.access_token);
+              console.log('✅ API login successful!');
+            } else {
+              console.error('❌ API login failed: No access token');
+              setUser(null);
+            }
+          } catch (error) {
+            console.error('❌ API login failed:', error);
             setUser(null);
           }
-        } catch (error) {
-          console.error('❌ Auto-login failed:', error);
-          setUser(null);
         }
-      } else {
+      } else if (!AUTO_LOGIN_ENABLED) {
         setUser(null);
       }
       
@@ -93,7 +119,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await apiClient.login(email, password);
       
       if (response.access_token) {
-        // تحويل استجابة API إلى تنسيق User
         const user: User = {
           id: response.user.id,
           username: response.user.username,
@@ -129,7 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email: 'admin@salamaty.com',
       first_name: 'مدير',
       last_name: 'النظام',
-      role: 'admin',
+      role: 'super_admin',
       department: 'الإدارة العامة',
       position: 'مدير النظام',
       phone: '+966500000000',
