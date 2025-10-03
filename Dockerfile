@@ -28,13 +28,9 @@ COPY backend/ ./backend
 # Copy built frontend
 COPY --from=frontend-build /app/dist ./dist
 
-# Copy start script so Railway startCommand can run it when using Docker
-COPY start.sh ./
-RUN chmod +x ./start.sh
-
 # Env
 ENV PORT=8000
 EXPOSE 8000
 
-# Start using start.sh (build/start logic lives there)
-CMD ["./start.sh"]
+# Start backend directly
+CMD ["python3", "backend/main.py"]

@@ -1,12 +1,16 @@
 #!/bin/bash
-# Start script used by Railway when Dockerfile is present
-# Build frontend (if dist missing) and start backend
-if [ ! -d "dist" ]; then
-  echo "dist not found, building frontend"
-  npm ci --silent
-  npm run build
+# Start script for Docker container
+set -e
+
+echo "Starting application..."
+
+# Check if we're in the right directory
+if [ ! -f "backend/main.py" ]; then
+    echo "Error: backend/main.py not found"
+    exit 1
 fi
 
-# Start backend using python3
-cd backend || exit 1
-python3 main.py
+# Start backend directly (frontend is already built in Docker)
+echo "Starting backend server..."
+cd backend
+exec python3 main.py
