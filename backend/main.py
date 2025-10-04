@@ -91,6 +91,13 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
+
+# Public health endpoint for platform health checks (Railway expects `/health`)
+@app.get("/health")
+async def public_health_check():
+    """Return simple 200 OK payload for external load balancers/healthchecks."""
+    return {"status": "healthy"}
+
 @app.post("/api/test-login")
 async def test_login(data: dict = Body(...)):
     return {"received": data, "message": "Test endpoint working"}
