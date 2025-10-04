@@ -1611,11 +1611,7 @@ async def get_monthly_rounds(
         raise HTTPException(status_code=500, detail=f"خطأ في جلب الجولات الشهرية: {str(e)}")
 
 
-if __name__ == "__main__":
-    # Bind to PORT provided by hosting (e.g., Railway), default to 8000 locally
-    import os as _os
-    _port = int(_os.getenv("PORT", "8000"))
-    uvicorn.run(app, host="0.0.0.0", port=_port)
+
 
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
