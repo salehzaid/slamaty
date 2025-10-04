@@ -83,27 +83,20 @@ if os.path.exists(DIST_DIR):
     if os.path.exists(assets_dir):
         app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
-@app.get("/", response_class=FileResponse)
-async def serve_index():
-    index_path = os.path.join(DIST_DIR, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    raise HTTPException(status_code=404, detail="Not Found")
-
 @app.get("/api")
 async def root():
     return {"message": "مرحباً بك في نظام سلامتي API"}
 
-@app.get("/health")
+@app.get("/api/health")
 async def health_check():
     return {"status": "healthy"}
 
-@app.post("/test-login")
+@app.post("/api/test-login")
 async def test_login(data: dict = Body(...)):
     return {"received": data, "message": "Test endpoint working"}
 
 # Authentication endpoints
-@app.post("/auth/register", response_model=UserResponse)
+@app.post("/api/auth/register", response_model=UserResponse)
 async def register(user: UserCreate, db: Session = Depends(get_db)):
     # Check if user already exists
     db_user = get_user_by_email(db, email=user.email)
@@ -119,7 +112,7 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
     
     return db_user
 
-@app.post("/auth/signin")
+@app.post("/api/auth/signin")
 async def signin(login_request: dict = Body(...), db: Session = Depends(get_db)):
     try:
         # دعم كل من username و email
@@ -152,12 +145,12 @@ async def signin(login_request: dict = Body(...), db: Session = Depends(get_db))
 
 # Google Sign-In endpoint removed
 
-@app.get("/auth/me", response_model=UserResponse)
+@app.get("/api/auth/me", response_model=UserResponse)
 async def get_current_user_info(current_user = Depends(get_current_user)):
     return current_user
 
 # Rounds endpoints
-@app.post("/rounds", response_model=RoundResponse)
+@app.post("/api/rounds", response_model=RoundResponse)
 async def create_new_round(round: RoundCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # Check if user has permission to create rounds (super_admin or quality_manager only)
     if current_user.role not in ["super_admin", "quality_manager"]:
@@ -201,12 +194,12 @@ async def create_new_round(round: RoundCreate, db: Session = Depends(get_db), cu
     
     return created_round
 
-@app.get("/rounds", response_model=List[RoundResponse])
+@app.get("/api/rounds", response_model=List[RoundResponse])
 async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     rounds = get_rounds(db, skip=skip, limit=limit)
     return rounds
 
-@app.get("/rounds/my", response_model=List[RoundResponse])
+@app.get("/api/rounds/my", response_model=List[RoundResponse])
 async def get_my_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Get rounds assigned to the current user"""
     print(f"🔍 API: Getting rounds for user ID: {current_user.id}")
@@ -214,7 +207,7 @@ async def get_my_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(g
     print(f"📊 API: Returning {len(rounds)} rounds")
     return rounds
 
-@app.get("/rounds/{round_id}", response_model=RoundResponse)
+@app.get("/api/rounds/{round_id}", response_model=RoundResponse)
 async def get_round_endpoint(round_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Get a specific round by ID"""
     round_data = get_round_by_id(db, round_id)
@@ -222,7 +215,7 @@ async def get_round_endpoint(round_id: int, db: Session = Depends(get_db), curre
         raise HTTPException(status_code=404, detail="Round not found")
     return round_data
 
-@app.put("/rounds/{round_id}", response_model=RoundResponse)
+@app.put("/api/rounds/{round_id}", response_model=RoundResponse)
 async def update_round_endpoint(round_id: int, round_data: dict = Body(...), db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Update an existing round"""
     updated_round = update_round(db, round_id, round_data)
@@ -230,7 +223,7 @@ async def update_round_endpoint(round_id: int, round_data: dict = Body(...), db:
         raise HTTPException(status_code=404, detail="Round not found")
     return updated_round
 
-@app.delete("/rounds/{round_id}")
+@app.delete("/api/rounds/{round_id}")
 async def delete_round_endpoint(round_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Delete a round - Only super_admin and quality_manager can delete rounds"""
     # Check if user has permission to delete rounds (super_admin or quality_manager only)
@@ -247,7 +240,7 @@ async def delete_round_endpoint(round_id: int, db: Session = Depends(get_db), cu
     return {"message": "تم حذف الجولة بنجاح"}
 
 # Endpoint to submit evaluation results for a round
-@app.post("/rounds/{round_id}/evaluations")
+@app.post("/api/rounds/{round_id}/evaluations")
 async def submit_evaluations_endpoint(round_id: int, payload: dict = Body(...), db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Accepts payload: { evaluations: [{item_id, status, comments?, evidence_files?}], notes? }
     Stores evaluation_results rows and updates round compliance percentage.
@@ -265,7 +258,7 @@ async def submit_evaluations_endpoint(round_id: int, payload: dict = Body(...), 
         raise HTTPException(status_code=500, detail=str(e))
 
 # Endpoint to save partial evaluation (draft)
-@app.post("/rounds/{round_id}/evaluations/draft")
+@app.post("/api/rounds/{round_id}/evaluations/draft")
 async def save_evaluation_draft_endpoint(round_id: int, payload: dict = Body(...), db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Save partial evaluation as draft without changing round status to completed.
     Accepts payload: { evaluations: [{item_id, status, comments?, evidence_files?}], notes? }
@@ -283,7 +276,7 @@ async def save_evaluation_draft_endpoint(round_id: int, payload: dict = Body(...
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/rounds/{round_id}/evaluations", response_model=List[EvaluationResultResponse])
+@app.get("/api/rounds/{round_id}/evaluations", response_model=List[EvaluationResultResponse])
 async def get_round_evaluations_endpoint(round_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Return saved evaluation results for a round"""
     try:
@@ -294,7 +287,7 @@ async def get_round_evaluations_endpoint(round_id: int, db: Session = Depends(ge
         raise HTTPException(status_code=500, detail=str(e))
 
 # Endpoint to finalize evaluation (mark as completed)
-@app.post("/rounds/{round_id}/evaluations/finalize")
+@app.post("/api/rounds/{round_id}/evaluations/finalize")
 async def finalize_evaluation_endpoint(round_id: int, payload: dict = Body(...), db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Finalize evaluation and mark round as completed.
     Accepts payload: { evaluations: [{item_id, status, comments?, evidence_files?}], notes? }
@@ -325,7 +318,7 @@ async def finalize_evaluation_endpoint(round_id: int, payload: dict = Body(...),
         raise HTTPException(status_code=500, detail=str(e))
 
 # CAPA endpoints
-@app.post("/capa", response_model=CapaResponse)
+@app.post("/api/capa", response_model=CapaResponse)
 async def create_new_capa(capa: CapaCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # Create the CAPA
     created_capa = create_capa(db, capa, current_user.id)
@@ -353,13 +346,13 @@ async def create_new_capa(capa: CapaCreate, db: Session = Depends(get_db), curre
     
     return created_capa
 
-@app.get("/capa", response_model=List[CapaResponse])
+@app.get("/api/capa", response_model=List[CapaResponse])
 async def get_all_capas(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Get CAPAs filtered to show only those linked to non-compliant evaluation items"""
     capas = get_capas(db, skip=skip, limit=limit)
     return capas
 
-@app.get("/capa/all", response_model=List[CapaResponse])
+@app.get("/api/capa/all", response_model=List[CapaResponse])
 async def get_all_capas_unfiltered_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Get all CAPAs without filtering - for admin purposes only"""
     if current_user.role not in ["super_admin", "quality_manager"]:
@@ -368,7 +361,7 @@ async def get_all_capas_unfiltered_endpoint(skip: int = 0, limit: int = 100, db:
     capas = get_all_capas_unfiltered(db, skip=skip, limit=limit)
     return capas
 
-@app.get("/capa/{capa_id}", response_model=CapaResponse)
+@app.get("/api/capa/{capa_id}", response_model=CapaResponse)
 async def get_capa_by_id_endpoint(capa_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Get a single CAPA by ID with evaluation item details"""
     capa = get_capa_by_id(db, capa_id)
@@ -392,7 +385,7 @@ async def update_capa_endpoint(capa_id: int, capa_data: CapaCreate, db: Session 
     
     return updated_capa
 
-@app.delete("/capa/all")
+@app.delete("/api/capa/all")
 async def delete_all_capas_endpoint(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Delete all CAPAs - Only super_admin can delete all CAPAs"""
     # Check if user has permission to delete all CAPAs (super_admin only)
@@ -411,7 +404,7 @@ async def delete_all_capas_endpoint(db: Session = Depends(get_db), current_user 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"حدث خطأ أثناء حذف خطط التحسين: {str(e)}")
 
-@app.delete("/capa/{capa_id}")
+@app.delete("/api/capa/{capa_id}")
 async def delete_capa_endpoint(capa_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Delete a CAPA - Only super_admin and quality_manager can delete CAPAs"""
     # Check if user has permission to delete CAPAs (super_admin or quality_manager only)
@@ -428,7 +421,7 @@ async def delete_capa_endpoint(capa_id: int, db: Session = Depends(get_db), curr
     return {"message": "تم حذف خطة التحسين بنجاح", "deleted_capa_id": capa_id}
 
 # User endpoints
-@app.get("/users", response_model=List[UserResponse])
+@app.get("/api/users", response_model=List[UserResponse])
 async def get_all_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # Check if user has permission to view users (super_admin or quality_manager only)
     if current_user.role not in ["super_admin", "quality_manager"]:
@@ -439,7 +432,7 @@ async def get_all_users(skip: int = 0, limit: int = 100, db: Session = Depends(g
     users = get_users(db, skip=skip, limit=limit)
     return users
 
-@app.post("/users", response_model=UserResponse)
+@app.post("/api/users", response_model=UserResponse)
 async def create_new_user(user: UserCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # Check if user has permission to create users (super_admin or quality_manager only)
     if current_user.role not in ["super_admin", "quality_manager"]:
@@ -460,7 +453,7 @@ async def create_new_user(user: UserCreate, db: Session = Depends(get_db), curre
     db_user = create_user(db, user, hashed_password)
     return db_user
 
-@app.get("/users/{user_id}", response_model=UserResponse)
+@app.get("/api/users/{user_id}", response_model=UserResponse)
 async def get_user(user_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # Check if user has permission to view users (super_admin or quality_manager only)
     if current_user.role not in ["super_admin", "quality_manager"]:
@@ -473,7 +466,7 @@ async def get_user(user_id: int, db: Session = Depends(get_db), current_user = D
         raise HTTPException(status_code=404, detail="المستخدم غير موجود")
     return user
 
-@app.put("/users/{user_id}", response_model=UserResponse)
+@app.put("/api/users/{user_id}", response_model=UserResponse)
 async def update_user(user_id: int, user: dict = Body(...), db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # Check if user has permission to update users (super_admin or quality_manager only)
     if current_user.role not in ["super_admin", "quality_manager"]:
@@ -496,7 +489,7 @@ async def update_user(user_id: int, user: dict = Body(...), db: Session = Depend
     print(f"✅ Backend - Updated user photo_url: {updated_user.photo_url}")
     return updated_user
 
-@app.delete("/users/{user_id}")
+@app.delete("/api/users/{user_id}")
 async def delete_user(user_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # Check if user has permission to delete users (super_admin or quality_manager only)
     if current_user.role not in [UserRole.SUPER_ADMIN, UserRole.QUALITY_MANAGER]:
@@ -527,7 +520,7 @@ async def delete_user(user_id: int, db: Session = Depends(get_db), current_user 
     
     return {"message": f"تم حذف المستخدم {user_to_delete.first_name} {user_to_delete.last_name} بنجاح"}
 
-@app.post("/users/{user_id}/send-welcome-email")
+@app.post("/api/users/{user_id}/send-welcome-email")
 async def send_welcome_email(user_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """إرسال إيميل ترحيبي للمستخدم"""
     user = get_user_by_id(db, user_id)
@@ -539,23 +532,23 @@ async def send_welcome_email(user_id: int, db: Session = Depends(get_db), curren
     return {"message": f"تم إرسال إيميل ترحيبي إلى {user.email}"}
 
 # Department endpoints
-@app.post("/departments", response_model=DepartmentResponse)
+@app.post("/api/departments", response_model=DepartmentResponse)
 async def create_new_department(department: DepartmentCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     return create_department(db, department)
 
-@app.get("/departments", response_model=List[DepartmentResponse])
+@app.get("/api/departments", response_model=List[DepartmentResponse])
 async def get_all_departments(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     departments = get_departments(db, skip=skip, limit=limit)
     return departments
 
-@app.get("/departments/{department_id}", response_model=DepartmentResponse)
+@app.get("/api/departments/{department_id}", response_model=DepartmentResponse)
 async def get_department(department_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     department = get_department_by_id(db, department_id)
     if not department:
         raise HTTPException(status_code=404, detail="القسم غير موجود")
     return department
 
-@app.put("/departments/{department_id}", response_model=DepartmentResponse)
+@app.put("/api/departments/{department_id}", response_model=DepartmentResponse)
 async def update_department_endpoint(department_id: int, department: dict = Body(...), db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     print(f"🔧 Updating department {department_id} with data: {department}")
     
@@ -575,7 +568,7 @@ async def update_department_endpoint(department_id: int, department: dict = Body
     print(f"✅ Department {department_id} updated successfully")
     return updated_department
 
-@app.delete("/departments/{department_id}")
+@app.delete("/api/departments/{department_id}")
 async def delete_department_endpoint(department_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     deleted_department = delete_department(db, department_id)
     if not deleted_department:
@@ -583,24 +576,24 @@ async def delete_department_endpoint(department_id: int, db: Session = Depends(g
     return {"message": "تم حذف القسم بنجاح"}
 
 # Evaluation Categories endpoints
-@app.post("/evaluation-categories", response_model=EvaluationCategoryResponse)
+@app.post("/api/evaluation-categories", response_model=EvaluationCategoryResponse)
 async def create_evaluation_category_endpoint(category: EvaluationCategoryCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     category_data = category.dict()
     return create_evaluation_category(db, category_data)
 
-@app.get("/evaluation-categories", response_model=List[EvaluationCategoryResponse])
+@app.get("/api/evaluation-categories", response_model=List[EvaluationCategoryResponse])
 async def get_evaluation_categories_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     categories = get_evaluation_categories(db, skip=skip, limit=limit)
     return categories
 
-@app.get("/evaluation-categories/{category_id}", response_model=EvaluationCategoryResponse)
+@app.get("/api/evaluation-categories/{category_id}", response_model=EvaluationCategoryResponse)
 async def get_evaluation_category_endpoint(category_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     category = get_evaluation_category_by_id(db, category_id)
     if not category:
         raise HTTPException(status_code=404, detail="تصنيف التقييم غير موجود")
     return category
 
-@app.put("/evaluation-categories/{category_id}", response_model=EvaluationCategoryResponse)
+@app.put("/api/evaluation-categories/{category_id}", response_model=EvaluationCategoryResponse)
 async def update_evaluation_category_endpoint(category_id: int, category: EvaluationCategoryCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     category_data = category.dict()
     updated_category = update_evaluation_category(db, category_id, category_data)
@@ -608,7 +601,7 @@ async def update_evaluation_category_endpoint(category_id: int, category: Evalua
         raise HTTPException(status_code=404, detail="تصنيف التقييم غير موجود")
     return updated_category
 
-@app.delete("/evaluation-categories/{category_id}")
+@app.delete("/api/evaluation-categories/{category_id}")
 async def delete_evaluation_category_endpoint(category_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     deleted_category = delete_evaluation_category(db, category_id)
     if not deleted_category:
@@ -616,24 +609,24 @@ async def delete_evaluation_category_endpoint(category_id: int, db: Session = De
     return {"message": "تم حذف تصنيف التقييم بنجاح"}
 
 # Evaluation Items endpoints
-@app.post("/evaluation-items", response_model=EvaluationItemResponse)
+@app.post("/api/evaluation-items", response_model=EvaluationItemResponse)
 async def create_evaluation_item_endpoint(item: EvaluationItemCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     item_data = item.dict()
     return create_evaluation_item(db, item_data)
 
-@app.get("/evaluation-items", response_model=List[EvaluationItemResponse])
+@app.get("/api/evaluation-items", response_model=List[EvaluationItemResponse])
 async def get_evaluation_items_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     items = get_evaluation_items(db, skip=skip, limit=limit)
     return items
 
-@app.get("/evaluation-items/{item_id}", response_model=EvaluationItemResponse)
+@app.get("/api/evaluation-items/{item_id}", response_model=EvaluationItemResponse)
 async def get_evaluation_item_endpoint(item_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     item = get_evaluation_item_by_id(db, item_id)
     if not item:
         raise HTTPException(status_code=404, detail="عنصر التقييم غير موجود")
     return item
 
-@app.put("/evaluation-items/{item_id}", response_model=EvaluationItemResponse)
+@app.put("/api/evaluation-items/{item_id}", response_model=EvaluationItemResponse)
 async def update_evaluation_item_endpoint(item_id: int, item: EvaluationItemCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     item_data = item.dict()
     updated_item = update_evaluation_item(db, item_id, item_data)
@@ -641,26 +634,26 @@ async def update_evaluation_item_endpoint(item_id: int, item: EvaluationItemCrea
         raise HTTPException(status_code=404, detail="عنصر التقييم غير موجود")
     return updated_item
 
-@app.delete("/evaluation-items/{item_id}")
+@app.delete("/api/evaluation-items/{item_id}")
 async def delete_evaluation_item_endpoint(item_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     deleted_item = delete_evaluation_item(db, item_id)
     if not deleted_item:
         raise HTTPException(status_code=404, detail="عنصر التقييم غير موجود")
     return {"message": "تم حذف عنصر التقييم بنجاح"}
 
-@app.get("/evaluation-items/category/{category_id}", response_model=List[EvaluationItemResponse])
+@app.get("/api/evaluation-items/category/{category_id}", response_model=List[EvaluationItemResponse])
 async def get_evaluation_items_by_category_endpoint(category_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     items = get_evaluation_items_by_category(db, category_id, skip=skip, limit=limit)
     return items
 
 # Assessors endpoints
-@app.get("/assessors")
+@app.get("/api/assessors")
 async def get_assessors_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     assessors = get_assessors(db, skip=skip, limit=limit)
     return assessors
 
 # Objective Options endpoints
-@app.post("/objective-options", response_model=ObjectiveOptionResponse)
+@app.post("/api/objective-options", response_model=ObjectiveOptionResponse)
 async def create_objective_option_endpoint(
     objective_option: ObjectiveOptionCreate, 
     db: Session = Depends(get_db), 
@@ -670,7 +663,7 @@ async def create_objective_option_endpoint(
     db_objective_option = create_objective_option(db, objective_option.dict())
     return db_objective_option
 
-@app.get("/objective-options", response_model=List[ObjectiveOptionResponse])
+@app.get("/api/objective-options", response_model=List[ObjectiveOptionResponse])
 async def get_objective_options_endpoint(
     skip: int = 0, 
     limit: int = 100, 
@@ -682,7 +675,7 @@ async def get_objective_options_endpoint(
     objective_options = get_objective_options(db, skip=skip, limit=limit, active_only=active_only)
     return objective_options
 
-@app.get("/objective-options/{objective_option_id}", response_model=ObjectiveOptionResponse)
+@app.get("/api/objective-options/{objective_option_id}", response_model=ObjectiveOptionResponse)
 async def get_objective_option_endpoint(
     objective_option_id: int, 
     db: Session = Depends(get_db), 
@@ -694,7 +687,7 @@ async def get_objective_option_endpoint(
         raise HTTPException(status_code=404, detail="خيار الارتباط غير موجود")
     return objective_option
 
-@app.put("/objective-options/{objective_option_id}", response_model=ObjectiveOptionResponse)
+@app.put("/api/objective-options/{objective_option_id}", response_model=ObjectiveOptionResponse)
 async def update_objective_option_endpoint(
     objective_option_id: int, 
     objective_option: ObjectiveOptionUpdate, 
@@ -707,7 +700,7 @@ async def update_objective_option_endpoint(
         raise HTTPException(status_code=404, detail="خيار الارتباط غير موجود")
     return db_objective_option
 
-@app.delete("/objective-options/{objective_option_id}")
+@app.delete("/api/objective-options/{objective_option_id}")
 async def delete_objective_option_endpoint(
     objective_option_id: int, 
     db: Session = Depends(get_db), 
@@ -720,7 +713,7 @@ async def delete_objective_option_endpoint(
     return {"message": "تم حذف خيار الارتباط بنجاح"}
 
 # Audit Log endpoints
-@app.get("/audit-logs", response_model=List[AuditLogResponse])
+@app.get("/api/audit-logs", response_model=List[AuditLogResponse])
 async def get_audit_logs_endpoint(
     skip: int = 0, 
     limit: int = 100, 
@@ -733,7 +726,7 @@ async def get_audit_logs_endpoint(
     audit_logs = get_audit_logs(db, skip=skip, limit=limit, user_id=user_id, entity_type=entity_type)
     return audit_logs
 
-@app.get("/audit-logs/user/{user_id}", response_model=List[AuditLogResponse])
+@app.get("/api/audit-logs/user/{user_id}", response_model=List[AuditLogResponse])
 async def get_user_audit_logs_endpoint(
     user_id: int,
     skip: int = 0, 
@@ -745,7 +738,7 @@ async def get_user_audit_logs_endpoint(
     audit_logs = get_audit_logs_by_user(db, user_id, skip=skip, limit=limit)
     return audit_logs
 
-@app.get("/audit-logs/entity/{entity_type}/{entity_id}", response_model=List[AuditLogResponse])
+@app.get("/api/audit-logs/entity/{entity_type}/{entity_id}", response_model=List[AuditLogResponse])
 async def get_entity_audit_logs_endpoint(
     entity_type: str,
     entity_id: int,
@@ -759,7 +752,7 @@ async def get_entity_audit_logs_endpoint(
     return audit_logs
 
 # Notification endpoints
-@app.get("/notifications", response_model=List[NotificationResponse])
+@app.get("/api/notifications", response_model=List[NotificationResponse])
 async def get_user_notifications(
     skip: int = 0,
     limit: int = 50,
@@ -773,7 +766,7 @@ async def get_user_notifications(
     notifications = get_notifications_by_user(db, current_user.id, skip=skip, limit=limit, status=status_filter)
     return notifications
 
-@app.get("/notifications/unread-count")
+@app.get("/api/notifications/unread-count")
 async def get_unread_notifications_count(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
@@ -782,7 +775,7 @@ async def get_unread_notifications_count(
     count = get_unread_notifications_count(db, current_user.id)
     return {"unread_count": count}
 
-@app.put("/notifications/{notification_id}/read")
+@app.put("/api/notifications/{notification_id}/read")
 async def mark_notification_as_read(
     notification_id: int,
     db: Session = Depends(get_db),
@@ -794,7 +787,7 @@ async def mark_notification_as_read(
         raise HTTPException(status_code=404, detail="الإشعار غير موجود")
     return {"message": "تم تحديد الإشعار كمقروء"}
 
-@app.put("/notifications/mark-all-read")
+@app.put("/api/notifications/mark-all-read")
 async def mark_all_notifications_as_read(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
@@ -803,7 +796,7 @@ async def mark_all_notifications_as_read(
     count = mark_all_notifications_as_read(db, current_user.id)
     return {"message": f"تم تحديد {count} إشعار كمقروء"}
 
-@app.delete("/notifications/{notification_id}")
+@app.delete("/api/notifications/{notification_id}")
 async def delete_notification(
     notification_id: int,
     db: Session = Depends(get_db),
@@ -816,7 +809,7 @@ async def delete_notification(
     return {"message": "تم حذف الإشعار"}
 
 # User Notification Settings endpoints
-@app.get("/notification-settings", response_model=UserNotificationSettingsResponse)
+@app.get("/api/notification-settings", response_model=UserNotificationSettingsResponse)
 async def get_user_notification_settings_endpoint(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
@@ -839,7 +832,7 @@ async def get_user_notification_settings_endpoint(
         settings = create_user_notification_settings(db, current_user.id, default_settings)
     return settings
 
-@app.put("/notification-settings", response_model=UserNotificationSettingsResponse)
+@app.put("/api/notification-settings", response_model=UserNotificationSettingsResponse)
 async def update_user_notification_settings_endpoint(
     settings_update: UserNotificationSettingsUpdate,
     db: Session = Depends(get_db),
@@ -851,7 +844,7 @@ async def update_user_notification_settings_endpoint(
     return settings
 
 # Round Type endpoints
-@app.get("/round-types", response_model=List[RoundTypeResponse])
+@app.get("/api/round-types", response_model=List[RoundTypeResponse])
 async def get_round_types_endpoint(
     skip: int = 0,
     limit: int = 100,
@@ -861,7 +854,7 @@ async def get_round_types_endpoint(
     """الحصول على قائمة أنواع الجولات"""
     return get_round_types(db, skip=skip, limit=limit)
 
-@app.post("/round-types", response_model=RoundTypeResponse)
+@app.post("/api/round-types", response_model=RoundTypeResponse)
 async def create_round_type_endpoint(
     round_type: RoundTypeCreate,
     db: Session = Depends(get_db),
@@ -874,7 +867,7 @@ async def create_round_type_endpoint(
     round_type_data = round_type.dict()
     return create_round_type(db, round_type_data)
 
-@app.get("/round-types/{round_type_id}", response_model=RoundTypeResponse)
+@app.get("/api/round-types/{round_type_id}", response_model=RoundTypeResponse)
 async def get_round_type_endpoint(
     round_type_id: int,
     db: Session = Depends(get_db),
@@ -886,7 +879,7 @@ async def get_round_type_endpoint(
         raise HTTPException(status_code=404, detail="نوع الجولة غير موجود")
     return round_type
 
-@app.put("/round-types/{round_type_id}", response_model=RoundTypeResponse)
+@app.put("/api/round-types/{round_type_id}", response_model=RoundTypeResponse)
 async def update_round_type_endpoint(
     round_type_id: int,
     round_type_update: RoundTypeUpdate,
@@ -903,7 +896,7 @@ async def update_round_type_endpoint(
         raise HTTPException(status_code=404, detail="نوع الجولة غير موجود")
     return round_type
 
-@app.delete("/round-types/{round_type_id}")
+@app.delete("/api/round-types/{round_type_id}")
 async def delete_round_type_endpoint(
     round_type_id: int,
     db: Session = Depends(get_db),
@@ -1637,7 +1630,11 @@ async def serve_frontend():
 
 @app.get("/{path:path}")
 async def serve_frontend_routes(path: str):
+    # Skip API routes
+    if path.startswith("api") or path.startswith("docs") or path.startswith("redoc") or path == "openapi.json":
+        raise HTTPException(status_code=404, detail="Not Found")
+    
     index_path = os.path.join(DIST_DIR, "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)
-    return {"message": "Frontend not built. Please run 'npm run build' first."}
+    raise HTTPException(status_code=404, detail="Not Found")
