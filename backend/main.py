@@ -75,7 +75,16 @@ app.add_middleware(
 security = HTTPBearer()
 
 # Serve built frontend at root if available
+# Resolve dist directory relative to this file so it works in Docker
 DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist"))
+
+# Serve index.html at root explicitly (highest priority) to avoid proxy/route ordering issues
+@app.get("/", include_in_schema=False)
+async def _serve_root_index():
+    index_path = os.path.join(DIST_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    raise HTTPException(status_code=404, detail="Not Found")
 if os.path.exists(DIST_DIR):
     # Serve entire dist (optional) and assets under their expected path
     app.mount("/static", StaticFiles(directory=DIST_DIR), name="static")
