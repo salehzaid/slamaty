@@ -19,14 +19,33 @@ const AUTO_LOGIN_ENABLED = true; // تسجيل الدخول التلقائي م�
 const USE_DIRECT_ADMIN_LOGIN = true; // استخدام تسجيل دخول مباشر بدون API
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  console.log('🔧 AuthProvider: Component initialized');
+  
+  // Direct admin user for immediate login
+  const defaultAdminUser: User = {
+    id: 1,
+    username: 'admin',
+    email: 'admin@salamaty.com',
+    first_name: 'مدير',
+    last_name: 'النظام',
+    role: 'super_admin',
+    department: 'الإدارة العامة',
+    position: 'مدير النظام',
+    phone: '+966500000000',
+    is_active: true,
+    created_at: new Date().toISOString()
+  };
+  
+  const [user, setUser] = useState<User | null>(defaultAdminUser);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const initializeAuth = async () => {
+      console.log('🚀 AuthContext: Starting authentication initialization...');
       // Check for stored authentication
       const storedUser = localStorage.getItem('sallamaty_user');
       const storedToken = localStorage.getItem('access_token');
+      console.log('🔍 AuthContext: Stored user exists:', !!storedUser);
       
       if (storedUser && storedToken) {
         try {
@@ -44,31 +63,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // �� تسجيل الدخول التلقائي
+      console.log('🔄 AuthContext: AUTO_LOGIN_ENABLED:', AUTO_LOGIN_ENABLED, 'storedUser:', !!storedUser);
       if (AUTO_LOGIN_ENABLED && !storedUser) {
         if (USE_DIRECT_ADMIN_LOGIN) {
-          // ⚡ تسجيل دخول فوري ومباشر بدون API
-          console.log('⚡ Direct admin login - instant access');
-          const defaultAdminUser: User = {
-            id: 1,
-            username: 'admin',
-            email: 'admin@salamaty.com',
-            first_name: 'مدير',
-            last_name: 'النظام',
-            role: 'super_admin',
-            department: 'الإدارة العامة',
-            position: 'مدير النظام',
-            phone: '+966500000000',
-            is_active: true,
-            created_at: new Date().toISOString()
-          };
-          
-          const defaultToken = 'admin-direct-access-token';
-          
-          setUser(defaultAdminUser);
-          localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
-          localStorage.setItem('access_token', defaultToken);
-          apiClient.setToken(defaultToken);
-          console.log('✅ Direct admin login successful!');
+          // 🔄 تسجيل دخول عبر API للحصول على JWT صحيح
+          console.log('🔄 Auto-login: Attempting to login via API...');
+          try {
+            const response = await fetch('http://localhost:8000/auth/signin', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: 'admin@salamaty.com',
+                password: '123456'
+              })
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              console.log('✅ API login successful!', data);
+              
+              const user: User = {
+                id: data.user.id,
+                username: data.user.username,
+                email: data.user.email,
+                first_name: data.user.first_name,
+                last_name: data.user.last_name,
+                role: data.user.role,
+                department: data.user.department,
+                position: data.user.position,
+                phone: data.user.phone,
+                is_active: data.user.is_active,
+                created_at: data.user.created_at
+              };
+              
+              setUser(user);
+              localStorage.setItem('sallamaty_user', JSON.stringify(user));
+              localStorage.setItem('access_token', data.access_token);
+              apiClient.setToken(data.access_token);
+              console.log('👤 User set:', user.email);
+            } else {
+              console.error('❌ API login failed:', response.status);
+              // Fallback to direct admin login
+              setUser(defaultAdminUser);
+              localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
+              localStorage.setItem('access_token', 'fallback-token');
+              apiClient.setToken('fallback-token');
+            }
+          } catch (error) {
+            console.error('❌ API login failed:', error);
+            // Fallback to direct admin login
+            setUser(defaultAdminUser);
+            localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
+            localStorage.setItem('access_token', 'fallback-token');
+            apiClient.setToken('fallback-token');
+          }
         } else {
           // 🔄 تسجيل دخول عبر API (أبطأ)
           console.log('🔄 Auto-login: Attempting to login via API...');
@@ -109,8 +159,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       setIsLoading(false);
+      console.log('🏁 AuthContext: Authentication initialization completed');
     };
 
+    console.log('🎯 AuthContext: Calling initializeAuth...');
     initializeAuth();
   }, []);
 
@@ -198,7 +250,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');

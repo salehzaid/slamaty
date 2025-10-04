@@ -45,7 +45,9 @@ import LayoutTestPage from './components/LayoutTestPage';
 import AdminModeNotification from './components/AdminModeNotification';
 
 const AppContent: React.FC = () => {
+  console.log('📱 AppContent: Component loaded');
   const auth = useAuth();
+  console.log('🔐 AppContent: Auth context:', auth);
   
   if (!auth) {
     return (
@@ -61,6 +63,7 @@ const AppContent: React.FC = () => {
   const { isAuthenticated, logout, isLoading } = auth;
 
   if (isLoading) {
+    console.log('⏳ AppContent: Still loading, showing loading screen');
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
@@ -72,6 +75,7 @@ const AppContent: React.FC = () => {
   }
 
   if (!isAuthenticated) {
+    console.log('🔒 AppContent: User not authenticated, showing login page');
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-900" dir="rtl">
         <Routes>

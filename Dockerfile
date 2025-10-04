@@ -6,6 +6,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --silent
 COPY . .
+# Set production API URL for build
+ENV VITE_API_URL=https://qpsrounds-production.up.railway.app
 RUN npm run build
 
 # Backend runtime stage
@@ -25,12 +27,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend code
 COPY backend/ ./backend
 
+# Copy start script
+COPY start.sh ./
+
 # Copy built frontend
 COPY --from=frontend-build /app/dist ./dist
+
+# Make start script executable
+RUN chmod +x start.sh
 
 # Env
 ENV PORT=8000
 EXPOSE 8000
 
-# Start backend directly
-CMD ["python3", "backend/main.py"]
+# Start using start script (Railway will override this with railway.json)
+CMD ["./start.sh"]
