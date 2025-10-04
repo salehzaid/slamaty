@@ -1620,25 +1620,11 @@ import os
 # Resolve dist directory relative to this file so it works in Docker
 DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist"))
 
-# Mount static files if built
+# Mount static files if built. Mounting at root after API routes lets FastAPI serve
+# API endpoints under /api/ while the StaticFiles handler returns the SPA for
+# any other unmatched path (including root).
 if os.path.exists(DIST_DIR):
+    # Internal assets still available under /static
     app.mount("/static", StaticFiles(directory=DIST_DIR), name="static")
-
-@app.get("/", response_class=FileResponse)
-async def serve_frontend():
-    """Serve the built frontend index directly at root so the SPA loads without proxy redirect issues."""
-    index_path = os.path.join(DIST_DIR, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return {"message": "Frontend not built. Please run 'npm run build' first."}
-
-@app.get("/{path:path}")
-async def serve_frontend_routes(path: str):
-    # Skip API routes
-    if path.startswith("api") or path.startswith("docs") or path.startswith("redoc") or path == "openapi.json":
-        raise HTTPException(status_code=404, detail="Not Found")
-    
-    index_path = os.path.join(DIST_DIR, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    raise HTTPException(status_code=404, detail="Not Found")
+    # Serve SPA at root (index.html) for any non-API path
+    app.mount("/", StaticFiles(directory=DIST_DIR, html=True), name="frontend")
