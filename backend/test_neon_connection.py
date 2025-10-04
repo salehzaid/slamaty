@@ -11,7 +11,7 @@ from models_updated import User, UserRole, Base
 from datetime import datetime
 
 # إعدادات قاعدة البيانات Neon
-NEON_DATABASE_URL = "postgresql://neondb_owner:@ep-lingering-morning-adejreab.us-east-1.aws.neon.tech/neondb?sslmode=require"
+NEON_DATABASE_URL = "postgresql://neondb_owner:npg_ERS5fHwxWiu2@ep-lingering-morning-adejreab.us-east-1.aws.neon.tech/neondb?sslmode=require"
 
 def test_neon_connection():
     """اختبار الاتصال بقاعدة بيانات Neon وعرض المستخدمين"""
