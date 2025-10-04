@@ -59,6 +59,11 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+# Temporary diagnostic endpoint to list registered routes (hidden from docs)
+@app.get("/__routes", include_in_schema=False)
+async def _list_routes():
+    return {"routes": sorted({route.path for route in app.routes})}
+
 # CORS middleware
 import os
 cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5174").split(",")
