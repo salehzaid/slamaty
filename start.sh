@@ -10,6 +10,12 @@ if [ ! -f "backend/main.py" ]; then
     exit 1
 fi
 
+# Load environment variables from env.production if available
+if [ -f "backend/env.production" ]; then
+    echo "Loading environment variables from env.production..."
+    export $(cat backend/env.production | grep -v '^#' | xargs) 2>/dev/null || echo "Some variables may not be set"
+fi
+
 # Start backend directly (frontend is already built in Docker)
 echo "Starting backend server..."
 cd backend
