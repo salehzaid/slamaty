@@ -1628,12 +1628,12 @@ DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist")
 if os.path.exists(DIST_DIR):
     app.mount("/static", StaticFiles(directory=DIST_DIR), name="static")
 
-@app.get("/", response_class=RedirectResponse)
+@app.get("/", response_class=FileResponse)
 async def serve_frontend():
-    """Redirect root to the static frontend index to ensure platform serves the SPA reliably."""
+    """Serve the built frontend index directly at root so the SPA loads without proxy redirect issues."""
     index_path = os.path.join(DIST_DIR, "index.html")
     if os.path.exists(index_path):
-        return RedirectResponse(url="/static/index.html")
+        return FileResponse(index_path)
     return {"message": "Frontend not built. Please run 'npm run build' first."}
 
 @app.get("/{path:path}")
