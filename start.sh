@@ -19,4 +19,6 @@ fi
 # Start backend directly (frontend is already built in Docker)
 echo "Starting backend server..."
 cd backend
-exec python3 main.py
+PORT=${PORT:-8000}
+# Use uvicorn to serve the FastAPI app directly (ensures predictable behavior in Railway)
+exec uvicorn backend.main:app --host 0.0.0.0 --port ${PORT}
