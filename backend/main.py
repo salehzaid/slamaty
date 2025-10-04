@@ -6,6 +6,7 @@ from sqlalchemy import func
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.exception_handlers import http_exception_handler
 from typing import List, Optional
 from datetime import datetime, timedelta
 import os
@@ -63,6 +64,21 @@ app = FastAPI(
 @app.get("/__routes", include_in_schema=False)
 async def _list_routes():
     return {"routes": sorted({route.path for route in app.routes})}
+
+
+# Custom 404 handler: return SPA index for non-API GET requests so client-side routing works
+@app.exception_handler(HTTPException)
+async def spa_http_exception_handler(request: Request, exc: HTTPException):
+    try:
+        # Only intercept 404 for GET requests that are not API routes
+        if exc.status_code == 404 and request.method == "GET" and not request.url.path.startswith("/api"):
+            index_path = os.path.join(DIST_DIR, "index.html")
+            if os.path.exists(index_path):
+                return FileResponse(index_path)
+    except Exception:
+        pass
+    # Fallback to default handler
+    return await http_exception_handler(request, exc)
 
 # CORS middleware
 import os
