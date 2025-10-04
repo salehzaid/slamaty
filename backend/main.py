@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 import uvicorn
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from typing import List, Optional
 from datetime import datetime, timedelta
 import os
@@ -1628,11 +1628,12 @@ DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist")
 if os.path.exists(DIST_DIR):
     app.mount("/static", StaticFiles(directory=DIST_DIR), name="static")
 
-@app.get("/", response_class=FileResponse)
+@app.get("/", response_class=RedirectResponse)
 async def serve_frontend():
+    """Redirect root to the static frontend index to ensure platform serves the SPA reliably."""
     index_path = os.path.join(DIST_DIR, "index.html")
     if os.path.exists(index_path):
-        return FileResponse(index_path)
+        return RedirectResponse(url="/static/index.html")
     return {"message": "Frontend not built. Please run 'npm run build' first."}
 
 @app.get("/{path:path}")
