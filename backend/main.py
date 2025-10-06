@@ -1774,8 +1774,33 @@ DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist")
 if os.path.exists(DIST_DIR):
     # Internal assets still available under /static
     app.mount("/static", StaticFiles(directory=DIST_DIR), name="static")
-    # Note: Removed the root mount that was interfering with API routes
-    # The frontend will be served through the custom 404 handler instead
+    
+    # Serve index.html for root and any other routes (SPA support)
+    @app.get("/")
+    async def serve_frontend():
+        index_file = os.path.join(DIST_DIR, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        return {"message": "Frontend not built yet"}
+    
+    # Catch-all route to serve SPA for any unmatched paths
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        # Don't intercept API routes
+        if full_path.startswith("api/") or full_path.startswith("docs") or full_path.startswith("redoc") or full_path.startswith("openapi.json"):
+            raise HTTPException(status_code=404, detail="Not found")
+        
+        # Try to serve the requested file if it exists
+        file_path = os.path.join(DIST_DIR, full_path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        
+        # Otherwise, serve index.html for SPA routing
+        index_file = os.path.join(DIST_DIR, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        
+        raise HTTPException(status_code=404, detail="Frontend not found")
 
 if __name__ == "__main__":
     import uvicorn
