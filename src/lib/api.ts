@@ -342,8 +342,16 @@ class ApiClient {
   }
 
   // Reports endpoints - استخدام البيانات الحقيقية من قاعدة البيانات
-  async getDashboardStats() {
-    return this.request('/api/reports/dashboard-stats')
+  async getReportsDashboardStats() {
+    return this.request('/api/reports/dashboard/stats')
+  }
+
+  async getComplianceTrends(months: number = 6) {
+    return this.request(`/api/reports/compliance-trends?months=${months}`)
+  }
+
+  async getDepartmentPerformance() {
+    return this.request('/api/reports/department-performance')
   }
 
   async getRoundsByType() {

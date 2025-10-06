@@ -1699,7 +1699,7 @@ async def get_monthly_rounds(
     """Get monthly rounds statistics"""
     try:
         from datetime import datetime, timedelta
-        from sqlalchemy import extract
+        from sqlalchemy import extract, case
         
         # Get data for the last N months
         end_date = datetime.now()
@@ -1710,8 +1710,8 @@ async def get_monthly_rounds(
             extract('year', Round.created_at).label('year'),
             extract('month', Round.created_at).label('month'),
             func.count(Round.id).label('scheduled'),
-            func.count(db.case([(Round.status == "completed", 1)])).label('completed'),
-            func.count(db.case([(Round.status == "overdue", 1)])).label('overdue')
+            func.sum(case((Round.status == "completed", 1), else_=0)).label('completed'),
+            func.sum(case((Round.status == "overdue", 1), else_=0)).label('overdue')
         ).filter(
             Round.created_at >= start_date
         ).group_by(
