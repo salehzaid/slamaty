@@ -21,4 +21,5 @@ echo "Starting backend server..."
 cd backend
 PORT=${PORT:-8000}
 # Use uvicorn to serve the FastAPI app directly (ensures predictable behavior in Railway)
-exec uvicorn backend.main:app --host 0.0.0.0 --port ${PORT}
+# Note: We're already in backend/ directory, so use main:app not backend.main:app
+exec uvicorn main:app --host 0.0.0.0 --port ${PORT}
