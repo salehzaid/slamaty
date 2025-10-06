@@ -357,6 +357,18 @@ class ApiClient {
   async getMonthlyRounds(months: number = 6) {
     return this.request(`/api/reports/monthly-rounds?months=${months}`)
   }
+
+  // Evaluation Results endpoints
+  async finalizeEvaluation(roundId: number, payload: { evaluations: any[], notes?: string }) {
+    return this.request(`/api/rounds/${roundId}/evaluations/finalize`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  async getEvaluationResults(roundId: number) {
+    return this.request(`/api/rounds/${roundId}/evaluation-results`)
+  }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL)
