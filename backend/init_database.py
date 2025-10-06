@@ -34,15 +34,17 @@ def create_initial_users(db):
         {
             "username": "admin",
             "email": "admin@salamah.com",
-            "full_name": "مدير النظام",
+            "first_name": "مدير",
+            "last_name": "النظام",
             "hashed_password": get_password_hash("admin123"),
-            "role": UserRole.ADMIN,
+            "role": UserRole.SUPER_ADMIN,
             "is_active": True
         },
         {
             "username": "quality_manager",
             "email": "quality@salamah.com",
-            "full_name": "مدير الجودة",
+            "first_name": "مدير",
+            "last_name": "الجودة",
             "hashed_password": get_password_hash("quality123"),
             "role": UserRole.QUALITY_MANAGER,
             "is_active": True
@@ -50,17 +52,19 @@ def create_initial_users(db):
         {
             "username": "assessor1",
             "email": "assessor1@salamah.com",
-            "full_name": "المقيم الأول",
+            "first_name": "المقيم",
+            "last_name": "الأول",
             "hashed_password": get_password_hash("assessor123"),
             "role": UserRole.ASSESSOR,
             "is_active": True
         },
         {
-            "username": "department_manager",
+            "username": "department_head",
             "email": "dept@salamah.com",
-            "full_name": "مدير قسم",
+            "first_name": "مدير",
+            "last_name": "القسم",
             "hashed_password": get_password_hash("dept123"),
-            "role": UserRole.DEPARTMENT_MANAGER,
+            "role": UserRole.DEPARTMENT_HEAD,
             "is_active": True
         }
     ]
@@ -263,7 +267,7 @@ def main():
         print("  👤 Admin: admin / admin123")
         print("  👤 Quality Manager: quality_manager / quality123")
         print("  👤 Assessor: assessor1 / assessor123")
-        print("  👤 Department Manager: department_manager / dept123")
+        print("  👤 Department Head: department_head / dept123")
         print("\n")
         
     except Exception as e:
@@ -275,4 +279,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
