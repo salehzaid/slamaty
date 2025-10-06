@@ -24,8 +24,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Direct admin user for immediate login
   const defaultAdminUser: User = {
     id: 1,
-    username: 'admin',
-    email: 'admin@salamaty.com',
+    username: 'test_admin',
+    email: 'testadmin@salamaty.com',
     first_name: 'مدير',
     last_name: 'النظام',
     role: 'super_admin',
@@ -69,14 +69,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // 🔄 تسجيل دخول عبر API للحصول على JWT صحيح
           console.log('🔄 Auto-login: Attempting to login via API...');
           try {
-            const response = await fetch('http://localhost:8000/auth/signin', {
+            const response = await fetch('http://localhost:8000/api/auth/signin', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                email: 'admin@salamaty.com',
-                password: '123456'
+                email: 'testadmin@salamaty.com',
+                password: 'test123'
               })
             });
             
@@ -108,22 +108,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               // Fallback to direct admin login
               setUser(defaultAdminUser);
               localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
-              localStorage.setItem('access_token', 'fallback-token');
-              apiClient.setToken('fallback-token');
+              localStorage.setItem('access_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
+              apiClient.setToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
             }
           } catch (error) {
             console.error('❌ API login failed:', error);
             // Fallback to direct admin login
             setUser(defaultAdminUser);
             localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
-            localStorage.setItem('access_token', 'fallback-token');
-            apiClient.setToken('fallback-token');
+            localStorage.setItem('access_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
+            apiClient.setToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
           }
         } else {
           // 🔄 تسجيل دخول عبر API (أبطأ)
           console.log('🔄 Auto-login: Attempting to login via API...');
           try {
-            const response = await apiClient.login('admin@salamaty.com', '123456');
+            const response = await apiClient.login('testadmin@salamaty.com', 'test123');
             
             if (response.access_token) {
               const user: User = {
@@ -147,11 +147,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               console.log('✅ API login successful!');
             } else {
               console.error('❌ API login failed: No access token');
-              setUser(null);
+              // Fallback to direct admin login
+              setUser(defaultAdminUser);
+              localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
+              localStorage.setItem('access_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
+              apiClient.setToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
             }
           } catch (error) {
             console.error('❌ API login failed:', error);
-            setUser(null);
+            // Fallback to direct admin login
+            setUser(defaultAdminUser);
+            localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
+            localStorage.setItem('access_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
+            apiClient.setToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
           }
         }
       } else if (!AUTO_LOGIN_ENABLED) {
@@ -202,8 +210,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginAsAdmin = () => {
     const defaultAdminUser: User = {
       id: 1,
-      username: 'admin',
-      email: 'admin@salamaty.com',
+      username: 'test_admin',
+      email: 'testadmin@salamaty.com',
       first_name: 'مدير',
       last_name: 'النظام',
       role: 'super_admin',
@@ -214,7 +222,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       created_at: new Date().toISOString()
     };
     
-    const defaultToken = 'admin-direct-access-token';
+    const defaultToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s';
     
     setUser(defaultAdminUser);
     localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));

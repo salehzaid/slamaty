@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Search, Filter, MoreHorizontal, AlertTriangle, X, Trash2, RefreshCw } from 'lucide-react'
+import { Search, Filter, MoreHorizontal, AlertTriangle, X, Trash2, RefreshCw, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { useCapas, useAllCapasUnfiltered, useDeleteCapa, useDeleteAllCapas } from '@/hooks/useCapas'
+import { useCapas, useAllCapasUnfiltered, useDeleteCapa, useDeleteAllCapas, useUpdateCapa } from '@/hooks/useCapas'
 import { useAuth } from '@/context/AuthContext'
 
 const CapaManagement: React.FC = () => {
@@ -28,6 +28,7 @@ const CapaManagement: React.FC = () => {
   const { hasPermission } = useAuth()
   const deleteCapaMutation = useDeleteCapa()
   const deleteAllCapasMutation = useDeleteAllCapas()
+  const updateCapaMutation = useUpdateCapa()
 
   // Use appropriate data source based on toggle
   const currentCapas = showAllCapas ? allCapas : capas
@@ -109,6 +110,29 @@ const CapaManagement: React.FC = () => {
         alert('ليس لديك صلاحية لحذف جميع خطط التصحيح.')
       } else {
         alert(`فشل في حذف جميع خطط التصحيح: ${error?.message || 'خطأ غير معروف'}`)
+      }
+    }
+  }
+
+  const handleStartCapa = async (capaId: number) => {
+    try {
+      await updateCapaMutation.mutate({
+        id: capaId,
+        data: { status: 'in_progress' }
+      })
+      refetch() // Refresh the data
+    } catch (error: any) {
+      console.error('Failed to start CAPA:', error)
+      
+      // Handle different error types
+      if (error?.response?.status === 401) {
+        alert('انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.')
+        // Redirect to login or refresh token
+        window.location.href = '/login'
+      } else if (error?.response?.status === 403) {
+        alert('ليس لديك صلاحية لبدء خطة التصحيح.')
+      } else {
+        alert(`فشل في بدء خطة التصحيح: ${error?.message || 'خطأ غير معروف'}`)
       }
     }
   }
@@ -442,6 +466,18 @@ const CapaManagement: React.FC = () => {
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     )}
+                    {(capa.status === 'pending' || capa.status === 'assigned') && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleStartCapa(capa.id)}
+                        disabled={updateCapaMutation.loading}
+                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                        title="بدء الخطة التصحيحية"
+                      >
+                        <Play className="w-4 h-4" />
+                      </Button>
+                    )}
                     <Button variant="ghost" size="sm" onClick={() => navigate(`/capa/edit/${capa.id}`)} className="text-gray-600 hover:bg-gray-50">
                       <MoreHorizontal className="w-4 h-4" />
                     </Button>
@@ -512,7 +548,7 @@ const CapaManagement: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowDeleteConfirm(null)}
-                disabled={deleteCapaMutation.isPending}
+                disabled={deleteCapaMutation.loading}
               >
                 إلغاء
               </Button>
@@ -522,10 +558,10 @@ const CapaManagement: React.FC = () => {
                   handleDeleteCapa(showDeleteConfirm);
                   setShowDeleteConfirm(null);
                 }}
-                disabled={deleteCapaMutation.isPending}
+                disabled={deleteCapaMutation.loading}
                 className="flex items-center gap-2"
               >
-                {deleteCapaMutation.isPending ? (
+                {deleteCapaMutation.loading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     جاري الحذف...
@@ -566,7 +602,7 @@ const CapaManagement: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowDeleteAllConfirm(false)}
-                disabled={deleteAllCapasMutation.isPending}
+                disabled={deleteAllCapasMutation.loading}
               >
                 إلغاء
               </Button>
@@ -576,10 +612,10 @@ const CapaManagement: React.FC = () => {
                   handleDeleteAllCapas();
                   setShowDeleteAllConfirm(false);
                 }}
-                disabled={deleteAllCapasMutation.isPending}
+                disabled={deleteAllCapasMutation.loading}
                 className="flex items-center gap-2"
               >
-                {deleteAllCapasMutation.isPending ? (
+                {deleteAllCapasMutation.loading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     جاري الحذف...

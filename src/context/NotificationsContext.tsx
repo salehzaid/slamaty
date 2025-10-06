@@ -58,7 +58,7 @@ export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({ ch
     try {
       setIsLoading(true)
       // use apiClient.get which returns { data } wrapper
-      const response = await apiClient.get('/notifications')
+      const response = await apiClient.get('/api/notifications')
       const raw = response?.data || response || []
       const apiNotifications = (raw || []).map((notification: any) => ({
         ...notification,

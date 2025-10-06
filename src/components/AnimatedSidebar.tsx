@@ -14,31 +14,25 @@ import {
   ChevronRight,
   Bell,
   HelpCircle,
-  LogOut,
   Menu,
-  X,
   Target,
-  Zap,
   Trophy,
   ChevronDown,
-  Folder,
-  Link2
+  Folder
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { useAuth } from '@/context/AuthContext'
 import { useLayout } from '@/context/LayoutContext'
 
 interface AnimatedSidebarProps {
   onLogout: () => void
 }
 
-const AnimatedSidebar: React.FC<AnimatedSidebarProps> = ({ onLogout }) => {
+const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { user } = useAuth()
-  const { isSidebarCollapsed, setIsSidebarCollapsed, isMobile } = useLayout()
+  const { isSidebarCollapsed, setIsSidebarCollapsed } = useLayout()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
@@ -106,20 +100,20 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = ({ onLogout }) => {
       ]
     },
     {
-      id: 'capa',
-      label: 'الخطط التصحيحية',
-      icon: Shield,
-      badge: null,
-      color: 'text-orange-600',
-      path: '/capa'
-    },
-    {
       id: 'capa-enhanced',
       label: 'الخطط التصحيحية المحسنة',
       icon: Shield,
       badge: 'NEW',
       color: 'text-orange-600',
       path: '/capa-enhanced'
+    },
+    {
+      id: 'capa-dashboard',
+      label: 'داشبورد الخطط',
+      icon: BarChart3,
+      badge: null,
+      color: 'text-blue-600',
+      path: '/capa-dashboard'
     },
     {
       id: 'reports',

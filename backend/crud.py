@@ -418,9 +418,9 @@ def create_capa(db: Session, capa_data: dict, created_by_id: int):
         created_by_id=created_by_id,
         # New CAPA improvement fields
         root_cause=capa_data.get("root_cause"),
-        corrective_actions=capa_data.get("corrective_actions", "[]"),
-        preventive_actions=capa_data.get("preventive_actions", "[]"),
-        verification_steps=capa_data.get("verification_steps", "[]"),
+        corrective_actions=json.dumps(capa_data.get("corrective_actions", []), ensure_ascii=False) if not isinstance(capa_data.get("corrective_actions", []), str) else capa_data.get("corrective_actions", "[]"),
+        preventive_actions=json.dumps(capa_data.get("preventive_actions", []), ensure_ascii=False) if not isinstance(capa_data.get("preventive_actions", []), str) else capa_data.get("preventive_actions", "[]"),
+        verification_steps=json.dumps(capa_data.get("verification_steps", []), ensure_ascii=False) if not isinstance(capa_data.get("verification_steps", []), str) else capa_data.get("verification_steps", "[]"),
         verification_status=ver_status_norm,
         severity=capa_data.get("severity", 3),
         estimated_cost=capa_data.get("estimated_cost"),
@@ -431,6 +431,76 @@ def create_capa(db: Session, capa_data: dict, created_by_id: int):
     db.add(db_capa)
     db.commit()
     db.refresh(db_capa)
+    
+    # Write-through: Add actions to capa_actions table
+    try:
+        from models_updated import CapaAction
+        
+        # Process corrective actions
+        corrective_actions = capa_data.get("corrective_actions", [])
+        if isinstance(corrective_actions, str):
+            corrective_actions = json.loads(corrective_actions) if corrective_actions and corrective_actions != '[]' else []
+        
+        for action in corrective_actions:
+            if isinstance(action, dict) and action.get('task'):
+                db_action = CapaAction(
+                    capa_id=db_capa.id,
+                    action_type='corrective',
+                    task=action.get('task'),
+                    due_date=action.get('due_date'),
+                    assigned_to=action.get('assigned_to'),
+                    assigned_to_id=action.get('assigned_to_id'),
+                    notes=action.get('notes'),
+                    status=action.get('status', 'open'),
+                    completed_at=action.get('completed_at'),
+                    required=True
+                )
+                db.add(db_action)
+        
+        # Process preventive actions
+        preventive_actions = capa_data.get("preventive_actions", [])
+        if isinstance(preventive_actions, str):
+            preventive_actions = json.loads(preventive_actions) if preventive_actions and preventive_actions != '[]' else []
+        
+        for action in preventive_actions:
+            if isinstance(action, dict) and action.get('task'):
+                db_action = CapaAction(
+                    capa_id=db_capa.id,
+                    action_type='preventive',
+                    task=action.get('task'),
+                    due_date=action.get('due_date'),
+                    assigned_to=action.get('assigned_to'),
+                    assigned_to_id=action.get('assigned_to_id'),
+                    notes=action.get('notes'),
+                    status=action.get('status', 'open'),
+                    completed_at=action.get('completed_at'),
+                    required=True
+                )
+                db.add(db_action)
+        
+        # Process verification steps
+        verification_steps = capa_data.get("verification_steps", [])
+        if isinstance(verification_steps, str):
+            verification_steps = json.loads(verification_steps) if verification_steps and verification_steps != '[]' else []
+        
+        for step in verification_steps:
+            if isinstance(step, dict) and step.get('step'):
+                db_action = CapaAction(
+                    capa_id=db_capa.id,
+                    action_type='verification',
+                    task=step.get('step'),
+                    notes=step.get('notes'),
+                    status='completed' if step.get('completed') else 'open',
+                    completed_at=step.get('completed_at'),
+                    completed_by_id=step.get('completed_by_id'),
+                    required=step.get('required', True)
+                )
+                db.add(db_action)
+        
+        db.commit()
+        print(f"✅ Added actions to capa_actions table for CAPA {db_capa.id}")
+    except Exception as e:
+        print(f"⚠️ Failed to add actions to capa_actions table: {e}")
     
     # Send notifications to department managers
     try:
@@ -526,7 +596,7 @@ def get_all_capas_unfiltered(db: Session, skip: int = 0, limit: int = 100):
     ).offset(skip).limit(limit).all()
 
 def get_capa_by_id(db: Session, capa_id: int):
-    """Get a CAPA by ID with evaluation item details if linked"""
+    """Get a CAPA by ID with evaluation item details and actions from capa_actions table"""
     capa = db.query(Capa).options(
         joinedload(Capa.assigned_manager),
         joinedload(Capa.creator)
@@ -558,6 +628,48 @@ def get_capa_by_id(db: Session, capa_id: int):
         capa.evaluation_item_title = None
         capa.evaluation_item_code = None
         capa.evaluation_item_category = None
+    
+    # Load actions from capa_actions table (preferred over JSON)
+    try:
+        from models_updated import CapaAction
+        actions = db.query(CapaAction).filter(CapaAction.capa_id == capa_id).all()
+        
+        # Group actions by type
+        corrective = []
+        preventive = []
+        verification = []
+        
+        for action in actions:
+            action_dict = {
+                'id': action.id,
+                'task': action.task,
+                'due_date': action.due_date.isoformat() if action.due_date else None,
+                'assigned_to': action.assigned_to,
+                'assigned_to_id': action.assigned_to_id,
+                'notes': action.notes,
+                'status': action.status,
+                'completed_at': action.completed_at.isoformat() if action.completed_at else None,
+                'completed_by_id': action.completed_by_id
+            }
+            
+            if action.action_type == 'corrective':
+                corrective.append(action_dict)
+            elif action.action_type == 'preventive':
+                preventive.append(action_dict)
+            elif action.action_type == 'verification':
+                action_dict['step'] = action.task  # For compatibility
+                action_dict['required'] = action.required
+                action_dict['completed'] = action.status == 'completed'
+                verification.append(action_dict)
+        
+        # Override JSON fields with table data if actions found
+        if corrective or preventive or verification:
+            capa.corrective_actions_from_table = corrective
+            capa.preventive_actions_from_table = preventive
+            capa.verification_steps_from_table = verification
+        
+    except Exception as e:
+        print(f"⚠️ Error loading actions from capa_actions table: {e}")
     
     return capa
 
@@ -593,11 +705,11 @@ def update_capa(db: Session, capa_id: int, capa_data: dict):
     if 'root_cause' in capa_data and capa_data['root_cause'] is not None:
         db_capa.root_cause = capa_data['root_cause']
     if 'corrective_actions' in capa_data and capa_data['corrective_actions'] is not None:
-        db_capa.corrective_actions = capa_data['corrective_actions']
+        db_capa.corrective_actions = json.dumps(capa_data['corrective_actions'], ensure_ascii=False) if not isinstance(capa_data['corrective_actions'], str) else capa_data['corrective_actions']
     if 'preventive_actions' in capa_data and capa_data['preventive_actions'] is not None:
-        db_capa.preventive_actions = capa_data['preventive_actions']
+        db_capa.preventive_actions = json.dumps(capa_data['preventive_actions'], ensure_ascii=False) if not isinstance(capa_data['preventive_actions'], str) else capa_data['preventive_actions']
     if 'verification_steps' in capa_data and capa_data['verification_steps'] is not None:
-        db_capa.verification_steps = capa_data['verification_steps']
+        db_capa.verification_steps = json.dumps(capa_data['verification_steps'], ensure_ascii=False) if not isinstance(capa_data['verification_steps'], str) else capa_data['verification_steps']
     if 'verification_status' in capa_data and capa_data['verification_status'] is not None:
         db_capa.verification_status = capa_data['verification_status']
     if 'severity' in capa_data and capa_data['severity'] is not None:
@@ -616,6 +728,84 @@ def update_capa(db: Session, capa_id: int, capa_data: dict):
         db_capa.status_history = capa_data['status_history']
     
     db.commit()
+    
+    # Write-through: Update actions in capa_actions table
+    try:
+        from models_updated import CapaAction
+        
+        # Delete existing actions for this CAPA
+        db.query(CapaAction).filter(CapaAction.capa_id == capa_id).delete()
+        
+        # Re-add actions from updated data
+        # Process corrective actions
+        if 'corrective_actions' in capa_data and capa_data['corrective_actions'] is not None:
+            corrective_actions = capa_data['corrective_actions']
+            if isinstance(corrective_actions, str):
+                corrective_actions = json.loads(corrective_actions) if corrective_actions and corrective_actions != '[]' else []
+            
+            for action in corrective_actions:
+                if isinstance(action, dict) and action.get('task'):
+                    db_action = CapaAction(
+                        capa_id=capa_id,
+                        action_type='corrective',
+                        task=action.get('task'),
+                        due_date=action.get('due_date'),
+                        assigned_to=action.get('assigned_to'),
+                        assigned_to_id=action.get('assigned_to_id'),
+                        notes=action.get('notes'),
+                        status=action.get('status', 'open'),
+                        completed_at=action.get('completed_at'),
+                        required=True
+                    )
+                    db.add(db_action)
+        
+        # Process preventive actions
+        if 'preventive_actions' in capa_data and capa_data['preventive_actions'] is not None:
+            preventive_actions = capa_data['preventive_actions']
+            if isinstance(preventive_actions, str):
+                preventive_actions = json.loads(preventive_actions) if preventive_actions and preventive_actions != '[]' else []
+            
+            for action in preventive_actions:
+                if isinstance(action, dict) and action.get('task'):
+                    db_action = CapaAction(
+                        capa_id=capa_id,
+                        action_type='preventive',
+                        task=action.get('task'),
+                        due_date=action.get('due_date'),
+                        assigned_to=action.get('assigned_to'),
+                        assigned_to_id=action.get('assigned_to_id'),
+                        notes=action.get('notes'),
+                        status=action.get('status', 'open'),
+                        completed_at=action.get('completed_at'),
+                        required=True
+                    )
+                    db.add(db_action)
+        
+        # Process verification steps
+        if 'verification_steps' in capa_data and capa_data['verification_steps'] is not None:
+            verification_steps = capa_data['verification_steps']
+            if isinstance(verification_steps, str):
+                verification_steps = json.loads(verification_steps) if verification_steps and verification_steps != '[]' else []
+            
+            for step in verification_steps:
+                if isinstance(step, dict) and step.get('step'):
+                    db_action = CapaAction(
+                        capa_id=capa_id,
+                        action_type='verification',
+                        task=step.get('step'),
+                        notes=step.get('notes'),
+                        status='completed' if step.get('completed') else 'open',
+                        completed_at=step.get('completed_at'),
+                        completed_by_id=step.get('completed_by_id'),
+                        required=step.get('required', True)
+                    )
+                    db.add(db_action)
+        
+        db.commit()
+        print(f"✅ Updated actions in capa_actions table for CAPA {capa_id}")
+    except Exception as e:
+        print(f"⚠️ Failed to update actions in capa_actions table: {e}")
+    
     db.refresh(db_capa)
     return db_capa
 

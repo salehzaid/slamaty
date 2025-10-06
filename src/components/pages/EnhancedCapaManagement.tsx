@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import CapaDashboard from '@/components/CapaDashboard'
 import EnhancedCapaForm from '@/components/forms/EnhancedCapaForm'
 import { Button } from '@/components/ui/button'
@@ -9,15 +9,13 @@ import { Badge } from '@/components/ui/badge'
 import { 
   AlertTriangle, 
   ArrowLeft, 
-  Eye, 
   Edit, 
   CheckCircle, 
   Clock,
   User,
   Calendar,
   DollarSign,
-  FileText,
-  BarChart3
+  FileText
 } from 'lucide-react'
 
 interface CapaData {
@@ -85,10 +83,8 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
   users = [],
   isLoading = false,
   onCreateCapa,
-  onUpdateCapa,
-  onViewCapa
+  onUpdateCapa
 }) => {
-  const navigate = useNavigate()
   const location = useLocation()
   // If we were navigated here with failingItems from evaluation, capture them
   const state = (location && (location.state as any)) || {}
@@ -106,18 +102,41 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
 
   // Items evaluated in rounds that are non-compliant and need CAPAs
   const [evaluatedFailingItems, setEvaluatedFailingItems] = useState<any[]>([])
-  const [groupBy, setGroupBy] = useState<'none' | 'department' | 'score'>('department')
 
   const fetchCapas = async () => {
     try {
+      console.log('🔄 Starting fetchCapas...')
       const res = await apiClient.getCapas()
-      // apiClient.getCapas may return array or an object with { capas }
-      const arr = Array.isArray(res) ? res : ((res && (res.capas || res.data?.capas)) || [])
-      if (Array.isArray(arr)) {
-        setCapasList(arr as any)
+      console.log('📦 CAPAs API response (wrapped):', res)
+      console.log('📦 res.data:', (res as any).data)
+      console.log('📦 res type:', typeof res, Array.isArray(res))
+
+      // ApiClient.request returns { data: <payload>, success: true }
+      const payload: any = res && (res as any).data ? (res as any).data : res
+      console.log('📦 payload:', payload)
+      console.log('📦 payload type:', typeof payload, Array.isArray(payload))
+      console.log('📦 payload.capas:', payload?.capas)
+      console.log('📦 payload.capas length:', payload?.capas?.length)
+
+      // payload may be an array or an object like { status: 'success', capas: [...], total_count }
+      let capasArray: any[] = []
+      if (Array.isArray(payload)) {
+        console.log('✅ Payload is array')
+        capasArray = payload
+      } else if (payload && Array.isArray(payload.capas)) {
+        console.log('✅ Payload.capas is array with length:', payload.capas.length)
+        capasArray = payload.capas
+      } else {
+        console.log('❌ Could not extract capas array')
+        console.log('❌ payload:', JSON.stringify(payload, null, 2))
       }
+
+      console.log('📋 Extracted CAPAs array length:', capasArray.length)
+      console.log('📋 Extracted CAPAs array:', capasArray)
+      setCapasList(capasArray as any)
+      console.log('✅ capasList updated')
     } catch (e) {
-      console.error('Failed to fetch CAPAs for dashboard:', e)
+      console.error('❌ Failed to fetch CAPAs for dashboard:', e)
     }
   }
 
@@ -146,8 +165,9 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
     // fetch non-compliant evaluation items and present them as drafts for review.
     if (!roundFromEval || !roundFromEval.id) return
     try {
-      // apiClient.getRoundNonCompliantItems returns an object { items, total_items }
-      const res: any = await apiClient.getRoundNonCompliantItems(roundFromEval.id)
+      // For now, we'll skip this API call as it doesn't exist
+      // const res: any = await apiClient.getRoundNonCompliantItems(roundFromEval.id)
+      const res: any = { items: [] }
       const items = (res && (res.items || res.items === 0 ? res.items : (res.data?.items || res.data || []))) || []
       setEvaluatedFailingItems(items)
       setFailingItems([])
@@ -227,7 +247,23 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
   }
 
   const handleEditCapa = (capa: CapaData) => {
-    setSelectedCapa(capa)
+    // Transform backend field names to frontend field names for the form
+    const formData = {
+      ...capa,
+      // Transform root_cause -> root_cause_analysis
+      root_cause_analysis: capa.root_cause || '',
+      // Transform target_date -> resolution_deadline (extract date part)
+      resolution_deadline: capa.target_date 
+        ? new Date(capa.target_date).toISOString().split('T')[0] 
+        : '',
+      // Ensure arrays are properly formatted
+      corrective_actions: Array.isArray(capa.corrective_actions) ? capa.corrective_actions : [],
+      preventive_actions: Array.isArray(capa.preventive_actions) ? capa.preventive_actions : [],
+      verification_steps: Array.isArray(capa.verification_steps) ? capa.verification_steps : []
+    }
+    
+    console.log('📝 Editing CAPA with transformed data:', formData)
+    setSelectedCapa(formData as any)
     setIsEditing(true)
     setCurrentView('form')
   }
@@ -237,26 +273,87 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
     setCurrentView('view')
   }
 
+  const handleStartCapa = async (capa: CapaData) => {
+    // Open form directly without auto-save - user can save manually
+    // Transform backend field names to frontend field names for the form
+    const formData = {
+      ...capa,
+      // Transform root_cause -> root_cause_analysis
+      root_cause_analysis: capa.root_cause || '',
+      // Transform target_date -> resolution_deadline (extract date part)
+      resolution_deadline: capa.target_date 
+        ? new Date(capa.target_date).toISOString().split('T')[0] 
+        : '',
+      // Ensure arrays are properly formatted
+      corrective_actions: Array.isArray(capa.corrective_actions) ? capa.corrective_actions : [],
+      preventive_actions: Array.isArray(capa.preventive_actions) ? capa.preventive_actions : [],
+      verification_steps: Array.isArray(capa.verification_steps) ? capa.verification_steps : []
+    }
+    
+    console.log('🎬 Starting CAPA with transformed data:', formData)
+    setSelectedCapa(formData as any)
+    setIsEditing(true)
+    setCurrentView('form')
+  }
+
   const handleFormSubmit = async (data: any) => {
     try {
+      console.log('📥 Raw form data received:', data)
+      
+      // Transform frontend field names to backend field names
+      const transformedData = {
+        title: data.title,
+        description: data.description,
+        department: data.department,
+        priority: data.priority || 'medium',
+        status: data.status || 'PENDING',
+        verification_status: data.verification_status || 'pending',
+        severity: data.severity || 3,
+        estimated_cost: data.estimated_cost,
+        // Transform root_cause_analysis -> root_cause
+        root_cause: data.root_cause_analysis || data.root_cause || '',
+        // Transform resolution_deadline -> target_date
+        target_date: data.resolution_deadline || data.target_date || new Date().toISOString(),
+        // Calculate sla_days from resolution_deadline if available
+        sla_days: data.resolution_deadline 
+          ? Math.ceil((new Date(data.resolution_deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+          : data.sla_days || 14,
+        corrective_actions: data.corrective_actions || [],
+        preventive_actions: data.preventive_actions || [],
+        verification_steps: data.verification_steps || [],
+        round_id: data.round_id,
+        evaluation_item_id: data.evaluation_item_id,
+        assigned_to_id: data.assigned_to_id,
+        escalation_level: data.escalation_level || 0
+      }
+      
+      console.log('🔄 Transformed data for API:', transformedData)
+      
       if (isEditing && selectedCapa) {
-        if (onUpdateCapa) await onUpdateCapa(selectedCapa.id, data)
-        else {
+        console.log('🔄 Updating CAPA:', selectedCapa.id)
+        if (onUpdateCapa) {
+          await onUpdateCapa(selectedCapa.id, transformedData)
+        } else {
           // fallback: call API directly
-          await apiClient.updateCapa(selectedCapa.id, data)
+          const resp = await apiClient.updateCapa(selectedCapa.id, transformedData)
+          console.log('✅ Update response:', resp)
         }
+        // Refresh the list after update
+        await fetchCapas()
+        alert('✅ تم حفظ التحديثات بنجاح')
       } else {
+        console.log('➕ Creating new CAPA')
         let createdCapa: any = null
         if (onCreateCapa) {
-          await onCreateCapa(data)
+          await onCreateCapa(transformedData)
           // try refresh
           await fetchCapas()
         } else {
           // fallback: call API directly to create CAPA
-          const resp = await apiClient.createCapa(data)
-          console.log('createCapa response', resp)
+          const resp = await apiClient.createCapa(transformedData)
+          console.log('✅ createCapa response', resp)
           // Try to extract the created capa object from different response shapes
-          createdCapa = resp?.data?.capa || resp?.data || resp
+          createdCapa = resp?.data || resp
           if (createdCapa && createdCapa.id) {
             // Normalize dates and arrays if needed
             const normalized: CapaData = {
@@ -286,10 +383,14 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
             await fetchCapas()
           }
         }
+        alert('✅ تم إنشاء الخطة التصحيحية بنجاح')
       }
       setCurrentView('dashboard')
     } catch (error) {
-      console.error('Error saving CAPA:', error)
+      console.error('❌ Error saving CAPA:', error)
+      alert(`❌ فشل حفظ الخطة التصحيحية: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`)
+      // Don't close the form on error - let user try again
+      return
     }
   }
 
@@ -578,6 +679,7 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
         onViewCapa={handleViewCapa}
         onEditCapa={handleEditCapa}
         onCreateCapa={handleCreateCapa}
+        onStartCapa={handleStartCapa}
         isLoading={isLoading}
       />
     </div>

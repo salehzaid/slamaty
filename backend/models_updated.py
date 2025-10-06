@@ -154,13 +154,44 @@ class Capa(Base):
     sla_days = Column(Integer, default=14)
     escalation_level = Column(Integer, default=0)
     closed_at = Column(DateTime(timezone=True), nullable=True)
-    verified_at = Column(DateTime(timezone=True), nullable=True)
+    # verified_at = Column(DateTime(timezone=True), nullable=True)  # Column doesn't exist in DB
     
     # Relationships
     round = relationship("Round", back_populates="capas")
     creator = relationship("User", back_populates="capas_created", foreign_keys=[created_by_id])
     assigned_manager = relationship("User", foreign_keys=[assigned_to_id])
     evaluation_item = relationship("EvaluationItem")
+    actions = relationship("CapaAction", back_populates="capa", cascade="all, delete-orphan")
+
+class CapaAction(Base):
+    """جدول الإجراءات المرتبطة بالخطط التصحيحية
+    
+    يخزن الإجراءات التصحيحية والوقائية وخطوات التحقق في صفوف منفصلة
+    لتسهيل الاستعلام والتقارير والمتابعة الفردية
+    """
+    __tablename__ = "capa_actions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    capa_id = Column(Integer, ForeignKey("capas.id", ondelete="CASCADE"), nullable=False, index=True)
+    action_type = Column(String, nullable=False, index=True)  # 'corrective' | 'preventive' | 'verification'
+    task = Column(Text, nullable=False)
+    due_date = Column(DateTime(timezone=True), nullable=True, index=True)
+    assigned_to = Column(String, nullable=True)  # نص احتياطي لاسم المسؤول
+    assigned_to_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    notes = Column(Text, nullable=True)
+    status = Column(String, default="open", index=True)  # open | in_progress | completed | cancelled
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+    completed_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    # verification-specific fields
+    required = Column(Boolean, default=True)  # لخطوات التحقق: إلزامية أم لا
+    # metadata
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    capa = relationship("Capa", back_populates="actions")
+    assigned_user = relationship("User", foreign_keys=[assigned_to_id])
+    completed_by = relationship("User", foreign_keys=[completed_by_id])
 
 class EvaluationCategory(Base):
     __tablename__ = "evaluation_categories"

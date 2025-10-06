@@ -24,6 +24,13 @@ const SimpleDashboard: React.FC = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
+        // Skip loading if user is not authenticated
+        if (!apiClient.isAuthenticated()) {
+          console.log('⚠️ User not authenticated, skipping dashboard data load')
+          setLoading(false)
+          return
+        }
+        
         setLoading(true)
         setError('')
         

@@ -3,7 +3,6 @@ import {
   Plus, 
   Search, 
   Filter, 
-  Calendar, 
   User, 
   Building2,
   ClipboardCheck,
@@ -11,9 +10,9 @@ import {
   AlertCircle,
   CheckCircle2
 } from 'lucide-react';
-import { mockRounds, mockDepartments } from '../data/mockData';
-import { Round, RoundStatus } from '../types';
+import { RoundStatus } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { useRounds } from '../hooks/useRounds';
 import RoundForm from './forms/RoundForm';
 
 const RoundsPage: React.FC = () => {
@@ -23,7 +22,10 @@ const RoundsPage: React.FC = () => {
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [showCreateForm, setShowCreateForm] = useState(false);
 
-  const filteredRounds = mockRounds.filter(round => {
+  // Use real data from API instead of mock data
+  const { data: rounds, loading, error, refetch } = useRounds();
+
+  const filteredRounds = (rounds || []).filter(round => {
     const matchesSearch = round.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          round.department.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || round.status === statusFilter;
@@ -58,6 +60,53 @@ const RoundsPage: React.FC = () => {
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
+
+  const getRoundTypeText = (type: string) => {
+    const types = {
+      'equipment_safety': 'سلامة المعدات',
+      'infection_control': 'مكافحة العدوى',
+      'patient_safety': 'سلامة المرضى',
+      'medication_safety': 'سلامة الأدوية',
+      'environmental_safety': 'السلامة البيئية'
+    };
+    return types[type as keyof typeof types] || type;
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">جاري تحميل الجولات</h3>
+          <p className="text-lg text-gray-600">يرجى الانتظار...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="p-6 bg-gradient-to-r from-red-50 to-red-100 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+            <AlertCircle className="w-12 h-12 text-red-500" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">خطأ في تحميل الجولات</h3>
+          <p className="text-lg text-gray-600 mb-8">{error}</p>
+          <button 
+            onClick={refetch}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            إعادة المحاولة
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const getStatusText = (status: RoundStatus) => {
     const texts = {
@@ -145,8 +194,8 @@ const RoundsPage: React.FC = () => {
             className="input-field"
           >
             <option value="all">جميع الأقسام</option>
-            {mockDepartments.map(dept => (
-              <option key={dept.id} value={dept.name}>{dept.name}</option>
+            {Array.from(new Set((rounds || []).map(round => round.department))).map(dept => (
+              <option key={dept} value={dept}>{dept}</option>
             ))}
           </select>
           

@@ -10,6 +10,10 @@ from fastapi.exception_handlers import http_exception_handler
 from typing import List, Optional
 from datetime import datetime, timedelta
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv('env.local')
 
 from database import get_db, engine
 from models_updated import Base, UserRole, User, Round, Capa, Department
@@ -81,9 +85,16 @@ async def spa_http_exception_handler(request: Request, exc: HTTPException):
     return await http_exception_handler(request, exc)
 
 # CORS middleware
-import os
 cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5174").split(",")
 cors_origins = [origin.strip() for origin in cors_origins]
+
+# Add more origins for development
+cors_origins.extend([
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+])
 
 app.add_middleware(
     CORSMiddleware,
@@ -1150,6 +1161,89 @@ async def create_enhanced_capa(
         }
     }
 
+@app.put("/api/capas/{capa_id}")
+async def update_enhanced_capa(
+    capa_id: int,
+    capa_update: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update an existing enhanced CAPA plan"""
+    # Check permissions - only quality managers and super admins can update CAPAs
+    if current_user.role not in ["quality_manager", "super_admin"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Only quality managers and super admins can update CAPA plans"
+        )
+    
+    # Get existing CAPA
+    existing_capa = get_capa_by_id(db, capa_id)
+    if not existing_capa:
+        raise HTTPException(status_code=404, detail="CAPA plan not found")
+    
+    # Convert Pydantic models to JSON strings for database storage
+    import json
+    import datetime
+
+    def safe_serialize_actions(actions):
+        if not actions:
+            return "[]"
+        out = []
+        for a in actions:
+            if hasattr(a, 'dict'):
+                item = a.dict()
+            elif hasattr(a, 'model_dump'):
+                item = a.model_dump()
+            else:
+                item = dict(a) if isinstance(a, (list, tuple)) else a
+            out.append(item)
+        return json.dumps(out, ensure_ascii=False)
+
+    # Prepare data for database
+    db_data = {
+        "title": capa_update.get("title", existing_capa.title),
+        "description": capa_update.get("description", existing_capa.description),
+        "department": capa_update.get("department", existing_capa.department),
+        "priority": capa_update.get("priority", existing_capa.priority),
+        "status": capa_update.get("status", existing_capa.status),
+        "assigned_to": capa_update.get("assigned_to", existing_capa.assigned_to),
+        "assigned_to_id": capa_update.get("assigned_to_id", existing_capa.assigned_to_id),
+        "evaluation_item_id": capa_update.get("evaluation_item_id", existing_capa.evaluation_item_id),
+        "target_date": capa_update.get("target_date", existing_capa.target_date),
+        "root_cause": capa_update.get("root_cause", existing_capa.root_cause),
+        "corrective_actions": safe_serialize_actions(capa_update.get("corrective_actions", [])),
+        "preventive_actions": safe_serialize_actions(capa_update.get("preventive_actions", [])),
+        "verification_steps": safe_serialize_actions(capa_update.get("verification_steps", [])),
+        "verification_status": capa_update.get("verification_status", existing_capa.verification_status),
+        "severity": capa_update.get("severity", existing_capa.severity),
+        "estimated_cost": capa_update.get("estimated_cost", existing_capa.estimated_cost),
+        "sla_days": capa_update.get("sla_days", existing_capa.sla_days),
+        "escalation_level": capa_update.get("escalation_level", existing_capa.escalation_level)
+    }
+
+    # Update CAPA in database
+    try:
+        updated_capa = update_capa(db, capa_id, db_data)
+        if not updated_capa:
+            raise HTTPException(status_code=404, detail="CAPA plan not found")
+        
+        return {
+            "status": "success",
+            "message": "CAPA plan updated successfully",
+            "capa_id": updated_capa.id,
+            "capa": {
+                "id": updated_capa.id,
+                "title": updated_capa.title,
+                "description": updated_capa.description,
+                "department": updated_capa.department,
+                "severity": updated_capa.severity,
+                "verification_status": updated_capa.verification_status
+            }
+        }
+    except Exception as e:
+        print(f"Error updating CAPA: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to update CAPA: {str(e)}")
+
 @app.get("/api/capas/{capa_id}", response_model=dict)
 async def get_enhanced_capa(
     capa_id: int,
@@ -1161,22 +1255,30 @@ async def get_enhanced_capa(
     if not capa:
         raise HTTPException(status_code=404, detail="CAPA plan not found")
     
-    # Serialize JSON fields
+    # Serialize JSON fields - prefer table data over JSON if available
     import json
-    try:
-        corrective_actions = json.loads(capa.corrective_actions) if capa.corrective_actions else []
-    except (json.JSONDecodeError, TypeError):
-        corrective_actions = []
     
-    try:
-        preventive_actions = json.loads(capa.preventive_actions) if capa.preventive_actions else []
-    except (json.JSONDecodeError, TypeError):
-        preventive_actions = []
+    # Check if actions were loaded from table
+    corrective_actions = getattr(capa, 'corrective_actions_from_table', None)
+    if corrective_actions is None:
+        try:
+            corrective_actions = json.loads(capa.corrective_actions) if capa.corrective_actions else []
+        except (json.JSONDecodeError, TypeError):
+            corrective_actions = []
     
-    try:
-        verification_steps = json.loads(capa.verification_steps) if capa.verification_steps else []
-    except (json.JSONDecodeError, TypeError):
-        verification_steps = []
+    preventive_actions = getattr(capa, 'preventive_actions_from_table', None)
+    if preventive_actions is None:
+        try:
+            preventive_actions = json.loads(capa.preventive_actions) if capa.preventive_actions else []
+        except (json.JSONDecodeError, TypeError):
+            preventive_actions = []
+    
+    verification_steps = getattr(capa, 'verification_steps_from_table', None)
+    if verification_steps is None:
+        try:
+            verification_steps = json.loads(capa.verification_steps) if capa.verification_steps else []
+        except (json.JSONDecodeError, TypeError):
+            verification_steps = []
     
     try:
         status_history = json.loads(capa.status_history) if capa.status_history else []
@@ -1208,7 +1310,7 @@ async def get_enhanced_capa(
             "sla_days": capa.sla_days,
             "escalation_level": capa.escalation_level,
             "closed_at": capa.closed_at,
-            "verified_at": capa.verified_at,
+                "verified_at": getattr(capa, 'verified_at', None),
             "status_history": status_history,
             "created_by_id": capa.created_by_id,
             "created_at": capa.created_at,
@@ -1643,6 +1745,22 @@ async def get_monthly_rounds(
 
 
 
+# Enhanced CAPA Dashboard API
+from api_enhanced_dashboard import router as dashboard_router
+app.include_router(dashboard_router, prefix="/api", tags=["dashboard"])
+
+# CAPA Actions API
+from api_capa_actions import router as capa_actions_router
+app.include_router(capa_actions_router, tags=["capa-actions"])
+
+# Analytics API
+from api_analytics import router as analytics_router
+app.include_router(analytics_router, prefix="/api", tags=["analytics"])
+
+# Notifications API
+from api_notifications import router as notifications_router
+app.include_router(notifications_router, prefix="/api", tags=["notifications"])
+
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
@@ -1656,5 +1774,9 @@ DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist")
 if os.path.exists(DIST_DIR):
     # Internal assets still available under /static
     app.mount("/static", StaticFiles(directory=DIST_DIR), name="static")
-    # Serve SPA at root (index.html) for any non-API path
-    app.mount("/", StaticFiles(directory=DIST_DIR, html=True), name="frontend")
+    # Note: Removed the root mount that was interfering with API routes
+    # The frontend will be served through the custom 404 handler instead
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

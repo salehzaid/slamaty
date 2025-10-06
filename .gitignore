@@ -32,6 +32,8 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+backend/backend_pid.txt
+backend/server.log
 
 # Test files
 test-*.html

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { useForm, useFieldArray, Controller } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
@@ -14,10 +14,8 @@ import { AlertTriangle, FileText, Plus, Trash2, Calendar, User, DollarSign, Aler
 // Validation schemas
 const ActionItemSchema = z.object({
   task: z.string().min(3, 'المهمة يجب أن تكون 3 أحرف على الأقل'),
-  due_date: z.string().optional(),
-  assigned_to_id: z.number().optional(),
-  status: z.string().default('open'),
-  completed_at: z.string().optional(),
+  due_date: z.string().min(1, 'تاريخ الإنجاز المتوقع مطلوب'),
+  assigned_to: z.string().min(1, 'المسؤول مطلوب'), // تغيير من assigned_to_id إلى assigned_to
   notes: z.string().optional()
 })
 
@@ -33,13 +31,13 @@ const VerificationStepSchema = z.object({
 const CapaCreateSchema = z.object({
   title: z.string().min(5, 'العنوان يجب أن يكون 5 أحرف على الأقل'),
   description: z.string().min(10, 'الوصف يجب أن يكون 10 أحرف على الأقل'),
-  root_cause: z.string().optional(),
+  root_cause_analysis: z.string().min(10, 'تحليل السبب الجذري مطلوب'),
   corrective_actions: z.array(ActionItemSchema).default([]),
   preventive_actions: z.array(ActionItemSchema).default([]),
   verification_steps: z.array(VerificationStepSchema).default([]),
   severity: z.number().min(1).max(5).default(3),
   estimated_cost: z.number().optional(),
-  sla_days: z.number().min(1).max(365).default(14),
+  resolution_deadline: z.string().min(1, 'مهلة الحل مطلوبة'),
   round_id: z.number().optional(),
   evaluation_item_id: z.number().optional(),
   department: z.string().min(1, 'القسم مطلوب'),
@@ -58,6 +56,13 @@ interface EnhancedCapaFormProps {
   isReadOnlyTitle?: boolean
   departments?: Array<{ id: number; name: string }>
   users?: Array<{ id: number; first_name: string; last_name: string }>
+  evaluationData?: {
+    item_name?: string
+    department?: string
+    notes?: string
+    round_id?: number
+    evaluation_item_id?: number
+  }
 }
 
 const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
@@ -68,8 +73,9 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
   description = "قم بإنشاء خطة تصحيحية شاملة مع الإجراءات التصحيحية والوقائية وخطوات التحقق",
   onCancel,
   isReadOnlyTitle = false,
-  departments = [],
-  users = []
+  departments = [], // eslint-disable-line @typescript-eslint/no-unused-vars
+  users = [], // eslint-disable-line @typescript-eslint/no-unused-vars
+  evaluationData
 }) => {
   const {
     register,
@@ -84,13 +90,13 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
     defaultValues: {
       title: '',
       description: '',
-      root_cause: '',
+      root_cause_analysis: '',
       corrective_actions: [],
       preventive_actions: [],
       verification_steps: [],
       severity: 3,
       estimated_cost: undefined,
-      sla_days: 14,
+      resolution_deadline: '',
       round_id: undefined,
       evaluation_item_id: undefined,
       department: '',
@@ -122,6 +128,27 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
     }
   }, [initialData, reset])
 
+  // Auto-fill form with evaluation data
+  useEffect(() => {
+    if (evaluationData) {
+      if (evaluationData.item_name) {
+        setValue('title', `ملاحظة (${evaluationData.item_name})`)
+      }
+      if (evaluationData.department) {
+        setValue('department', evaluationData.department)
+      }
+      if (evaluationData.notes) {
+        setValue('description', evaluationData.notes)
+      }
+      if (evaluationData.round_id) {
+        setValue('round_id', evaluationData.round_id)
+      }
+      if (evaluationData.evaluation_item_id) {
+        setValue('evaluation_item_id', evaluationData.evaluation_item_id)
+      }
+    }
+  }, [evaluationData, setValue])
+
   const severity = watch('severity')
   const severityLabels = {
     1: { label: 'منخفض', color: 'bg-green-100 text-green-800' },
@@ -145,7 +172,10 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={handleSubmit((data) => {
+          console.log('📤 Form data submitted:', data)
+          onSubmit(data)
+        })} className="space-y-8">
           {/* Basic Information */}
           <div className="space-y-6">
             <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -164,11 +194,14 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
                   {...register('title')}
                   placeholder="عنوان الخطة التصحيحية"
                   className={errors.title ? 'border-red-500' : ''}
-                  readOnly={isReadOnlyTitle}
-                  disabled={isReadOnlyTitle}
+                  readOnly={isReadOnlyTitle || !!evaluationData?.item_name}
+                  disabled={isReadOnlyTitle || !!evaluationData?.item_name}
                 />
                 {errors.title && (
                   <p className="text-sm text-red-500">{errors.title.message}</p>
+                )}
+                {evaluationData?.item_name && (
+                  <p className="text-sm text-green-600">تم تعبئة العنوان تلقائياً من اسم عنصر التقييم</p>
                 )}
               </div>
 
@@ -177,20 +210,19 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
                   <FileText className="w-4 h-4" />
                   القسم *
                 </Label>
-                <Select onValueChange={(value) => setValue('department', value)}>
-                  <SelectTrigger className={errors.department ? 'border-red-500' : ''}>
-                    <SelectValue placeholder="اختر القسم" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {departments.map((dept) => (
-                      <SelectItem key={dept.id} value={dept.name}>
-                        {dept.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="department"
+                  {...register('department')}
+                  placeholder="القسم الذي تم فيه التقييم"
+                  className={errors.department ? 'border-red-500' : ''}
+                  readOnly={!!evaluationData?.department}
+                  disabled={!!evaluationData?.department}
+                />
                 {errors.department && (
                   <p className="text-sm text-red-500">{errors.department.message}</p>
+                )}
+                {evaluationData?.department && (
+                  <p className="text-sm text-green-600">تم تعبئة القسم تلقائياً من نتائج التقييم</p>
                 )}
               </div>
             </div>
@@ -198,31 +230,40 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
             <div className="space-y-2">
               <Label htmlFor="description" className="flex items-center gap-2">
                 <FileText className="w-4 h-4" />
-                وصف المشكلة *
+                الملاحظة *
               </Label>
               <Textarea
                 id="description"
                 {...register('description')}
-                placeholder="وصف تفصيلي للمشكلة"
+                placeholder="الملاحظة المكتوبة أثناء التقييم"
                 rows={4}
                 className={errors.description ? 'border-red-500' : ''}
+                readOnly={!!evaluationData?.notes}
+                disabled={!!evaluationData?.notes}
               />
               {errors.description && (
                 <p className="text-sm text-red-500">{errors.description.message}</p>
               )}
+              {evaluationData?.notes && (
+                <p className="text-sm text-green-600">تم تعبئة الملاحظة تلقائياً من نتائج التقييم</p>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="root_cause" className="flex items-center gap-2">
+              <Label htmlFor="root_cause_analysis" className="flex items-center gap-2">
                 <AlertCircle className="w-4 h-4" />
-                تحليل السبب الجذري
+                تحليل السبب الجذري *
               </Label>
               <Textarea
-                id="root_cause"
-                {...register('root_cause')}
-                placeholder="تحليل السبب الجذري للمشكلة"
+                id="root_cause_analysis"
+                {...register('root_cause_analysis')}
+                placeholder="تحليل مفصل للسبب الجذري للمشكلة"
                 rows={4}
+                className={errors.root_cause_analysis ? 'border-red-500' : ''}
               />
+              {errors.root_cause_analysis && (
+                <p className="text-sm text-red-500">{errors.root_cause_analysis.message}</p>
+              )}
             </div>
           </div>
 
@@ -261,30 +302,31 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="estimated_cost" className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4" />
-                  التكلفة المتوقعة
+                  التكلفة المتوقعة (ريال سعودي)
                 </Label>
                 <Input
                   id="estimated_cost"
                   type="number"
                   step="0.01"
                   {...register('estimated_cost', { valueAsNumber: true })}
-                  placeholder="0.00"
+                  placeholder="0.00 ريال"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="sla_days" className="flex items-center gap-2">
+                <Label htmlFor="resolution_deadline" className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  مهلة الحل (أيام) *
+                  مهلة الحل (تاريخ معالجة الملاحظة) *
                 </Label>
                 <Input
-                  id="sla_days"
-                  type="number"
-                  min="1"
-                  max="365"
-                  {...register('sla_days', { valueAsNumber: true })}
-                  placeholder="14"
+                  id="resolution_deadline"
+                  type="date"
+                  {...register('resolution_deadline')}
+                  className={errors.resolution_deadline ? 'border-red-500' : ''}
                 />
+                {errors.resolution_deadline && (
+                  <p className="text-sm text-red-500">{errors.resolution_deadline.message}</p>
+                )}
               </div>
             </div>
           </div>
@@ -300,7 +342,7 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => appendCorrective({ task: '', due_date: '', assigned_to_id: undefined, status: 'open' })}
+                onClick={() => appendCorrective({ task: '', due_date: '', assigned_to: '', notes: '' })}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 إضافة إجراء
@@ -319,26 +361,28 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>تاريخ الاستحقاق</Label>
+                      <Label>تاريخ الإنجاز المتوقع *</Label>
                       <Input
                         type="date"
                         {...register(`corrective_actions.${index}.due_date`)}
                       />
+                      {errors.corrective_actions?.[index]?.due_date && (
+                        <p className="text-sm text-red-500">{errors.corrective_actions[index]?.due_date?.message}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
-                      <Label>المسؤول</Label>
-                      <Select onValueChange={(value) => setValue(`corrective_actions.${index}.assigned_to_id`, parseInt(value))}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر المسؤول" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {users.map((user) => (
-                            <SelectItem key={user.id} value={user.id.toString()}>
-                              {user.first_name} {user.last_name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Label>المسؤول *</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Input
+                          {...register(`corrective_actions.${index}.assigned_to`)}
+                          placeholder="اسم المسؤول"
+                          className="pl-10"
+                        />
+                      </div>
+                      {errors.corrective_actions?.[index]?.assigned_to && (
+                        <p className="text-sm text-red-500">{errors.corrective_actions[index]?.assigned_to?.message}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>ملاحظات</Label>
@@ -375,7 +419,7 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => appendPreventive({ task: '', due_date: '', assigned_to_id: undefined, status: 'open' })}
+                onClick={() => appendPreventive({ task: '', due_date: '', assigned_to: '', notes: '' })}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 إضافة إجراء
@@ -394,26 +438,28 @@ const EnhancedCapaForm: React.FC<EnhancedCapaFormProps> = ({
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>تاريخ الاستحقاق</Label>
+                      <Label>تاريخ الإنجاز المتوقع *</Label>
                       <Input
                         type="date"
                         {...register(`preventive_actions.${index}.due_date`)}
                       />
+                      {errors.preventive_actions?.[index]?.due_date && (
+                        <p className="text-sm text-red-500">{errors.preventive_actions[index]?.due_date?.message}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
-                      <Label>المسؤول</Label>
-                      <Select onValueChange={(value) => setValue(`preventive_actions.${index}.assigned_to_id`, parseInt(value))}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر المسؤول" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {users.map((user) => (
-                            <SelectItem key={user.id} value={user.id.toString()}>
-                              {user.first_name} {user.last_name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Label>المسؤول *</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Input
+                          {...register(`preventive_actions.${index}.assigned_to`)}
+                          placeholder="اسم المسؤول"
+                          className="pl-10"
+                        />
+                      </div>
+                      {errors.preventive_actions?.[index]?.assigned_to && (
+                        <p className="text-sm text-red-500">{errors.preventive_actions[index]?.assigned_to?.message}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>ملاحظات</Label>

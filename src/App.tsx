@@ -12,9 +12,9 @@ import SimpleDashboard from './components/SimpleDashboard';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import TestRegisterPage from './components/TestRegisterPage';
-import CapaManagement from './components/pages/CapaManagement';
-import CapaFormPage from '@/components/pages/CapaFormPage';
-import EnhancedCapaManagement from './components/pages/EnhancedCapaManagement';
+// Deprecated traditional CAPA components removed; use enhanced CAPA page instead
+import EnhancedCapaManagement from './components/pages/EnhancedCapaManagement'
+import EnhancedCapaDashboardMain from './components/dashboard/EnhancedCapaDashboardMain';
 import DepartmentsManagement from './components/pages/DepartmentsManagement';
 import DepartmentFormPage from './components/pages/DepartmentFormPage';
 import ReportsPage from './components/pages/ReportsPage';
@@ -104,10 +104,10 @@ const AppContent: React.FC = () => {
             <Route path="/rounds/evaluate/:roundId" element={<EvaluateRoundPage />} />
             <Route path="/rounds/capa-integration" element={<CapaIntegrationRoundSelector />} />
             <Route path="/rounds/:roundId/capa-integration" element={<EvaluationCapaIntegration />} />
-            <Route path="/capa" element={<CapaManagement />} />
-            <Route path="/capa/new" element={<CapaFormPage />} />
-            <Route path="/capa/edit/:id" element={<CapaFormPage />} />
+            {/* Deprecated traditional CAPA pages removed in favor of enhanced page */}
+            {/* Routes for /capa removed. Use /capa-enhanced instead. */}
             <Route path="/capa-enhanced" element={<EnhancedCapaManagement />} />
+        <Route path="/capa-dashboard" element={<EnhancedCapaDashboardMain />} />
             <Route path="/my-rounds" element={<MyRoundsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/departments" element={<DepartmentsManagement />} />

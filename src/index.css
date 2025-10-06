@@ -1,6 +1,7 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+@import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
@@ -87,12 +88,11 @@
   }
 }
 
-/* Import IBM Plex Sans Arabic Font */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap');
+/* Import Noto Kufi Arabic Font - moved to top */
 
-/* Force IBM Plex Sans Arabic font on all elements */
+/* Force Noto Kufi Arabic font on all elements */
 * {
-  font-family: 'IBM Plex Sans Arabic', 'Tajawal', 'Noto Kufi Arabic', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'Noto Kufi Arabic', 'IBM Plex Sans Arabic', 'Tajawal', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 /* Additional font enforcement */
@@ -109,17 +109,17 @@ article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup, 
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
-  font-family: 'IBM Plex Sans Arabic', 'Tajawal', 'Noto Kufi Arabic', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'Noto Kufi Arabic', 'IBM Plex Sans Arabic', 'Tajawal', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 /* Arabic Typography Enhancements */
 body {
-  font-family: 'IBM Plex Sans Arabic', 'Tajawal', 'Noto Kufi Arabic', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Noto Kufi Arabic', 'IBM Plex Sans Arabic', 'Tajawal', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   direction: rtl;
   text-align: right;
 }
 
-/* IBM Plex Sans Arabic Typography System */
+/* Noto Kufi Arabic Typography System */
 .font-aws-pro {
   font-family: 'IBM Plex Sans Arabic', 'Tajawal', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }

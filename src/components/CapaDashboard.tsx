@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import React, { useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,7 +18,8 @@ import {
   Clock,
   AlertCircle,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  Play
 } from 'lucide-react'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
@@ -64,6 +65,7 @@ interface CapaDashboardProps {
   onViewCapa?: (capa: CapaData) => void
   onEditCapa?: (capa: CapaData) => void
   onCreateCapa?: () => void
+  onStartCapa?: (capa: CapaData) => void
   isLoading?: boolean
 }
 
@@ -72,6 +74,7 @@ const CapaDashboard: React.FC<CapaDashboardProps> = ({
   onViewCapa,
   onEditCapa,
   onCreateCapa,
+  onStartCapa,
   isLoading = false
 }) => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -156,10 +159,10 @@ const CapaDashboard: React.FC<CapaDashboardProps> = ({
     { name: 'مرفوض', value: stats.rejected, color: '#ef4444' }
   ]
 
-  const departmentData = departments.map(dept => ({
-    name: dept,
-    value: capas.filter(c => c.department === dept).length
-  }))
+  // const departmentData = departments.map(dept => ({
+  //   name: dept,
+  //   value: capas.filter(c => c.department === dept).length
+  // }))
 
   if (isLoading) {
     return (
@@ -459,6 +462,18 @@ const CapaDashboard: React.FC<CapaDashboardProps> = ({
                           <Eye className="w-4 h-4 mr-2" />
                           عرض
                         </Button>
+                        {(capa.status === 'pending' || capa.status === 'assigned' || capa.verification_status === 'pending') && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onStartCapa?.(capa)}
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                            title="بدء الخطة التصحيحية"
+                          >
+                            <Play className="w-4 h-4 mr-2" />
+                            بدء
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
                           size="sm"

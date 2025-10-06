@@ -44,8 +44,13 @@ def _truncate_for_bcrypt(password: str) -> str:
         return password[:72] if len(password) > 72 else password
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    safe = _truncate_for_bcrypt(plain_password)
-    return pwd_context.verify(safe, hashed_password)
+    try:
+        # Use bcrypt directly to avoid passlib issues
+        import bcrypt
+        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    except Exception as e:
+        print(f"Password verification error: {e}")
+        return False
 
 def get_password_hash(password: str) -> str:
     safe = _truncate_for_bcrypt(password)
