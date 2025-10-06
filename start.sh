@@ -16,6 +16,14 @@ if [ -f "backend/env.production" ]; then
     export $(cat backend/env.production | grep -v '^#' | xargs) 2>/dev/null || echo "Some variables may not be set"
 fi
 
+# Initialize database if needed (only on first deployment)
+if [ "$INIT_DATABASE" = "true" ]; then
+    echo "Initializing database..."
+    cd backend
+    python3 init_database.py || echo "Database initialization failed or already initialized"
+    cd ..
+fi
+
 # Start backend directly (frontend is already built in Docker)
 echo "Starting backend server..."
 cd backend
