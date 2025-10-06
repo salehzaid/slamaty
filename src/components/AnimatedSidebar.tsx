@@ -284,13 +284,13 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
         "fixed top-0 right-0 h-screen bg-slate-900 shadow-2xl transition-all duration-300 ease-in-out flex flex-col z-40",
         "border-l border-slate-700 backdrop-blur-sm",
         "shadow-slate-900/50",
-        isCollapsed ? "w-16" : "w-72",
+        (isCollapsed && !isMobileOpen) ? "w-16" : "w-72",
         // Mobile: overlay behavior
         isMobileOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
       )}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-700">
-          {!isCollapsed && (
+          {(!isCollapsed || isMobileOpen) && (
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25">
                 <Shield className="w-5 h-5 text-white" />
@@ -354,7 +354,7 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
                     </div>
 
                     {/* Label and Badge */}
-                    {!isCollapsed && (
+                    {(!isCollapsed || isMobileOpen) && (
                       <div className="flex-1 flex items-center justify-between min-w-0">
                         <span className={cn(
                           "text-sm font-medium truncate transition-all duration-200",
@@ -406,7 +406,7 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
                   </button>
 
                   {/* Submenu */}
-                  {hasSubmenu && isExpanded && !isCollapsed && (
+                  {hasSubmenu && isExpanded && (!isCollapsed || isMobileOpen) && (
                     <div className="mr-4 space-y-1">
                       {item.submenu.map((subItem) => {
                         const SubIcon = subItem.icon
@@ -481,7 +481,7 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
                   </div>
 
                   {/* Label and Badge */}
-                  {!isCollapsed && (
+                  {(!isCollapsed || isMobileOpen) && (
                     <div className="flex-1 flex items-center justify-between min-w-0">
                       <span className={cn(
                         "text-sm font-medium truncate transition-all duration-200",
