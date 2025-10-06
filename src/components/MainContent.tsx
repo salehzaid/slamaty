@@ -13,14 +13,16 @@ const MainContent: React.FC<MainContentProps> = ({ children, onLogout }) => {
 
   return (
     <main 
-      className="transition-all duration-300 ease-in-out" 
+      className="transition-all duration-300 ease-in-out min-h-screen" 
       style={{ 
-        marginRight: isMobile ? '0px' : `${sidebarWidth}px` 
+        marginRight: isMobile ? '0' : `${sidebarWidth}px` 
       }}
     >
       <Header onLogout={onLogout} />
       <DynamicLayout>
-        {children}
+        <div className="p-3 sm:p-4 md:p-6 lg:p-8">
+          {children}
+        </div>
       </DynamicLayout>
     </main>
   )

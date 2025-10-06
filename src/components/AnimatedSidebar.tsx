@@ -58,6 +58,18 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
     return () => window.removeEventListener('resize', handleResize)
   }, [setIsSidebarCollapsed])
 
+  // Listen for mobile menu toggle from Header
+  useEffect(() => {
+    const handleMobileToggle = () => {
+      if (window.innerWidth < 1024) {
+        setIsMobileOpen(prev => !prev)
+      }
+    }
+    
+    window.addEventListener("toggle-mobile-sidebar", handleMobileToggle)
+    return () => window.removeEventListener("toggle-mobile-sidebar", handleMobileToggle)
+  }, [])
+
   const menuItems = [
     {
       id: 'dashboard',
