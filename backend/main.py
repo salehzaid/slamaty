@@ -86,45 +86,61 @@ async def create_emergency_test_round():
         # Get database session directly
         db = next(get_db())
         
-        # Check if admin user exists
-        admin_user = db.query(User).filter(User.email == "testadmin@salamaty.com").first()
-        if not admin_user:
-            # Create admin user first
+        # Check if admin user exists using raw SQL
+        user_query = text("SELECT id FROM users WHERE email = 'testadmin@salamaty.com'")
+        user_result = db.execute(user_query).fetchone()
+        
+        if not user_result:
+            # Create admin user first using raw SQL
             from auth import get_password_hash
-            from models_updated import UserRole
+            import uuid
             
-            admin_user = User(
-                username="testadmin",
-                email="testadmin@salamaty.com",
-                first_name="مدير",
-                last_name="النظام",
-                hashed_password=get_password_hash("test123"),
-                role=UserRole.SUPER_ADMIN,
-                department="الإدارة العامة",
-                position="مدير النظام",
-                phone="+966500000000",
-                is_active=True
-            )
-            db.add(admin_user)
+            admin_password = get_password_hash("test123")
+            user_id = 1  # Simple ID assignment
+            
+            insert_user_query = text("""
+                INSERT INTO users (id, username, email, first_name, last_name, 
+                                 hashed_password, role, department, position, phone, is_active)
+                VALUES (:id, :username, :email, :first_name, :last_name,
+                       :hashed_password, :role, :department, :position, :phone, :is_active)
+                ON CONFLICT (email) DO NOTHING
+                RETURNING id
+            """)
+            
+            user_data = {
+                "id": user_id,
+                "username": "testadmin",
+                "email": "testadmin@salamaty.com",
+                "first_name": "مدير",
+                "last_name": "النظام",
+                "hashed_password": admin_password,
+                "role": "super_admin",
+                "department": "الإدارة العامة",
+                "position": "مدير النظام",
+                "phone": "+966500000000",
+                "is_active": True
+            }
+            
+            result = db.execute(insert_user_query, user_data)
+            admin_user_id = result.fetchone()
+            if admin_user_id:
+                admin_user_id = admin_user_id[0]
+            else:
+                # User already exists, get ID
+                admin_user_id = db.execute(user_query).fetchone()[0]
+            
             db.commit()
-            db.refresh(admin_user)
-            print("✅ Created admin user")
+            print("✅ Created/verified admin user")
+        else:
+            admin_user_id = user_result[0]
         
-        # Create test round with minimal required fields
-        test_round_data = {
-            "round_code": "TEST001",
-            "title": "جولة تجريبية - اختبار النظام",
-            "description": "جولة تجريبية لاختبار عمل النظام",
-            "round_type": "patient_safety",
-            "department": "الطوارئ",
-            "assigned_to": json.dumps([admin_user.id]),
-            "scheduled_date": datetime.now() + timedelta(hours=1),
-            "status": "scheduled",
-            "priority": "medium",
-            "created_by_id": admin_user.id
-        }
+        # Check if test round already exists
+        check_query = text("SELECT id FROM rounds WHERE round_code = 'TEST001'")
+        existing = db.execute(check_query).fetchone()
+        if existing:
+            return {"message": "Test round already exists", "round_id": existing[0]}
         
-        # Try to create round using raw SQL to avoid model issues
+        # Create test round using raw SQL
         insert_query = text("""
             INSERT INTO rounds (round_code, title, description, round_type, department, 
                               assigned_to, scheduled_date, status, priority, created_by_id)
@@ -132,6 +148,19 @@ async def create_emergency_test_round():
                    :assigned_to, :scheduled_date, :status, :priority, :created_by_id)
             RETURNING id
         """)
+        
+        test_round_data = {
+            "round_code": "TEST001",
+            "title": "جولة تجريبية - اختبار النظام",
+            "description": "جولة تجريبية لاختبار عمل النظام",
+            "round_type": "patient_safety",
+            "department": "الطوارئ",
+            "assigned_to": json.dumps([admin_user_id]),
+            "scheduled_date": datetime.now() + timedelta(hours=1),
+            "status": "scheduled",
+            "priority": "medium",
+            "created_by_id": admin_user_id
+        }
         
         result = db.execute(insert_query, test_round_data)
         round_id = result.fetchone()[0]
@@ -144,7 +173,7 @@ async def create_emergency_test_round():
         return {
             "message": "تم إنشاء جولة تجريبية بنجاح",
             "round_id": round_id,
-            "admin_user_id": admin_user.id
+            "admin_user_id": admin_user_id
         }
         
     except Exception as e:
