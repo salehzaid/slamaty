@@ -372,6 +372,47 @@ async def debug_constraints():
     except Exception as e:
         return {"error": str(e)}
 
+
+# Version / deployment diagnostic endpoint
+@app.get("/api/health/version", include_in_schema=False)
+async def deployment_version_info():
+    """Return simple deployment metadata to verify frontend build/version on the server."""
+    try:
+        info = {}
+        # Try to read build commit from env
+        import os
+        info['build_commit'] = os.getenv('BUILD_COMMIT') or os.getenv('GIT_COMMIT') or None
+
+        # If dist exists, try to parse the main script filename
+        dist_index = os.path.join(DIST_DIR, 'index.html') if 'DIST_DIR' in globals() else os.path.join('dist', 'index.html')
+        if os.path.exists(dist_index):
+            try:
+                with open(dist_index, 'r', encoding='utf-8') as f:
+                    html = f.read()
+                # find the first script src under /assets
+                import re
+                m = re.search(r"<script[^>]+src=\"(/assets/[^\"]+)\"", html)
+                if m:
+                    script_path = m.group(1)
+                    info['frontend_main_script'] = script_path
+                    asset_file = os.path.join('dist', script_path.lstrip('/'))
+                    if os.path.exists(asset_file):
+                        info['frontend_asset_mtime'] = os.path.getmtime(asset_file)
+                # also include presence of dist folder
+                info['dist_exists'] = True
+            except Exception as err:
+                info['dist_error'] = str(err)
+        else:
+            info['dist_exists'] = False
+
+        # Add server timestamp
+        import time
+        info['server_time'] = time.time()
+
+        return info
+    except Exception as e:
+        return {"error": str(e)}
+
 # Database diagnostic endpoint
 @app.get("/api/health/database", include_in_schema=False)
 async def check_database_health(db: Session = Depends(get_db)):
@@ -1988,6 +2029,611 @@ async def get_reports_dashboard_stats(
     except Exception as e:
         print(f"Error getting reports dashboard stats: {e}")
         raise HTTPException(status_code=500, detail=f"خطأ في جلب إحصائيات التقارير: {str(e)}")
+
+# =====================================================
+# CAPA Dashboard Endpoints
+# =====================================================
+
+@app.get("/api/dashboard/stats/")
+async def get_dashboard_stats(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get CAPA dashboard statistics"""
+    try:
+        # Query the view for dashboard stats
+        result = db.execute(text("SELECT * FROM capa_dashboard_stats")).fetchone()
+        
+        if not result:
+            return {
+                "total_capas": 0,
+                "overdue_capas": 0,
+                "completed_this_month": 0,
+                "critical_pending": 0,
+                "average_completion_time": 0,
+                "cost_savings": 0
+            }
+        
+        return {
+            "total_capas": result[0] or 0,
+            "overdue_capas": result[1] or 0,
+            "completed_this_month": result[2] or 0,
+            "critical_pending": result[3] or 0,
+            "average_completion_time": float(result[4]) if result[4] else 0,
+            "cost_savings": result[5] or 0
+        }
+    except Exception as e:
+        print(f"Error getting dashboard stats: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب إحصائيات الداشبورد: {str(e)}")
+
+@app.get("/api/dashboard/overdue/")
+async def get_overdue_actions(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get overdue CAPA actions"""
+    try:
+        # Query overdue actions
+        query = text("""
+            SELECT 
+                ca.id,
+                ca.task,
+                ca.due_date,
+                ca.status,
+                ca.capa_id,
+                c.title as capa_title,
+                ca.assigned_to,
+                ca.action_type
+            FROM capa_actions ca
+            JOIN capas c ON c.id = ca.capa_id
+            WHERE ca.due_date < NOW()
+            AND ca.status NOT IN ('completed', 'cancelled')
+            ORDER BY ca.due_date ASC
+        """)
+        
+        results = db.execute(query).fetchall()
+        
+        # Organize by action type
+        corrective_actions = []
+        preventive_actions = []
+        verification_steps = []
+        
+        for row in results:
+            action_data = {
+                "id": row[0],
+                "task": row[1],
+                "due_date": row[2].isoformat() if row[2] else None,
+                "status": row[3],
+                "capa_id": row[4],
+                "capa_title": row[5],
+                "assigned_to": row[6]
+            }
+            
+            if row[7] == 'corrective':
+                corrective_actions.append(action_data)
+            elif row[7] == 'preventive':
+                preventive_actions.append(action_data)
+            elif row[7] == 'verification':
+                verification_steps.append(action_data)
+        
+        return {
+            "corrective_actions": corrective_actions,
+            "preventive_actions": preventive_actions,
+            "verification_steps": verification_steps
+        }
+    except Exception as e:
+        print(f"Error getting overdue actions: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب الإجراءات المتأخرة: {str(e)}")
+
+@app.get("/api/dashboard/upcoming/")
+async def get_upcoming_deadlines(
+    days: int = 7,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get upcoming deadlines within specified days"""
+    try:
+        query = text("""
+            SELECT 
+                ca.id,
+                ca.task,
+                ca.due_date,
+                ca.status,
+                ca.capa_id,
+                c.title as capa_title,
+                ca.assigned_to,
+                ca.action_type
+            FROM capa_actions ca
+            JOIN capas c ON c.id = ca.capa_id
+            WHERE ca.due_date BETWEEN NOW() AND NOW() + INTERVAL ':days days'
+            AND ca.status NOT IN ('completed', 'cancelled')
+            ORDER BY ca.due_date ASC
+        """.replace(':days', str(days)))
+        
+        results = db.execute(query).fetchall()
+        
+        # Organize by action type
+        corrective_actions = []
+        preventive_actions = []
+        verification_steps = []
+        
+        for row in results:
+            action_data = {
+                "id": row[0],
+                "task": row[1],
+                "due_date": row[2].isoformat() if row[2] else None,
+                "status": row[3],
+                "capa_id": row[4],
+                "capa_title": row[5],
+                "assigned_to": row[6]
+            }
+            
+            if row[7] == 'corrective':
+                corrective_actions.append(action_data)
+            elif row[7] == 'preventive':
+                preventive_actions.append(action_data)
+            elif row[7] == 'verification':
+                verification_steps.append(action_data)
+        
+        return {
+            "corrective_actions": corrective_actions,
+            "preventive_actions": preventive_actions,
+            "verification_steps": verification_steps
+        }
+    except Exception as e:
+        print(f"Error getting upcoming deadlines: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب المواعيد القادمة: {str(e)}")
+
+# =====================================================
+# Actions Endpoints
+# =====================================================
+
+@app.get("/api/actions/")
+async def get_actions(
+    capa_id: Optional[int] = None,
+    action_type: Optional[str] = None,
+    assigned_to_id: Optional[int] = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get actions with optional filters"""
+    try:
+        # Build query with filters
+        where_clauses = []
+        params = {}
+        
+        if capa_id:
+            where_clauses.append("ca.capa_id = :capa_id")
+            params['capa_id'] = capa_id
+        
+        if action_type:
+            where_clauses.append("ca.action_type = :action_type")
+            params['action_type'] = action_type
+        
+        if assigned_to_id:
+            where_clauses.append("ca.assigned_to_id = :assigned_to_id")
+            params['assigned_to_id'] = assigned_to_id
+        
+        where_clause = " AND " + " AND ".join(where_clauses) if where_clauses else ""
+        
+        query = text(f"""
+            SELECT 
+                ca.id,
+                ca.task,
+                ca.description,
+                ca.assigned_to,
+                ca.due_date,
+                ca.status,
+                ca.completion_percentage,
+                ca.capa_id,
+                c.title as capa_title,
+                ca.action_type,
+                ca.notes
+            FROM capa_actions ca
+            JOIN capas c ON c.id = ca.capa_id
+            {where_clause}
+            ORDER BY ca.due_date ASC
+        """)
+        
+        results = db.execute(query, params).fetchall()
+        
+        actions = []
+        for row in results:
+            actions.append({
+                "id": row[0],
+                "task": row[1],
+                "description": row[2],
+                "assigned_to": row[3],
+                "due_date": row[4].isoformat() if row[4] else None,
+                "status": row[5],
+                "completion_percentage": row[6] or 0,
+                "capa_id": row[7],
+                "capa_title": row[8],
+                "type": row[9],
+                "notes": row[10]
+            })
+        
+        return actions
+    except Exception as e:
+        print(f"Error getting actions: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب الإجراءات: {str(e)}")
+
+@app.put("/api/actions/{action_id}")
+async def update_action(
+    action_id: int,
+    data: dict = Body(...),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update action status and progress"""
+    try:
+        # Build update query
+        update_fields = []
+        params = {"action_id": action_id}
+        
+        if "status" in data:
+            update_fields.append("status = :status")
+            params['status'] = data['status']
+        
+        if "completion_percentage" in data:
+            update_fields.append("completion_percentage = :completion_percentage")
+            params['completion_percentage'] = data['completion_percentage']
+        
+        if "notes" in data:
+            update_fields.append("notes = :notes")
+            params['notes'] = data['notes']
+        
+        if data.get('status') == 'completed':
+            update_fields.append("completed_at = NOW()")
+            update_fields.append("completed_by_id = :user_id")
+            params['user_id'] = current_user.id
+        
+        if not update_fields:
+            raise HTTPException(status_code=400, detail="لا توجد حقول للتحديث")
+        
+        update_query = text(f"""
+            UPDATE capa_actions
+            SET {', '.join(update_fields)}
+            WHERE id = :action_id
+            RETURNING id
+        """)
+        
+        result = db.execute(update_query, params)
+        db.commit()
+        
+        if not result.fetchone():
+            raise HTTPException(status_code=404, detail="الإجراء غير موجود")
+        
+        return {"success": True, "message": "تم تحديث الإجراء بنجاح"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        print(f"Error updating action: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في تحديث الإجراء: {str(e)}")
+
+# =====================================================
+# Timeline Endpoints
+# =====================================================
+
+@app.get("/api/timeline/events/")
+async def get_timeline_events(
+    capa_id: Optional[int] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get timeline events with optional filters"""
+    try:
+        where_clauses = []
+        params = {}
+        
+        if capa_id:
+            where_clauses.append("te.capa_id = :capa_id")
+            params['capa_id'] = capa_id
+        
+        if start_date:
+            where_clauses.append("te.created_at >= :start_date")
+            params['start_date'] = start_date
+        
+        if end_date:
+            where_clauses.append("te.created_at <= :end_date")
+            params['end_date'] = end_date
+        
+        where_clause = " AND " + " AND ".join(where_clauses) if where_clauses else ""
+        
+        query = text(f"""
+            SELECT 
+                te.id,
+                te.event_type,
+                te.title,
+                te.description,
+                te.created_at,
+                te.user_name,
+                te.capa_id,
+                c.title as capa_title,
+                te.action_id,
+                te.new_status,
+                te.progress_percentage
+            FROM timeline_events te
+            JOIN capas c ON c.id = te.capa_id
+            {where_clause}
+            ORDER BY te.created_at DESC
+            LIMIT 100
+        """)
+        
+        results = db.execute(query, params).fetchall()
+        
+        events = []
+        for row in results:
+            events.append({
+                "id": row[0],
+                "type": row[1],
+                "title": row[2],
+                "description": row[3],
+                "timestamp": row[4].isoformat() if row[4] else None,
+                "user_name": row[5],
+                "capa_id": row[6],
+                "capa_title": row[7],
+                "action_id": row[8],
+                "status": row[9],
+                "progress_percentage": row[10]
+            })
+        
+        return events
+    except Exception as e:
+        print(f"Error getting timeline events: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب أحداث الجدول الزمني: {str(e)}")
+
+# =====================================================
+# Alerts Endpoints
+# =====================================================
+
+@app.get("/api/alerts/")
+async def get_alerts(
+    user_id: Optional[int] = None,
+    filter_type: str = 'all',
+    priority: str = 'all',
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get alerts with optional filters"""
+    try:
+        where_clauses = []
+        params = {}
+        
+        if user_id:
+            where_clauses.append("user_id = :user_id")
+            params['user_id'] = user_id
+        
+        if filter_type != 'all':
+            if filter_type == 'unread':
+                where_clauses.append("read = FALSE")
+            elif filter_type in ['overdue', 'upcoming', 'escalation', 'completion', 'system']:
+                where_clauses.append("alert_type = :alert_type")
+                params['alert_type'] = filter_type
+        
+        if priority != 'all':
+            where_clauses.append("priority = :priority")
+            params['priority'] = priority
+        
+        where_clause = " WHERE " + " AND ".join(where_clauses) if where_clauses else ""
+        
+        query = text(f"""
+            SELECT 
+                id,
+                alert_type,
+                title,
+                message,
+                priority,
+                created_at,
+                read,
+                action_required,
+                capa_id,
+                capa_title,
+                action_id,
+                due_date,
+                days_until_due
+            FROM capa_alerts
+            {where_clause}
+            ORDER BY 
+                CASE priority 
+                    WHEN 'critical' THEN 1 
+                    WHEN 'high' THEN 2 
+                    WHEN 'medium' THEN 3 
+                    ELSE 4 
+                END,
+                created_at DESC
+            LIMIT 50
+        """)
+        
+        results = db.execute(query, params).fetchall()
+        
+        alerts = []
+        for row in results:
+            alerts.append({
+                "id": row[0],
+                "type": row[1],
+                "title": row[2],
+                "message": row[3],
+                "priority": row[4],
+                "created_at": row[5].isoformat() if row[5] else None,
+                "read": row[6],
+                "action_required": row[7],
+                "capa_id": row[8],
+                "capa_title": row[9],
+                "action_id": row[10],
+                "due_date": row[11].isoformat() if row[11] else None,
+                "days_until_due": row[12]
+            })
+        
+        return alerts
+    except Exception as e:
+        print(f"Error getting alerts: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب التنبيهات: {str(e)}")
+
+@app.put("/api/alerts/{alert_id}/read")
+async def mark_alert_as_read(
+    alert_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Mark alert as read"""
+    try:
+        query = text("""
+            UPDATE capa_alerts
+            SET read = TRUE, read_at = NOW()
+            WHERE id = :alert_id
+            RETURNING id
+        """)
+        
+        result = db.execute(query, {"alert_id": alert_id})
+        db.commit()
+        
+        if not result.fetchone():
+            raise HTTPException(status_code=404, detail="التنبيه غير موجود")
+        
+        return {"success": True, "message": "تم تعليم التنبيه كمقروء"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        print(f"Error marking alert as read: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في تحديث التنبيه: {str(e)}")
+
+# =====================================================
+# Reports Endpoints
+# =====================================================
+
+@app.get("/api/reports/basic/")
+async def get_basic_reports(
+    period: str = 'month',
+    department_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get basic CAPA reports"""
+    try:
+        # Determine date range based on period
+        if not start_date or not end_date:
+            from datetime import datetime, timedelta
+            end = datetime.now()
+            if period == 'week':
+                start = end - timedelta(days=7)
+            elif period == 'month':
+                start = end - timedelta(days=30)
+            elif period == 'quarter':
+                start = end - timedelta(days=90)
+            else:  # year
+                start = end - timedelta(days=365)
+            
+            start_date = start.isoformat()
+            end_date = end.isoformat()
+        
+        # Build department filter
+        dept_filter = ""
+        params = {"start_date": start_date, "end_date": end_date}
+        
+        if department_id and department_id != 'all':
+            dept_filter = "AND department = :department"
+            params['department'] = department_id
+        
+        # Get overall stats
+        stats_query = text(f"""
+            SELECT 
+                COUNT(*) as total_capas,
+                COUNT(*) FILTER (WHERE status IN ('verified', 'closed')) as completed_capas,
+                COUNT(*) FILTER (WHERE target_date < NOW() AND status NOT IN ('verified', 'closed')) as overdue_capas,
+                COALESCE(AVG(EXTRACT(DAY FROM (NOW() - created_at))) FILTER (WHERE status IN ('verified', 'closed')), 0) as avg_completion_time
+            FROM capas
+            WHERE created_at BETWEEN :start_date AND :end_date
+            {dept_filter}
+        """)
+        
+        stats_result = db.execute(stats_query, params).fetchone()
+        
+        # Get priority breakdown
+        priority_query = text(f"""
+            SELECT 
+                priority,
+                COUNT(*) as count
+            FROM capas
+            WHERE created_at BETWEEN :start_date AND :end_date
+            {dept_filter}
+            GROUP BY priority
+        """)
+        
+        priority_results = db.execute(priority_query, params).fetchall()
+        priority_breakdown = {row[0]: row[1] for row in priority_results}
+        
+        # Get status breakdown
+        status_query = text(f"""
+            SELECT 
+                status,
+                COUNT(*) as count
+            FROM capas
+            WHERE created_at BETWEEN :start_date AND :end_date
+            {dept_filter}
+            GROUP BY status
+        """)
+        
+        status_results = db.execute(status_query, params).fetchall()
+        status_breakdown = {row[0]: row[1] for row in status_results}
+        
+        # Get department stats
+        dept_query = text(f"""
+            SELECT 
+                department,
+                COUNT(*) as total_capas,
+                COUNT(*) FILTER (WHERE status IN ('verified', 'closed')) as completed_capas,
+                COUNT(*) FILTER (WHERE target_date < NOW() AND status NOT IN ('verified', 'closed')) as overdue_capas,
+                COALESCE(AVG(EXTRACT(DAY FROM (NOW() - created_at))) FILTER (WHERE status IN ('verified', 'closed')), 0) as avg_completion_time
+            FROM capas
+            WHERE created_at BETWEEN :start_date AND :end_date
+            {dept_filter}
+            GROUP BY department
+            ORDER BY total_capas DESC
+        """)
+        
+        dept_results = db.execute(dept_query, params).fetchall()
+        department_stats = []
+        for row in dept_results:
+            department_stats.append({
+                "department": row[0],
+                "total_capas": row[1],
+                "completed_capas": row[2],
+                "overdue_capas": row[3],
+                "average_completion_time": float(row[4])
+            })
+        
+        return {
+            "period": period,
+            "total_capas": stats_result[0] or 0,
+            "completed_capas": stats_result[1] or 0,
+            "overdue_capas": stats_result[2] or 0,
+            "average_completion_time": float(stats_result[3]) if stats_result[3] else 0,
+            "cost_savings": 0,
+            "department_stats": department_stats,
+            "priority_breakdown": {
+                "low": priority_breakdown.get('low', 0),
+                "medium": priority_breakdown.get('medium', 0),
+                "high": priority_breakdown.get('high', 0),
+                "critical": priority_breakdown.get('urgent', 0)
+            },
+            "status_breakdown": {
+                "pending": status_breakdown.get('pending', 0),
+                "in_progress": status_breakdown.get('in_progress', 0),
+                "completed": status_breakdown.get('verified', 0) + status_breakdown.get('closed', 0),
+                "closed": status_breakdown.get('closed', 0)
+            },
+            "monthly_trends": []
+        }
+    except Exception as e:
+        print(f"Error getting basic reports: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب التقارير: {str(e)}")
 
 @app.get("/api/reports/compliance-trends", response_model=dict)
 async def get_compliance_trends(
