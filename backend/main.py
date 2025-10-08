@@ -75,6 +75,34 @@ async def health_check():
     """Simple health check endpoint"""
     return {"status": "ok", "message": "Server is running"}
 
+# Test rounds endpoint (no authentication required for debugging)
+@app.get("/api/test/rounds", include_in_schema=False)
+async def test_rounds_endpoint():
+    """Test rounds endpoint without authentication"""
+    try:
+        db = next(get_db())
+        rounds = db.query(Round).limit(10).all()
+        db.close()
+        
+        rounds_data = []
+        for round in rounds:
+            rounds_data.append({
+                "id": round.id,
+                "title": round.title,
+                "round_code": round.round_code,
+                "department": round.department,
+                "status": round.status.value if hasattr(round.status, 'value') else str(round.status),
+                "scheduled_date": round.scheduled_date.isoformat() if round.scheduled_date else None
+            })
+        
+        return {
+            "status": "success",
+            "count": len(rounds_data),
+            "rounds": rounds_data
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
 # Emergency endpoint to create test data (no authentication required)
 @app.post("/api/emergency/create-test-round", include_in_schema=False)
 async def create_emergency_test_round():
@@ -86,94 +114,61 @@ async def create_emergency_test_round():
         # Get database session directly
         db = next(get_db())
         
-        # Check if admin user exists using raw SQL
-        user_query = text("SELECT id FROM users WHERE email = 'testadmin@salamaty.com'")
-        user_result = db.execute(user_query).fetchone()
-        
-        if not user_result:
-            # Create admin user first using raw SQL
+        # Check if admin user exists
+        admin_user = db.query(User).filter(User.email == "testadmin@salamaty.com").first()
+        if not admin_user:
+            # Create admin user first
             from auth import get_password_hash
-            import uuid
+            from models_updated import UserRole
             
-            admin_password = get_password_hash("test123")
-            user_id = 1  # Simple ID assignment
-            
-            insert_user_query = text("""
-                INSERT INTO users (id, username, email, first_name, last_name, 
-                                 hashed_password, role, department, position, phone, is_active)
-                VALUES (:id, :username, :email, :first_name, :last_name,
-                       :hashed_password, :role, :department, :position, :phone, :is_active)
-                ON CONFLICT (email) DO NOTHING
-                RETURNING id
-            """)
-            
-            user_data = {
-                "id": user_id,
-                "username": "testadmin",
-                "email": "testadmin@salamaty.com",
-                "first_name": "مدير",
-                "last_name": "النظام",
-                "hashed_password": admin_password,
-                "role": "super_admin",
-                "department": "الإدارة العامة",
-                "position": "مدير النظام",
-                "phone": "+966500000000",
-                "is_active": True
-            }
-            
-            result = db.execute(insert_user_query, user_data)
-            admin_user_id = result.fetchone()
-            if admin_user_id:
-                admin_user_id = admin_user_id[0]
-            else:
-                # User already exists, get ID
-                admin_user_id = db.execute(user_query).fetchone()[0]
-            
+            admin_user = User(
+                username="testadmin",
+                email="testadmin@salamaty.com",
+                first_name="مدير",
+                last_name="النظام",
+                hashed_password=get_password_hash("test123"),
+                role=UserRole.SUPER_ADMIN,
+                department="الإدارة العامة",
+                position="مدير النظام",
+                phone="+966500000000",
+                is_active=True
+            )
+            db.add(admin_user)
             db.commit()
-            print("✅ Created/verified admin user")
-        else:
-            admin_user_id = user_result[0]
+            db.refresh(admin_user)
+            print("✅ Created admin user")
+        
+        # Create test round with valid enum values
+        from models_updated import RoundType, RoundStatus
+        
+        test_round = Round(
+            round_code="TEST001",
+            title="جولة تجريبية - اختبار النظام",
+            description="جولة تجريبية لاختبار عمل النظام",
+            round_type=RoundType.PATIENT_SAFETY,
+            department="الطوارئ",
+            assigned_to=json.dumps([admin_user.id]),
+            scheduled_date=datetime.now() + timedelta(hours=1),
+            status=RoundStatus.SCHEDULED,
+            priority="medium",
+            created_by_id=admin_user.id
+        )
         
         # Check if test round already exists
-        check_query = text("SELECT id FROM rounds WHERE round_code = 'TEST001'")
-        existing = db.execute(check_query).fetchone()
+        existing = db.query(Round).filter(Round.round_code == "TEST001").first()
         if existing:
-            return {"message": "Test round already exists", "round_id": existing[0]}
+            return {"message": "Test round already exists", "round_id": existing.id}
         
-        # Create test round using raw SQL
-        insert_query = text("""
-            INSERT INTO rounds (round_code, title, description, round_type, department, 
-                              assigned_to, scheduled_date, status, priority, created_by_id)
-            VALUES (:round_code, :title, :description, :round_type, :department,
-                   :assigned_to, :scheduled_date, :status, :priority, :created_by_id)
-            RETURNING id
-        """)
-        
-        test_round_data = {
-            "round_code": "TEST001",
-            "title": "جولة تجريبية - اختبار النظام",
-            "description": "جولة تجريبية لاختبار عمل النظام",
-            "round_type": "MEDICATION_SAFETY",  # Use same type as existing round
-            "department": "الطوارئ",
-            "assigned_to": json.dumps([admin_user_id]),
-            "scheduled_date": datetime.now() + timedelta(hours=1),
-            "status": "scheduled",
-            "priority": "medium",
-            "created_by_id": admin_user_id
-        }
-        
-        result = db.execute(insert_query, test_round_data)
-        round_id = result.fetchone()[0]
+        db.add(test_round)
         db.commit()
-        
-        print(f"✅ Created test round with ID: {round_id}")
+        db.refresh(test_round)
         
         db.close()
         
         return {
             "message": "تم إنشاء جولة تجريبية بنجاح",
-            "round_id": round_id,
-            "admin_user_id": admin_user_id
+            "round_id": test_round.id,
+            "admin_user_id": admin_user.id
         }
         
     except Exception as e:
@@ -182,96 +177,81 @@ async def create_emergency_test_round():
         traceback.print_exc()
         return {"error": str(e), "message": "فشل في إنشاء الجولة التجريبية"}
 
-# Check database constraints endpoint
-@app.get("/api/debug/constraints", include_in_schema=False)
-async def check_constraints():
-    """Check database constraints for debugging"""
+# Simple test round creation (no constraints)
+@app.post("/api/emergency/create-simple-round", include_in_schema=False)
+async def create_simple_test_round():
+    """Create a very simple test round"""
     try:
+        from datetime import datetime, timedelta
+        
         db = next(get_db())
         
-        # Check round_type constraints
-        constraint_query = text("""
-            SELECT constraint_name, check_clause 
-            FROM information_schema.check_constraints 
-            WHERE table_name = 'rounds'
+        # Get or create a simple user
+        admin_user = db.query(User).filter(User.email == "testadmin@salamaty.com").first()
+        if not admin_user:
+            from auth import get_password_hash
+            from models_updated import UserRole
+            
+            admin_user = User(
+                username="testadmin",
+                email="testadmin@salamaty.com",
+                first_name="مدير",
+                last_name="النظام",
+                hashed_password=get_password_hash("test123"),
+                role=UserRole.SUPER_ADMIN,
+                department="الإدارة العامة",
+                position="مدير النظام",
+                phone="+966500000000",
+                is_active=True
+            )
+            db.add(admin_user)
+            db.commit()
+            db.refresh(admin_user)
+        
+        # Create simple round using raw SQL to avoid constraints
+        from sqlalchemy import text
+        
+        round_code = f"TEST{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        
+        insert_query = text("""
+            INSERT INTO rounds (
+                round_code, title, description, round_type, department, 
+                assigned_to, scheduled_date, status, priority, created_by_id
+            ) VALUES (
+                :round_code, :title, :description, :round_type, :department,
+                :assigned_to, :scheduled_date, :status, :priority, :created_by_id
+            ) RETURNING id
         """)
         
-        result = db.execute(constraint_query)
-        constraints = result.fetchall()
+        result = db.execute(insert_query, {
+            'round_code': round_code,
+            'title': 'جولة تجريبية بسيطة',
+            'description': 'جولة للاختبار',
+            'round_type': 'patient_safety',
+            'department': 'الطوارئ',
+            'assigned_to': f'[{admin_user.id}]',
+            'scheduled_date': datetime.now() + timedelta(hours=1),
+            'status': 'scheduled',
+            'priority': 'medium',
+            'created_by_id': admin_user.id
+        })
         
-        # Get allowed round types
-        types_query = text("""
-            SELECT DISTINCT round_type FROM rounds
-        """)
-        types_result = db.execute(types_query)
-        existing_types = [row[0] for row in types_result.fetchall()]
-        
+        round_id = result.scalar()
+        db.commit()
         db.close()
         
         return {
-            "constraints": [{"name": c[0], "clause": c[1]} for c in constraints],
-            "existing_round_types": existing_types,
-            "message": "Database constraints retrieved"
+            "message": "تم إنشاء جولة تجريبية بسيطة بنجاح",
+            "round_id": round_id,
+            "round_code": round_code,
+            "admin_user_id": admin_user.id
         }
         
     except Exception as e:
-        return {"error": str(e), "message": "فشل في فحص القيود"}
-
-# Test rounds API without authentication
-@app.get("/api/test/rounds", include_in_schema=False)
-async def test_rounds_api():
-    """Test rounds API without authentication"""
-    try:
-        db = next(get_db())
-        
-        # Get rounds using raw SQL
-        query = text("""
-            SELECT id, round_code, title, description, round_type, department,
-                   assigned_to, scheduled_date, deadline, status, priority,
-                   compliance_percentage, notes, created_by_id, created_at
-            FROM rounds 
-            ORDER BY created_at DESC
-            LIMIT 10
-        """)
-        
-        result = db.execute(query)
-        rows = result.fetchall()
-        
-        # Convert to proper format
-        rounds = []
-        for row in rows:
-            round_data = {
-                "id": row[0],
-                "round_code": row[1],
-                "title": row[2],
-                "description": row[3],
-                "round_type": row[4],
-                "department": row[5],
-                "assigned_to": row[6],
-                "scheduled_date": row[7].isoformat() if row[7] else None,
-                "deadline": row[8].isoformat() if row[8] else None,
-                "status": row[9],
-                "priority": row[10],
-                "compliance_percentage": row[11] or 0,
-                "notes": row[12],
-                "created_by_id": row[13],
-                "created_at": row[14].isoformat() if row[14] else None
-            }
-            rounds.append(round_data)
-        
-        db.close()
-        
-        return {
-            "message": f"تم جلب {len(rounds)} جولة بنجاح",
-            "rounds": rounds,
-            "count": len(rounds)
-        }
-        
-    except Exception as e:
-        print(f"❌ Error testing rounds API: {e}")
+        print(f"❌ Error creating simple test round: {e}")
         import traceback
         traceback.print_exc()
-        return {"error": str(e), "message": "فشل في جلب الجولات"}
+        return {"error": str(e), "message": "فشل في إنشاء الجولة التجريبية البسيطة"}
 
 # Database diagnostic endpoint
 @app.get("/api/health/database", include_in_schema=False)
@@ -569,7 +549,7 @@ async def create_new_round(round: RoundCreate, db: Session = Depends(get_db), cu
     
     return created_round
 
-@app.get("/api/rounds")
+@app.get("/api/rounds", response_model=List[RoundResponse])
 async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     try:
         print(f"🔍 [API] Fetching rounds from database for user {current_user.id}")
@@ -584,34 +564,12 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
             raise HTTPException(status_code=500, detail=f"خطأ في الاتصال بقاعدة البيانات: {str(conn_error)}")
         
         # Get rounds from database
-        rounds_data = get_rounds(db, skip=skip, limit=limit)
-        print(f"✅ [API] Successfully fetched {len(rounds_data)} rounds")
-        
-        # Convert to proper response format
-        rounds = []
-        for round_data in rounds_data:
-            round_response = {
-                "id": round_data["id"],
-                "round_code": round_data["round_code"],
-                "title": round_data["title"],
-                "description": round_data["description"],
-                "round_type": round_data["round_type"],
-                "department": round_data["department"],
-                "assigned_to": round_data["assigned_to"],
-                "scheduled_date": round_data["scheduled_date"].isoformat() if round_data["scheduled_date"] else None,
-                "deadline": round_data["deadline"].isoformat() if round_data["deadline"] else None,
-                "status": round_data["status"],
-                "priority": round_data["priority"],
-                "compliance_percentage": round_data["compliance_percentage"] or 0,
-                "notes": round_data["notes"],
-                "created_by_id": round_data["created_by_id"],
-                "created_at": round_data["created_at"].isoformat() if round_data["created_at"] else None
-            }
-            rounds.append(round_response)
+        rounds = get_rounds(db, skip=skip, limit=limit)
+        print(f"✅ [API] Successfully fetched {len(rounds)} rounds")
         
         # Log first few rounds for debugging
         if rounds:
-            print(f"📋 [API] First round: ID={rounds[0]['id']}, Title={rounds[0]['title']}")
+            print(f"📋 [API] First round: ID={rounds[0].id}, Title={rounds[0].title}")
         
         return rounds
         
