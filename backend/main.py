@@ -153,7 +153,7 @@ async def create_emergency_test_round():
             "round_code": "TEST001",
             "title": "جولة تجريبية - اختبار النظام",
             "description": "جولة تجريبية لاختبار عمل النظام",
-            "round_type": "patient_safety",
+            "round_type": "general",  # Use 'general' which should be allowed
             "department": "الطوارئ",
             "assigned_to": json.dumps([admin_user_id]),
             "scheduled_date": datetime.now() + timedelta(hours=1),
@@ -181,6 +181,41 @@ async def create_emergency_test_round():
         import traceback
         traceback.print_exc()
         return {"error": str(e), "message": "فشل في إنشاء الجولة التجريبية"}
+
+# Check database constraints endpoint
+@app.get("/api/debug/constraints", include_in_schema=False)
+async def check_constraints():
+    """Check database constraints for debugging"""
+    try:
+        db = next(get_db())
+        
+        # Check round_type constraints
+        constraint_query = text("""
+            SELECT constraint_name, check_clause 
+            FROM information_schema.check_constraints 
+            WHERE table_name = 'rounds'
+        """)
+        
+        result = db.execute(constraint_query)
+        constraints = result.fetchall()
+        
+        # Get allowed round types
+        types_query = text("""
+            SELECT DISTINCT round_type FROM rounds
+        """)
+        types_result = db.execute(types_query)
+        existing_types = [row[0] for row in types_result.fetchall()]
+        
+        db.close()
+        
+        return {
+            "constraints": [{"name": c[0], "clause": c[1]} for c in constraints],
+            "existing_round_types": existing_types,
+            "message": "Database constraints retrieved"
+        }
+        
+    except Exception as e:
+        return {"error": str(e), "message": "فشل في فحص القيود"}
 
 # Database diagnostic endpoint
 @app.get("/api/health/database", include_in_schema=False)
