@@ -25,24 +25,40 @@ export function useRounds(params?: { skip?: number; limit?: number }) {
       const data = Array.isArray(response) ? response : (response?.data || response || [])
       
       // Transform API data to match frontend interface
-      const transformedData = Array.isArray(data) ? data.map((round: any) => ({
-        id: round.id,
-        roundCode: round.round_code,
-        title: round.title,
-        description: round.description,
-        roundType: round.round_type,
-        department: round.department,
-        assignedTo: round.assigned_to ? JSON.parse(round.assigned_to) : [],
-        scheduledDate: round.scheduled_date,
-        deadline: round.deadline,  // إضافة deadline
-        endDate: round.end_date,   // إضافة end_date
-        status: round.status,
-        priority: round.priority,
-        compliancePercentage: round.compliance_percentage || 0,
-        notes: round.notes,
-        createdBy: round.created_by_id ? `مستخدم ${round.created_by_id}` : 'غير محدد',
-        createdAt: round.created_at
-      })) : []
+      const transformedData = Array.isArray(data) ? data.map((round: any) => {
+        // Safely parse assigned_to
+        let assignedTo = []
+        try {
+          if (round.assigned_to) {
+            if (typeof round.assigned_to === 'string') {
+              assignedTo = JSON.parse(round.assigned_to)
+            } else if (Array.isArray(round.assigned_to)) {
+              assignedTo = round.assigned_to
+            }
+          }
+        } catch (e) {
+          console.warn('Failed to parse assigned_to for round:', round.id, round.assigned_to)
+        }
+
+        return {
+          id: round.id,
+          roundCode: round.round_code || round.roundCode,
+          title: round.title || '',
+          description: round.description || '',
+          roundType: round.round_type || round.roundType || '',
+          department: round.department || '',
+          assignedTo: assignedTo,
+          scheduledDate: round.scheduled_date || round.scheduledDate || null,
+          deadline: round.deadline || null,
+          endDate: round.end_date || round.endDate || null,
+          status: round.status || 'scheduled',
+          priority: round.priority || 'medium',
+          compliancePercentage: round.compliance_percentage || round.compliancePercentage || 0,
+          notes: round.notes || '',
+          createdBy: round.created_by_id ? `مستخدم ${round.created_by_id}` : 'غير محدد',
+          createdAt: round.created_at || round.createdAt || new Date().toISOString()
+        }
+      }) : []
       
       console.log('Rounds data loaded:', transformedData.length, 'rounds')
       console.log('📅 Rounds with dates:', transformedData.map(r => ({
@@ -91,24 +107,40 @@ export function useMyRounds(params?: { skip?: number; limit?: number }) {
       console.log('📊 My rounds data:', data)
       
       // Transform API data to match frontend interface
-      const transformedData = Array.isArray(data) ? data.map((round: any) => ({
-        id: round.id,
-        roundCode: round.round_code,
-        title: round.title,
-        description: round.description,
-        roundType: round.round_type,
-        department: round.department,
-        assignedTo: round.assigned_to ? JSON.parse(round.assigned_to) : [],
-        scheduledDate: round.scheduled_date,
-        deadline: round.deadline,  // إضافة deadline
-        endDate: round.end_date,   // إضافة end_date
-        status: round.status,
-        priority: round.priority,
-        compliancePercentage: round.compliance_percentage || 0,
-        notes: round.notes,
-        createdBy: round.created_by_id ? `مستخدم ${round.created_by_id}` : 'غير محدد',
-        createdAt: round.created_at
-      })) : []
+      const transformedData = Array.isArray(data) ? data.map((round: any) => {
+        // Safely parse assigned_to
+        let assignedTo = []
+        try {
+          if (round.assigned_to) {
+            if (typeof round.assigned_to === 'string') {
+              assignedTo = JSON.parse(round.assigned_to)
+            } else if (Array.isArray(round.assigned_to)) {
+              assignedTo = round.assigned_to
+            }
+          }
+        } catch (e) {
+          console.warn('Failed to parse assigned_to for round:', round.id, round.assigned_to)
+        }
+
+        return {
+          id: round.id,
+          roundCode: round.round_code || round.roundCode,
+          title: round.title || '',
+          description: round.description || '',
+          roundType: round.round_type || round.roundType || '',
+          department: round.department || '',
+          assignedTo: assignedTo,
+          scheduledDate: round.scheduled_date || round.scheduledDate || null,
+          deadline: round.deadline || null,
+          endDate: round.end_date || round.endDate || null,
+          status: round.status || 'scheduled',
+          priority: round.priority || 'medium',
+          compliancePercentage: round.compliance_percentage || round.compliancePercentage || 0,
+          notes: round.notes || '',
+          createdBy: round.created_by_id ? `مستخدم ${round.created_by_id}` : 'غير محدد',
+          createdAt: round.created_at || round.createdAt || new Date().toISOString()
+        }
+      }) : []
       
       console.log('✅ Transformed my rounds data:', transformedData)
       setState(prev => ({ ...prev, data: transformedData, loading: false, error: null }))
