@@ -724,7 +724,6 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
             raise HTTPException(status_code=500, detail=f"خطأ في الاتصال بقاعدة البيانات: {str(conn_error)}")
         
         # Get rounds from database using raw SQL to avoid schema issues
-        from sqlalchemy import text
         
         query = text("""
             SELECT id, round_code, title, description, round_type, 
