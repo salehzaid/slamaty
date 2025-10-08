@@ -109,76 +109,80 @@ async def create_emergency_test_round():
     """Create a test round without authentication for debugging"""
     try:
         from datetime import datetime, timedelta
-        import json
+        from sqlalchemy import text
         
         # Get database session directly
         db = next(get_db())
         
-        # Check if admin user exists
-        admin_user = db.query(User).filter(User.email == "testadmin@salamaty.com").first()
-        if not admin_user:
-            # Create admin user first
-            from auth import get_password_hash
-            from models_updated import UserRole
+        try:
+            # Get or create admin user using raw SQL
+            user_query = text("SELECT id FROM users WHERE email = 'testadmin@salamaty.com'")
+            result = db.execute(user_query)
+            user_row = result.fetchone()
             
-            admin_user = User(
-                username="testadmin",
-                email="testadmin@salamaty.com",
-                first_name="مدير",
-                last_name="النظام",
-                hashed_password=get_password_hash("test123"),
-                role=UserRole.SUPER_ADMIN,
-                department="الإدارة العامة",
-                position="مدير النظام",
-                phone="+966500000000",
-                is_active=True
-            )
-            db.add(admin_user)
+            if user_row:
+                admin_user_id = user_row[0]
+                print("✅ Admin user already exists")
+            else:
+                # Create admin user using raw SQL
+                from auth import get_password_hash
+                
+                insert_user_query = text("""
+                    INSERT INTO users (
+                        username, email, first_name, last_name, hashed_password,
+                        role, department, position, phone, is_active
+                    ) VALUES (
+                        'testadmin', 'testadmin@salamaty.com', 'مدير', 'النظام',
+                        :hashed_password, 'super_admin', 'الإدارة العامة',
+                        'مدير النظام', '+966500000000', true
+                    ) RETURNING id
+                """)
+                
+                result = db.execute(insert_user_query, {
+                    'hashed_password': get_password_hash("test123")
+                })
+                admin_user_id = result.scalar()
+                db.commit()
+                print("✅ Created admin user")
+            
+            # Create test round using raw SQL
+            round_code = f"TEST{datetime.now().strftime('%Y%m%d%H%M%S')}"
+            
+            insert_round_query = text("""
+                INSERT INTO rounds (
+                    round_code, title, description, round_type, department, 
+                    assigned_to, scheduled_date, status, priority, created_by_id
+                ) VALUES (
+                    :round_code, :title, :description, :round_type, :department,
+                    :assigned_to, :scheduled_date, :status, :priority, :created_by_id
+                ) RETURNING id
+            """)
+            
+            result = db.execute(insert_round_query, {
+                'round_code': round_code,
+                'title': 'جولة تجريبية - اختبار النظام',
+                'description': 'جولة تجريبية لاختبار عمل النظام',
+                'round_type': 'PATIENT_SAFETY',
+                'department': 'الطوارئ',
+                'assigned_to': f'[{admin_user_id}]',
+                'scheduled_date': datetime.now() + timedelta(hours=1),
+                'status': 'SCHEDULED',
+                'priority': 'medium',
+                'created_by_id': admin_user_id
+            })
+            
+            round_id = result.scalar()
             db.commit()
-            db.refresh(admin_user)
-            print("✅ Created admin user")
-        else:
-            print("✅ Admin user already exists")
-        
-        # Create test round with valid enum values using raw SQL
-        from sqlalchemy import text
-        
-        round_code = f"TEST{datetime.now().strftime('%Y%m%d%H%M%S')}"
-        
-        insert_query = text("""
-            INSERT INTO rounds (
-                round_code, title, description, round_type, department, 
-                assigned_to, scheduled_date, status, priority, created_by_id
-            ) VALUES (
-                :round_code, :title, :description, :round_type, :department,
-                :assigned_to, :scheduled_date, :status, :priority, :created_by_id
-            ) RETURNING id
-        """)
-        
-        result = db.execute(insert_query, {
-            'round_code': round_code,
-            'title': 'جولة تجريبية - اختبار النظام',
-            'description': 'جولة تجريبية لاختبار عمل النظام',
-            'round_type': 'PATIENT_SAFETY',
-            'department': 'الطوارئ',
-            'assigned_to': f'[{admin_user.id}]',
-            'scheduled_date': datetime.now() + timedelta(hours=1),
-            'status': 'SCHEDULED',
-            'priority': 'medium',
-            'created_by_id': admin_user.id
-        })
-        
-        round_id = result.scalar()
-        db.commit()
-        
-        db.close()
-        
-        return {
-            "message": "تم إنشاء جولة تجريبية بنجاح",
-            "round_id": round_id,
-            "round_code": round_code,
-            "admin_user_id": admin_user.id
-        }
+            
+            return {
+                "message": "تم إنشاء جولة تجريبية بنجاح",
+                "round_id": round_id,
+                "round_code": round_code,
+                "admin_user_id": admin_user_id
+            }
+            
+        finally:
+            db.close()
         
     except Exception as e:
         print(f"❌ Error creating emergency test round: {e}")
