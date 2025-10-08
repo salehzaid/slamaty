@@ -137,6 +137,8 @@ async def create_emergency_test_round():
             db.commit()
             db.refresh(admin_user)
             print("✅ Created admin user")
+        else:
+            print("✅ Admin user already exists")
         
         # Create test round with valid enum values using raw SQL
         from sqlalchemy import text
