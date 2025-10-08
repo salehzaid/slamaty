@@ -217,6 +217,62 @@ async def check_constraints():
     except Exception as e:
         return {"error": str(e), "message": "فشل في فحص القيود"}
 
+# Test rounds API without authentication
+@app.get("/api/test/rounds", include_in_schema=False)
+async def test_rounds_api():
+    """Test rounds API without authentication"""
+    try:
+        db = next(get_db())
+        
+        # Get rounds using raw SQL
+        query = text("""
+            SELECT id, round_code, title, description, round_type, department,
+                   assigned_to, scheduled_date, deadline, status, priority,
+                   compliance_percentage, notes, created_by_id, created_at
+            FROM rounds 
+            ORDER BY created_at DESC
+            LIMIT 10
+        """)
+        
+        result = db.execute(query)
+        rows = result.fetchall()
+        
+        # Convert to proper format
+        rounds = []
+        for row in rows:
+            round_data = {
+                "id": row[0],
+                "round_code": row[1],
+                "title": row[2],
+                "description": row[3],
+                "round_type": row[4],
+                "department": row[5],
+                "assigned_to": row[6],
+                "scheduled_date": row[7].isoformat() if row[7] else None,
+                "deadline": row[8].isoformat() if row[8] else None,
+                "status": row[9],
+                "priority": row[10],
+                "compliance_percentage": row[11] or 0,
+                "notes": row[12],
+                "created_by_id": row[13],
+                "created_at": row[14].isoformat() if row[14] else None
+            }
+            rounds.append(round_data)
+        
+        db.close()
+        
+        return {
+            "message": f"تم جلب {len(rounds)} جولة بنجاح",
+            "rounds": rounds,
+            "count": len(rounds)
+        }
+        
+    except Exception as e:
+        print(f"❌ Error testing rounds API: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"error": str(e), "message": "فشل في جلب الجولات"}
+
 # Database diagnostic endpoint
 @app.get("/api/health/database", include_in_schema=False)
 async def check_database_health(db: Session = Depends(get_db)):
