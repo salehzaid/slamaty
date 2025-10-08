@@ -138,36 +138,43 @@ async def create_emergency_test_round():
             db.refresh(admin_user)
             print("✅ Created admin user")
         
-        # Create test round with valid enum values
-        from models_updated import RoundType, RoundStatus
+        # Create test round with valid enum values using raw SQL
+        from sqlalchemy import text
         
-        test_round = Round(
-            round_code="TEST001",
-            title="جولة تجريبية - اختبار النظام",
-            description="جولة تجريبية لاختبار عمل النظام",
-            round_type=RoundType.PATIENT_SAFETY,
-            department="الطوارئ",
-            assigned_to=json.dumps([admin_user.id]),
-            scheduled_date=datetime.now() + timedelta(hours=1),
-            status=RoundStatus.SCHEDULED,
-            priority="medium",
-            created_by_id=admin_user.id
-        )
+        round_code = f"TEST{datetime.now().strftime('%Y%m%d%H%M%S')}"
         
-        # Check if test round already exists
-        existing = db.query(Round).filter(Round.round_code == "TEST001").first()
-        if existing:
-            return {"message": "Test round already exists", "round_id": existing.id}
+        insert_query = text("""
+            INSERT INTO rounds (
+                round_code, title, description, round_type, department, 
+                assigned_to, scheduled_date, status, priority, created_by_id
+            ) VALUES (
+                :round_code, :title, :description, :round_type, :department,
+                :assigned_to, :scheduled_date, :status, :priority, :created_by_id
+            ) RETURNING id
+        """)
         
-        db.add(test_round)
+        result = db.execute(insert_query, {
+            'round_code': round_code,
+            'title': 'جولة تجريبية - اختبار النظام',
+            'description': 'جولة تجريبية لاختبار عمل النظام',
+            'round_type': 'PATIENT_SAFETY',
+            'department': 'الطوارئ',
+            'assigned_to': f'[{admin_user.id}]',
+            'scheduled_date': datetime.now() + timedelta(hours=1),
+            'status': 'SCHEDULED',
+            'priority': 'medium',
+            'created_by_id': admin_user.id
+        })
+        
+        round_id = result.scalar()
         db.commit()
-        db.refresh(test_round)
         
         db.close()
         
         return {
             "message": "تم إنشاء جولة تجريبية بنجاح",
-            "round_id": test_round.id,
+            "round_id": round_id,
+            "round_code": round_code,
             "admin_user_id": admin_user.id
         }
         
