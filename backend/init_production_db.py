@@ -6,6 +6,7 @@ Initializes the production database with tables and initial data
 
 import os
 import sys
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
@@ -15,7 +16,7 @@ from sqlalchemy.exc import SQLAlchemyError
 load_dotenv('env.production')
 
 # Import models and schemas
-from models_updated import Base, UserRole, User, Department, RoundTypeSettings, EvaluationCategory
+from models_updated import Base, UserRole, User, Department, RoundTypeSettings, EvaluationCategory, Round, RoundType, RoundStatus
 from auth import get_password_hash
 
 def test_database_connection():
@@ -118,6 +119,109 @@ def create_initial_data():
             db.close()
         return False
 
+def create_sample_rounds():
+    """Create sample rounds for testing"""
+    print("🔄 Creating sample rounds...")
+    
+    try:
+        DATABASE_URL = os.getenv("DATABASE_URL")
+        engine = create_engine(DATABASE_URL)
+        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        db = SessionLocal()
+        
+        # Get admin user ID
+        admin = db.query(User).filter(User.email == "testadmin@salamaty.com").first()
+        if not admin:
+            print("❌ Admin user not found")
+            return False
+            
+        sample_rounds = [
+            {
+                "round_code": "RND-SAMPLE-001",
+                "title": "جولة تفقدية - قسم الطوارئ",
+                "description": "جولة تفقدية دورية لقسم الطوارئ",
+                "round_type": RoundType.PATIENT_SAFETY,
+                "department": "الطوارئ",
+                "scheduled_date": datetime.now() + timedelta(days=1),
+                "deadline": datetime.now() + timedelta(days=8),
+                "end_date": datetime.now() + timedelta(days=8),
+                "status": RoundStatus.SCHEDULED,
+                "priority": "high",
+                "created_by_id": admin.id,
+                "compliance_percentage": 0,
+                "completion_percentage": 0
+            },
+            {
+                "round_code": "RND-SAMPLE-002",
+                "title": "جولة مكافحة العدوى",
+                "description": "فحص إجراءات مكافحة العدوى",
+                "round_type": RoundType.INFECTION_CONTROL,
+                "department": "العمليات",
+                "scheduled_date": datetime.now() + timedelta(days=2),
+                "deadline": datetime.now() + timedelta(days=9),
+                "end_date": datetime.now() + timedelta(days=9),
+                "status": RoundStatus.SCHEDULED,
+                "priority": "high",
+                "created_by_id": admin.id,
+                "compliance_percentage": 0,
+                "completion_percentage": 0
+            },
+            {
+                "round_code": "RND-SAMPLE-003",
+                "title": "جولة سلامة الأدوية",
+                "description": "مراجعة إجراءات سلامة الأدوية",
+                "round_type": RoundType.MEDICATION_SAFETY,
+                "department": "العناية المركزة",
+                "scheduled_date": datetime.now() + timedelta(days=3),
+                "deadline": datetime.now() + timedelta(days=10),
+                "end_date": datetime.now() + timedelta(days=10),
+                "status": RoundStatus.SCHEDULED,
+                "priority": "medium",
+                "created_by_id": admin.id,
+                "compliance_percentage": 0,
+                "completion_percentage": 0
+            },
+            {
+                "round_code": "RND-SAMPLE-004",
+                "title": "جولة النظافة والبيئة",
+                "description": "فحص معايير النظافة والبيئة",
+                "round_type": RoundType.HYGIENE,
+                "department": "الطوارئ",
+                "scheduled_date": datetime.now() + timedelta(days=4),
+                "status": RoundStatus.SCHEDULED,
+                "priority": "medium",
+                "created_by_id": admin.id,
+                "compliance_percentage": 0,
+                "completion_percentage": 0
+            }
+        ]
+        
+        created_count = 0
+        for round_data in sample_rounds:
+            existing = db.query(Round).filter(Round.round_code == round_data["round_code"]).first()
+            if not existing:
+                round_obj = Round(**round_data)
+                db.add(round_obj)
+                created_count += 1
+        
+        if created_count > 0:
+            db.commit()
+            print(f"✅ Created {created_count} sample rounds")
+        else:
+            print("⏭️  Sample rounds already exist")
+        
+        db.close()
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error creating sample rounds: {e}")
+        import traceback
+        traceback.print_exc()
+        if 'db' in locals():
+            db.rollback()
+            db.close()
+        return False
+
 def main():
     """Main initialization function"""
     print("=" * 60)
@@ -135,6 +239,10 @@ def main():
     # Create initial data
     if not create_initial_data():
         sys.exit(1)
+    
+    # Create sample rounds
+    if not create_sample_rounds():
+        print("⚠️  Warning: Failed to create sample rounds")
     
     print("\n" + "=" * 60)
     print("🎉 Database initialization completed successfully!")
