@@ -15,8 +15,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // 🔧 إعدادات تسجيل الدخول التلقائي
-const AUTO_LOGIN_ENABLED = true; // تسجيل الدخول التلقائي مُفعّل
-const USE_DIRECT_ADMIN_LOGIN = true; // استخدام تسجيل دخول مباشر بدون API
+const AUTO_LOGIN_ENABLED = false; // إيقاف تسجيل الدخول التلقائي
+const USE_DIRECT_ADMIN_LOGIN = false; // إيقاف تسجيل الدخول المباشر
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   console.log('🔧 AuthProvider: Component initialized');
