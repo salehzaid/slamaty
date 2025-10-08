@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار عرض التقويم</title>
+    <style>
+        body {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .round-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .round-title {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .round-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .detail-item {
+            padding: 5px 0;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .detail-value {
+            color: #333;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>اختبار عرض التقويم - الجولة الجديدة</h1>
+            <p>التحقق من عرض الجولة RND-TEST-20251007112301 في التقويم</p>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">🔍 اختبار الاتصال بالخادم الخلفي</div>
+            <div id="backend-test" class="loading">جاري الاختبار...</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">📊 جلب بيانات الجولات</div>
+            <div id="rounds-test" class="loading">جاري جلب البيانات...</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">📅 عرض الجولة الجديدة</div>
+            <div id="new-round-display" class="loading">جاري التحليل...</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">🔗 روابط مفيدة</div>
+            <div class="info">
+                <p><strong>صفحة التقويم:</strong> <a href="http://localhost:5174/rounds/calendar" target="_blank">http://localhost:5174/rounds/calendar</a></p>
+                <p><strong>صفحة الجولات:</strong> <a href="http://localhost:5174/rounds" target="_blank">http://localhost:5174/rounds</a></p>
+                <p><strong>API الجولات:</strong> <a href="http://localhost:8000/api/rounds" target="_blank">http://localhost:8000/api/rounds</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        async function testBackendConnection() {
+            const testDiv = document.getElementById('backend-test');
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    testDiv.innerHTML = `<div class="test-result success">✅ الخادم الخلفي يعمل بشكل صحيح<br>الحالة: ${data.status}</div>`;
+                    return true;
+                } else {
+                    testDiv.innerHTML = `<div class="test-result error">❌ الخادم الخلفي لا يستجيب<br>الحالة: ${response.status}</div>`;
+                    return false;
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<div class="test-result error">❌ خطأ في الاتصال بالخادم الخلفي<br>${error.message}</div>`;
+                return false;
+            }
+        }
+
+        async function testRoundsData() {
+            const testDiv = document.getElementById('rounds-test');
+            try {
+                const response = await fetch(`${API_BASE}/api/rounds`);
+                if (response.ok) {
+                    const rounds = await response.json();
+                    const totalRounds = rounds.length;
+                    const roundsWithDeadline = rounds.filter(r => r.deadline).length;
+                    const roundsWithEndDate = rounds.filter(r => r.end_date).length;
+                    
+                    testDiv.innerHTML = `
+                        <div class="test-result success">
+                            ✅ تم جلب بيانات الجولات بنجاح<br>
+                            إجمالي الجولات: ${totalRounds}<br>
+                            جولات مع deadline: ${roundsWithDeadline}<br>
+                            جولات مع end_date: ${roundsWithEndDate}
+                        </div>
+                    `;
+                    return rounds;
+                } else {
+                    testDiv.innerHTML = `<div class="test-result error">❌ فشل في جلب بيانات الجولات<br>الحالة: ${response.status}</div>`;
+                    return null;
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<div class="test-result error">❌ خطأ في جلب بيانات الجولات<br>${error.message}</div>`;
+                return null;
+            }
+        }
+
+        function displayNewRound(rounds) {
+            const testDiv = document.getElementById('new-round-display');
+            const newRound = rounds.find(r => r.round_code === 'RND-TEST-20251007112301');
+            
+            if (!newRound) {
+                testDiv.innerHTML = `<div class="test-result error">❌ لم يتم العثور على الجولة الجديدة RND-TEST-20251007112301</div>`;
+                return;
+            }
+
+            const scheduledDate = new Date(newRound.scheduled_date);
+            const endDate = new Date(newRound.end_date);
+            const deadline = newRound.deadline ? new Date(newRound.deadline) : null;
+            
+            const duration = Math.ceil((endDate - scheduledDate) / (1000 * 60 * 60 * 24));
+            
+            testDiv.innerHTML = `
+                <div class="test-result success">✅ تم العثور على الجولة الجديدة</div>
+                <div class="round-info">
+                    <div class="round-title">${newRound.title}</div>
+                    <div class="round-details">
+                        <div class="detail-item">
+                            <span class="detail-label">كود الجولة:</span>
+                            <span class="detail-value">${newRound.round_code}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">القسم:</span>
+                            <span class="detail-value">${newRound.department}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">نوع الجولة:</span>
+                            <span class="detail-value">${newRound.round_type}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">تاريخ البداية:</span>
+                            <span class="detail-value">${scheduledDate.toLocaleDateString('en-US')}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">تاريخ النهاية:</span>
+                            <span class="detail-value">${endDate.toLocaleDateString('en-US')}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">المدة:</span>
+                            <span class="detail-value">${duration} يوم</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Deadline:</span>
+                            <span class="detail-value">${deadline ? deadline.toLocaleDateString('en-US') : 'غير محدد'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="detail-value">${newRound.status}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-result info">
+                    📅 <strong>ملاحظة:</strong> يجب أن تظهر هذه الجولة في التقويم من ${scheduledDate.toLocaleDateString('en-US')} إلى ${endDate.toLocaleDateString('en-US')} (${duration} أيام)
+                </div>
+            `;
+        }
+
+        async function runTests() {
+            console.log('بدء اختبار عرض التقويم...');
+            
+            // اختبار الاتصال بالخادم الخلفي
+            const backendOk = await testBackendConnection();
+            if (!backendOk) return;
+            
+            // جلب بيانات الجولات
+            const rounds = await testRoundsData();
+            if (!rounds) return;
+            
+            // عرض الجولة الجديدة
+            displayNewRound(rounds);
+            
+            console.log('تم الانتهاء من الاختبار');
+        }
+
+        // تشغيل الاختبارات عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>

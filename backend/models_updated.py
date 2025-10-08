@@ -191,8 +191,31 @@ class CapaAction(Base):
     
     # Relationships
     capa = relationship("Capa", back_populates="actions")
-    assigned_user = relationship("User", foreign_keys=[assigned_to_id])
-    completed_by = relationship("User", foreign_keys=[completed_by_id])
+
+class EvaluationCommentTemplate(Base):
+    """جدول قوالب الملاحظات الشائعة للتقييمات
+    
+    يخزن الملاحظات المستخدمة بشكل متكرر لتسهيل إدخال البيانات
+    وتحسين تجربة المستخدم في التقييمات
+    """
+    __tablename__ = "evaluation_comment_templates"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    evaluation_item_id = Column(Integer, ForeignKey("evaluation_items.id"), nullable=True, index=True)
+    category_id = Column(Integer, ForeignKey("evaluation_categories.id"), nullable=True, index=True)
+    comment_text_ar = Column(Text, nullable=False)
+    comment_text_en = Column(Text, nullable=True)
+    usage_count = Column(Integer, default=0)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    is_public = Column(Boolean, default=False)
+    # metadata
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    evaluation_item = relationship("EvaluationItem", foreign_keys=[evaluation_item_id])
+    category = relationship("EvaluationCategory", foreign_keys=[category_id])
+    creator = relationship("User", foreign_keys=[created_by])
 
 class EvaluationCategory(Base):
     __tablename__ = "evaluation_categories"

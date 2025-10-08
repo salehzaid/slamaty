@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Check, X, Minus, HelpCircle, Save, Send } from 'lucide-react'
+import { Check, X, Minus, HelpCircle, Save, Send, Settings, Eye } from 'lucide-react'
 import { apiClient } from '@/lib/api'
+import EvaluationWizard from './EvaluationWizard'
 
 interface EvaluateRoundFormProps {
   roundId: number
@@ -30,6 +31,7 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
   const [notes, setNotes] = useState('')
   const [completionPercentage, setCompletionPercentage] = useState(0)
   const [roundStatus, setRoundStatus] = useState<string>('')
+  const [useWizardMode, setUseWizardMode] = useState(true) // Default to wizard mode
 
   useEffect(() => {
     let mounted = true
@@ -232,14 +234,72 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
     return groups
   }, [items])
 
+  // Load user preference for wizard mode
+  useEffect(() => {
+    const savedMode = localStorage.getItem('evaluation-mode')
+    if (savedMode !== null) {
+      setUseWizardMode(savedMode === 'wizard')
+    }
+  }, [])
+
+  // Save user preference
+  const handleModeToggle = (mode: 'wizard' | 'full') => {
+    setUseWizardMode(mode === 'wizard')
+    localStorage.setItem('evaluation-mode', mode)
+  }
+
   if (loading) return <div className="p-6">جاري تحميل عناصر التقييم...</div>
+
+  // If wizard mode is enabled, render the wizard
+  if (useWizardMode) {
+    return (
+      <EvaluationWizard
+        roundId={roundId}
+        onSubmit={onSubmit}
+        onCancel={onCancel}
+      />
+    )
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
+      {/* Mode Toggle Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-bold text-gray-900">نموذج تقييم الجولة</h1>
+            <Badge variant="outline" className="text-sm">
+              إجمالي العناصر: {items.length}
+            </Badge>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button
+              variant={useWizardMode ? "outline" : "default"}
+              size="sm"
+              onClick={() => handleModeToggle('full')}
+              className="flex items-center gap-2"
+            >
+              <Settings className="w-4 h-4" />
+              عرض جميع العناصر
+            </Button>
+            <Button
+              variant={useWizardMode ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleModeToggle('wizard')}
+              className="flex items-center gap-2"
+            >
+              <Eye className="w-4 h-4" />
+              الوضع المتدرج
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle className="text-xl font-bold">نموذج تقييم الجولة</CardTitle>
+            <CardTitle className="text-xl font-bold">نموذج تقييم الجولة - عرض كامل</CardTitle>
             <div className="text-sm text-gray-600">
               إجمالي العناصر: {items.length}
             </div>

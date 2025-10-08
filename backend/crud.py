@@ -225,43 +225,9 @@ def get_rounds(db: Session, skip: int = 0, limit: int = 100):
         # Test connection first
         db.execute(text("SELECT 1"))
         
-        # Use raw SQL to avoid model issues
-        query = text("""
-            SELECT id, round_code, title, description, round_type, department,
-                   assigned_to, scheduled_date, deadline, status, priority,
-                   compliance_percentage, notes, created_by_id, created_at
-            FROM rounds 
-            ORDER BY created_at DESC
-            LIMIT :limit OFFSET :skip
-        """)
-        
-        result = db.execute(query, {"limit": limit, "skip": skip})
-        rows = result.fetchall()
-        
-        # Convert to Round objects
-        rounds = []
-        for row in rows:
-            # Create a simple dict-like object
-            round_data = {
-                'id': row[0],
-                'round_code': row[1],
-                'title': row[2],
-                'description': row[3],
-                'round_type': row[4],
-                'department': row[5],
-                'assigned_to': row[6],
-                'scheduled_date': row[7],
-                'deadline': row[8],
-                'status': row[9],
-                'priority': row[10],
-                'compliance_percentage': row[11],
-                'notes': row[12],
-                'created_by_id': row[13],
-                'created_at': row[14]
-            }
-            rounds.append(round_data)
-        
-        print(f"✅ [CRUD] Retrieved {len(rounds)} rounds using raw SQL")
+        # Get rounds
+        rounds = db.query(Round).offset(skip).limit(limit).all()
+        print(f"✅ [CRUD] Retrieved {len(rounds)} rounds")
         
         return rounds
     except Exception as e:

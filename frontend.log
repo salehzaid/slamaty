@@ -3,184 +3,506 @@
 > vite
 
 
-  VITE v5.4.8  ready in 149 ms
+  VITE v5.4.8  ready in 152 ms
 
   ➜  Local:   http://localhost:5174/
   ➜  Network: use --host to expose
-  ➜  press h + enter to show help
 Browserslist: caniuse-lite is outdated. Please run:
   npx update-browserslist-db@latest
   Why you should do it regularly: https://github.com/browserslist/update-db#readme
-10:45:23 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:45:41 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:46:06 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:46:06 PM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:52:30 PM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/components/TestMyRounds.tsx, /src/components/SimpleDashboard.tsx, /src/components/LoginPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/CapaManagement.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestDataDisplay.tsx, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/forms/EvaluateRoundForm.tsx
-10:52:30 PM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
-10:52:30 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/TestMyRounds.tsx, /src/components/LoginPage.tsx, /src/components/AnimatedSidebar.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/RoundsListView.tsx, /src/components/pages/UsersManagement.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx
-10:52:41 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:53:26 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:53:26 PM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/components/TestMyRounds.tsx, /src/components/SimpleDashboard.tsx, /src/components/LoginPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/CapaManagement.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestDataDisplay.tsx, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/forms/EvaluateRoundForm.tsx
-10:53:27 PM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
-10:53:27 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/TestMyRounds.tsx, /src/components/LoginPage.tsx, /src/components/AnimatedSidebar.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/RoundsListView.tsx, /src/components/pages/UsersManagement.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx
-10:57:53 PM [vite] hmr update /src/components/forms/CapaForm.tsx, /src/index.css
-10:58:15 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:58:23 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:58:49 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:58:49 PM [vite] hmr update /src/components/forms/CapaForm.tsx, /src/index.css
-11:12:45 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-11:13:04 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-11:27:41 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-11:28:14 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-11:28:58 PM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-6:04:49 AM [vite] hmr update /src/components/pages/CapaManagement.tsx, /src/index.css
-6:04:53 AM [vite] hmr update /src/components/pages/CapaManagement.tsx, /src/index.css
-6:05:01 AM [vite] hmr update /src/components/pages/CapaManagement.tsx, /src/index.css
-6:05:07 AM [vite] hmr update /src/components/pages/CapaManagement.tsx, /src/index.css
-6:08:54 AM [vite] hmr update /src/components/pages/CapaManagement.tsx, /src/index.css
-6:15:13 AM [vite] hmr update /src/components/forms/LoginForm.tsx, /src/index.css
-6:15:18 AM [vite] hmr update /src/components/forms/LoginForm.tsx, /src/index.css
-6:15:23 AM [vite] hmr update /src/components/forms/LoginForm.tsx, /src/index.css
-6:15:59 AM [vite] hmr update /src/components/forms/LoginForm.tsx, /src/index.css
-6:19:04 AM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/components/TestMyRounds.tsx, /src/components/SimpleDashboard.tsx, /src/components/LoginPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestDataDisplay.tsx, /src/components/TestRoundsData.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/forms/EvaluateRoundForm.tsx
-6:19:05 AM [vite] warning: Duplicate member "getRound" in class body
-174|    }
-175|  
-176|    async getRound(id: number) {
+6:35:05 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+6:35:39 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+6:40:20 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+6:40:20 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+6:45:30 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+6:45:54 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+6:46:02 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+6:46:21 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+6:46:35 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+6:46:51 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+6:48:20 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+6:51:13 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+6:52:09 AM [vite] hmr update /src/components/SimpleDashboard.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/TestApi.tsx, /src/context/AuthContext.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestDataDisplay.tsx, /src/components/TestRoundsData.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/UsersManagement.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx
+6:52:09 AM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+6:52:09 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/NotificationDropdown.tsx, /src/components/UserDropdown.tsx
+6:52:09 AM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+6:52:09 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/LoginPage.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx
+6:52:24 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css, /src/components/pages/EvaluationCategoriesPage.tsx
+6:52:29 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css, /src/components/pages/EvaluationCategoriesPage.tsx
+6:54:48 AM [vite] hmr update /src/components/SimpleDashboard.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/TestApi.tsx, /src/context/AuthContext.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestDataDisplay.tsx, /src/components/TestRoundsData.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/UsersManagement.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx
+6:54:48 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css, /src/components/pages/EvaluationCategoriesPage.tsx
+6:54:48 AM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+6:54:48 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/NotificationDropdown.tsx, /src/components/UserDropdown.tsx
+6:54:48 AM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+6:54:48 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/LoginPage.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx
+6:57:25 AM [vite] hmr update /src/components/SimpleDashboard.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/TestApi.tsx, /src/context/AuthContext.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestDataDisplay.tsx, /src/components/TestRoundsData.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/UsersManagement.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx
+6:57:25 AM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+6:57:25 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/NotificationDropdown.tsx, /src/components/UserDropdown.tsx
+6:57:25 AM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+6:57:25 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/LoginPage.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx
+6:59:47 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+7:00:11 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+7:01:49 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+7:01:59 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+7:03:56 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css, /src/components/pages/EvaluationCategoriesPage.tsx
+7:04:23 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css, /src/components/pages/EvaluationCategoriesPage.tsx
+7:09:43 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css, /src/components/pages/EvaluationCategoriesPage.tsx
+7:12:29 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+7:12:53 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+7:12:54 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+7:14:33 AM [vite] page reload test-backend-connection.html
+7:15:03 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+7:15:03 AM [vite] page reload test-backend-connection.html
+7:15:06 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+7:21:50 AM [vite] page reload test-update-evaluation-item.html
+7:21:50 AM [vite] page reload test-update-evaluation-item.html
+7:22:22 AM [vite] page reload test-update-evaluation-item.html
+7:22:40 AM [vite] page reload test-update-evaluation-item.html
+8:29:02 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:29:13 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:29:23 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:29:27 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:29:32 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:30:14 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:31:36 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:33:44 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:33:50 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:33:55 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:34:01 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:34:12 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:34:47 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:36:59 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:44:34 AM [vite] page reload test-evaluation-items.html
+8:44:37 AM [vite] page reload test-evaluation-items.html
+8:44:52 AM [vite] page reload test-evaluation-items.html
+8:51:41 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:51:50 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+8:52:35 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+9:10:15 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+9:10:24 AM [vite] hmr update /src/components/pages/EvaluationItemsPage.tsx, /src/index.css
+9:12:41 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:12:51 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:13:26 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:17:51 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:18:21 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:23:26 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:23:32 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:23:41 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:24:53 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:26:23 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:26:31 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:29:29 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+9:30:58 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+9:31:30 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+9:31:30 AM [vite] warning: Duplicate key "endDate" in object literal
+138|          // إضافة معلومات إضافية للعرض
+139|          scheduledDate: scheduledDate,
+140|          endDate: endDate,
    |          ^
-177|      return this.request(`/rounds/${id}`)
-178|    }
+141|          deadline: deadline,
+142|          roundCode: round.round_code,
 
   Plugin: vite:esbuild
-  File: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/lib/api.ts
-6:19:05 AM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
-6:19:05 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/TestMyRounds.tsx, /src/components/LoginPage.tsx, /src/components/AnimatedSidebar.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/RoundsListView.tsx, /src/components/pages/UsersManagement.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx
-6:24:13 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-6:24:17 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-6:24:55 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:51:59 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:52:04 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:52:52 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:52:57 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:53:02 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:53:08 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:53:17 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:54:07 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:54:39 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:54:42 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:55:00 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
-10:58:55 AM [vite] hmr update /src/App.tsx, /src/index.css
-10:58:58 AM [vite] hmr update /src/App.tsx, /src/index.css
-10:59:05 AM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:59:12 AM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:59:31 AM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:59:40 AM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-10:59:44 AM [vite] hmr update /src/components/pages/EvaluateRoundPage.tsx, /src/index.css
-10:59:59 AM [vite] hmr update /src/components/pages/EvaluateRoundPage.tsx, /src/index.css
-11:00:03 AM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-11:00:05 AM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-11:00:12 AM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-11:00:21 AM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-11:00:46 AM [vite] hmr update /src/components/pages/EvaluateRoundPage.tsx, /src/index.css
-11:00:46 AM [vite] hmr update /src/App.tsx, /src/index.css
-11:00:46 AM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
-9:06:28 PM [vite] page reload src/types/index.ts
-9:06:36 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:06:40 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:06:43 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:06:48 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:06:52 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:06:57 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:07:05 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:07:13 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:07:17 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:07:21 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:07:31 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:07:40 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:07:49 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:08:50 PM [vite] page reload src/types/index.ts
-9:08:50 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:08:50 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:11:07 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:11:13 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:11:25 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:11:34 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
-9:11:38 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
-9:11:42 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
-9:11:49 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
-9:11:54 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:12:02 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:12:08 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:12:12 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
-9:12:51 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:12:51 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
-9:14:41 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:14:49 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:14:53 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:15:12 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:15:17 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:15:22 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:15:34 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:15:44 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:15:52 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:15:59 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:24:39 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:24:50 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:24:59 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:25:16 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:25:22 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:26:30 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:26:30 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:31:35 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:32:08 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:32:24 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:32:29 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:32:34 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:32:44 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:32:57 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:09 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:13 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:18 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:23 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:27 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:32 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:37 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:42 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:47 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:53 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:53 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:33:59 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:34:05 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:34:14 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:34:18 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:34:26 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:34:30 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:34:38 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:34:48 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:35:00 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:35:04 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:35:13 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:35:18 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:35:29 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:35:33 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:35:42 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:35:46 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:35:54 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:35:58 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:36:06 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:36:11 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:36:20 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:36:24 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:36:32 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:36:32 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:36:47 PM [vite] hmr update /src/components/forms/DepartmentForm.tsx, /src/index.css
-9:40:08 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:40:45 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:44:44 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
-9:45:02 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
-9:48:30 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
-9:48:42 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
-9:52:23 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:52:45 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
-9:52:58 PM [vite] hmr update /src/components/pages/DepartmentsManagement.tsx, /src/index.css
-9:52:58 PM [vite] hmr update /src/components/ui/DepartmentCard.tsx, /src/index.css
+  File: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/RoundsCalendarView.tsx
+9:31:38 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:32:18 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:32:42 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+9:32:42 AM [vite] warning: Duplicate key "endDate" in object literal
+138|          // إضافة معلومات إضافية للعرض
+139|          scheduledDate: scheduledDate,
+140|          endDate: endDate,
+   |          ^
+141|          deadline: deadline,
+142|          roundCode: round.round_code,
+
+  Plugin: vite:esbuild
+  File: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/RoundsCalendarView.tsx
+9:33:07 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+9:33:07 AM [vite] warning: Duplicate key "endDate" in object literal
+138|          // إضافة معلومات إضافية للعرض
+139|          scheduledDate: scheduledDate,
+140|          endDate: endDate,
+   |          ^
+141|          deadline: deadline,
+142|          roundCode: round.round_code,
+
+  Plugin: vite:esbuild
+  File: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/RoundsCalendarView.tsx
+9:33:15 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+9:33:15 AM [vite] warning: Duplicate key "endDate" in object literal
+137|          // إضافة معلومات إضافية للعرض
+138|          scheduledDate: scheduledDate,
+139|          endDate: endDate,
+   |          ^
+140|          deadline: deadline,
+141|          roundCode: round.round_code,
+
+  Plugin: vite:esbuild
+  File: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/RoundsCalendarView.tsx
+9:33:19 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+9:33:26 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+9:33:34 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:33:38 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:33:44 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:33:56 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:34:03 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:35:02 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:35:02 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+9:39:53 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:39:59 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:40:04 AM [vite] page reload src/components/Dashboard.tsx
+9:40:09 AM [vite] page reload src/components/Dashboard.tsx
+9:40:13 AM [vite] page reload src/components/Dashboard.tsx
+9:40:19 AM [vite] page reload src/components/RoundsPage.tsx
+9:40:25 AM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
+9:40:31 AM [vite] hmr update /src/components/pages/RoundsListView.tsx, /src/index.css
+9:40:36 AM [vite] page reload src/components/pages/CapaManagement.tsx
+9:40:41 AM [vite] hmr update /src/components/CapaDashboard.tsx, /src/index.css
+9:40:52 AM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+9:40:57 AM [vite] page reload src/components/notifications/RealTimeNotifications.tsx
+9:41:02 AM [vite] page reload src/components/reports/CustomReportBuilder.tsx
+9:41:10 AM [vite] hmr update /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/index.css
+9:41:16 AM [vite] hmr update /src/components/dashboard/AlertSystem.tsx, /src/index.css
+9:41:21 AM [vite] hmr update /src/components/dashboard/AlertSystem.tsx, /src/index.css
+9:41:26 AM [vite] hmr update /src/components/dashboard/ActionProgressTracker.tsx, /src/index.css
+9:41:30 AM [vite] hmr update /src/components/dashboard/CapaTimelineView.tsx, /src/index.css
+9:41:34 AM [vite] hmr update /src/components/dashboard/CapaTimelineView.tsx, /src/index.css
+9:41:39 AM [vite] hmr update /src/components/pages/EvaluationCapaIntegration.tsx, /src/index.css
+9:41:43 AM [vite] hmr update /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/index.css
+9:41:47 AM [vite] hmr update /src/components/pages/EvaluationCategoriesPage.tsx, /src/index.css
+9:41:54 AM [vite] page reload src/components/ui/TimelineChart.tsx
+9:41:58 AM [vite] hmr update /src/components/pages/TemplatesPage.tsx, /src/index.css
+9:42:03 AM [vite] hmr update /src/components/GamifiedEvaluationSystem.tsx, /src/index.css
+9:43:04 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:43:04 AM [vite] page reload src/components/Dashboard.tsx
+9:43:04 AM [vite] page reload src/components/RoundsPage.tsx
+9:43:04 AM [vite] hmr update /src/components/pages/RoundsListView.tsx, /src/index.css
+9:43:04 AM [vite] hmr update /src/components/CapaDashboard.tsx, /src/index.css
+9:43:04 AM [vite] page reload src/components/pages/CapaManagement.tsx
+9:43:04 AM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+9:43:04 AM [vite] page reload src/components/notifications/RealTimeNotifications.tsx
+9:43:04 AM [vite] page reload src/components/reports/CustomReportBuilder.tsx
+9:43:04 AM [vite] hmr update /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/index.css
+9:43:04 AM [vite] hmr update /src/components/dashboard/AlertSystem.tsx, /src/index.css
+9:43:04 AM [vite] hmr update /src/components/dashboard/CapaTimelineView.tsx, /src/index.css
+9:43:04 AM [vite] hmr update /src/components/dashboard/ActionProgressTracker.tsx, /src/index.css
+9:43:04 AM [vite] hmr update /src/components/pages/EvaluationCapaIntegration.tsx, /src/index.css
+9:43:04 AM [vite] hmr update /src/components/pages/EvaluationCategoriesPage.tsx, /src/index.css
+9:43:04 AM [vite] hmr update /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/index.css
+9:43:04 AM [vite] hmr update /src/components/pages/MyRoundsPage.tsx, /src/index.css
+9:43:04 AM [vite] page reload src/components/Dashboard.tsx
+9:43:04 AM [vite] page reload src/components/RoundsPage.tsx
+9:43:04 AM [vite] hmr update /src/components/pages/RoundsListView.tsx, /src/index.css
+9:43:04 AM [vite] hmr update /src/components/CapaDashboard.tsx, /src/index.css
+9:43:04 AM [vite] page reload src/components/pages/CapaManagement.tsx
+9:43:04 AM [vite] page reload src/components/ui/TimelineChart.tsx
+9:43:04 AM [vite] hmr update /src/components/pages/TemplatesPage.tsx, /src/index.css
+9:43:04 AM [vite] hmr update /src/components/GamifiedEvaluationSystem.tsx, /src/index.css
+9:46:14 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:46:21 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:46:50 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:46:58 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:47:48 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:49:37 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:49:49 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:49:55 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:50:15 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:50:24 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:51:35 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+9:57:36 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+9:58:21 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+10:02:28 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+10:02:39 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+10:02:55 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+10:03:40 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+10:18:03 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+10:18:11 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:19:09 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+10:21:40 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+10:21:40 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:35:39 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:35:45 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:35:51 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:35:59 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:36:11 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:36:19 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:36:35 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:36:42 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:37:27 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:49:35 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+10:49:43 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+10:49:51 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:50:01 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:50:14 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:50:20 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:50:34 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:50:52 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+10:50:52 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:50:52 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:53:06 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+10:53:12 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:53:28 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:53:32 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:53:56 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+10:53:56 AM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+10:59:39 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+10:59:50 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+10:59:57 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+11:00:08 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+11:00:31 AM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+11:02:57 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+11:04:35 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+11:04:41 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+11:04:47 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+11:05:35 AM [vite] hmr update /src/components/forms/CompleteRoundForm.tsx, /src/index.css
+11:24:39 AM [vite] page reload test_calendar_display.html
+11:24:45 AM [vite] page reload test_calendar_display.html
+11:25:33 AM [vite] page reload test_calendar_display.html
+2:00:46 PM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+2:01:02 PM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+2:01:45 PM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+2:07:26 PM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+2:07:32 PM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+2:07:53 PM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+2:11:46 PM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+2:11:47 PM [vite] Internal server error: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/ui/TimelineCalendar.tsx: Adjacent JSX elements must be wrapped in an enclosing tag. Did you want a JSX fragment <>...</>? (526:22)
+
+  524 |                           })}
+  525 |                         </div>
+> 526 |                       </div>
+      |                       ^
+  527 |                     </div>
+  528 |                   );
+  529 |                 })}
+  Plugin: vite:react-babel
+  File: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/ui/TimelineCalendar.tsx:526:22
+  524|                            })}
+  525|                          </div>
+  526|                        </div>
+     |                        ^
+  527|                      </div>
+  528|                    );
+      at constructor (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:362:19)
+      at TypeScriptParserMixin.raise (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:3259:19)
+      at TypeScriptParserMixin.jsxParseElementAt (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6789:18)
+      at TypeScriptParserMixin.jsxParseElement (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6796:17)
+      at TypeScriptParserMixin.parseExprAtom (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6806:19)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10591:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10576:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10556:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9483:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10410:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10415:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10392:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10355:21)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9421:39
+      at TypeScriptParserMixin.tryParse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:3597:20)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9421:18)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10325:39
+      at TypeScriptParserMixin.allowInAnd (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11937:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10325:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11196:28)
+      at TypeScriptParserMixin.parseExprAtom (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10849:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6811:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10591:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10576:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10556:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9483:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10410:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10415:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10392:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10355:21)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9432:20)
+      at TypeScriptParserMixin.parseExpressionBase (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10309:23)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10305:39
+      at TypeScriptParserMixin.allowInAnd (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11932:16)
+      at TypeScriptParserMixin.parseExpression (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10305:17)
+      at TypeScriptParserMixin.parseReturnStatement (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12622:28)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12274:21)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9157:18)
+      at TypeScriptParserMixin.parseStatementLike (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12243:17)
+      at TypeScriptParserMixin.parseStatementListItem (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12223:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12796:61)
+      at TypeScriptParserMixin.parseBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12789:10)
+      at TypeScriptParserMixin.parseBlock (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12777:10)
+      at TypeScriptParserMixin.parseFunctionBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11620:24)
+      at TypeScriptParserMixin.parseArrowExpression (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11595:10)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11208:12)
+      at TypeScriptParserMixin.parseExprAtom (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10849:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6811:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10591:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10576:21)
+2:15:46 PM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+2:15:51 PM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+2:16:02 PM [vite] hmr update /src/components/ui/TimelineCalendar.tsx, /src/index.css
+2:16:02 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+2:16:02 PM [vite] hmr update /src/components/pages/RoundsCalendarView.tsx, /src/index.css
+2:16:02 PM [vite] Internal server error: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/ui/TimelineCalendar.tsx: Adjacent JSX elements must be wrapped in an enclosing tag. Did you want a JSX fragment <>...</>? (526:22)
+
+  524 |                           })}
+  525 |                         </div>
+> 526 |                       </div>
+      |                       ^
+  527 |                     </div>
+  528 |                   );
+  529 |                 })}
+  Plugin: vite:react-babel
+  File: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/ui/TimelineCalendar.tsx:526:22
+  524|                            })}
+  525|                          </div>
+  526|                        </div>
+     |                        ^
+  527|                      </div>
+  528|                    );
+      at constructor (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:362:19)
+      at TypeScriptParserMixin.raise (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:3259:19)
+      at TypeScriptParserMixin.jsxParseElementAt (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6789:18)
+      at TypeScriptParserMixin.jsxParseElement (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6796:17)
+      at TypeScriptParserMixin.parseExprAtom (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6806:19)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10591:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10576:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10556:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9483:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10410:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10415:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10392:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10355:21)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9421:39
+      at TypeScriptParserMixin.tryParse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:3597:20)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9421:18)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10325:39
+      at TypeScriptParserMixin.allowInAnd (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11937:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10325:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11196:28)
+      at TypeScriptParserMixin.parseExprAtom (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10849:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6811:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10591:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10576:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10556:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9483:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10410:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10415:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10392:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10355:21)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9432:20)
+      at TypeScriptParserMixin.parseExpressionBase (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10309:23)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10305:39
+      at TypeScriptParserMixin.allowInAnd (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11932:16)
+      at TypeScriptParserMixin.parseExpression (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10305:17)
+      at TypeScriptParserMixin.parseReturnStatement (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12622:28)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12274:21)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9157:18)
+      at TypeScriptParserMixin.parseStatementLike (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12243:17)
+      at TypeScriptParserMixin.parseStatementListItem (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12223:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12796:61)
+      at TypeScriptParserMixin.parseBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12789:10)
+      at TypeScriptParserMixin.parseBlock (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12777:10)
+      at TypeScriptParserMixin.parseFunctionBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11620:24)
+      at TypeScriptParserMixin.parseArrowExpression (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11595:10)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:11208:12)
+      at TypeScriptParserMixin.parseExprAtom (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10849:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6811:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10591:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:10576:21)
+2:21:20 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+2:21:43 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+2:22:00 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+2:22:19 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+2:23:11 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+2:23:23 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+2:23:38 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:32:23 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:32:31 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:32:39 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:32:52 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:33:10 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:33:59 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:34:13 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:35:58 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:37:54 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:38:49 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:39:05 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:41:31 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:41:39 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:41:45 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:41:54 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:42:04 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+6:40:54 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+6:42:24 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+6:42:41 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+6:51:10 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+6:51:32 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+6:51:45 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:04:25 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:04:45 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:05:05 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:07:18 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:07:30 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:07:40 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:08:03 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:08:19 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:10:46 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:10:58 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:11:05 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:11:12 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:11:21 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:11:39 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:11:56 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:13:28 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+7:13:41 PM [vite] hmr update /src/components/ui/GanttCalendar.tsx, /src/index.css
+5:43:38 AM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css
+5:43:38 AM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+5:43:38 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/LoginPage.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx
+5:43:56 AM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css
+5:43:56 AM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+5:43:56 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/LoginPage.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx
+6:48:16 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+6:48:21 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+6:48:26 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+6:48:31 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+6:48:36 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+6:48:40 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+6:48:53 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+6:49:01 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+6:49:12 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+6:50:06 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+6:50:59 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+8:47:59 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+8:48:10 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+8:48:22 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+8:50:38 AM [vite] hmr update /src/components/forms/EvaluationWizard.tsx, /src/index.css
+8:50:42 AM [vite] hmr update /src/components/forms/EvaluationWizard.tsx, /src/index.css
+8:50:46 AM [vite] hmr update /src/components/forms/EvaluationWizard.tsx, /src/index.css
+8:50:55 AM [vite] hmr update /src/components/forms/EvaluationWizard.tsx, /src/index.css
+8:50:59 AM [vite] hmr update /src/components/forms/EvaluationWizard.tsx, /src/index.css
+8:52:57 AM [vite] hmr update /src/components/ui/ProgressBar.tsx, /src/index.css
+8:52:57 AM [vite] hmr update /src/index.css, /src/components/forms/EvaluationWizard.tsx
+8:52:57 AM [vite] hmr update /src/components/forms/CommentSuggestions.tsx, /src/index.css
+8:52:57 AM [vite] hmr update /src/components/forms/EvaluationWizard.tsx, /src/index.css
+8:52:57 AM [vite] hmr update /src/components/forms/EvaluationStep.tsx, /src/index.css
+8:52:57 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+9:16:20 AM [vite] hmr update /src/components/AnimatedSidebar.tsx, /src/index.css
+9:31:44 AM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+9:31:53 AM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+9:32:36 AM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+9:33:04 AM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+9:34:27 AM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+9:37:25 AM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+11:29:54 AM [vite] hmr update /src/components/SimpleDashboard.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/TestApi.tsx, /src/context/AuthContext.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestDataDisplay.tsx, /src/components/TestRoundsData.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/UsersManagement.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+11:29:54 AM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+11:29:54 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/NotificationDropdown.tsx, /src/components/UserDropdown.tsx
+11:29:54 AM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+11:29:54 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/LoginPage.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx
+11:42:21 AM [vite] hmr update /src/components/SimpleDashboard.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/TestApi.tsx, /src/context/AuthContext.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestDataDisplay.tsx, /src/components/TestRoundsData.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/UsersManagement.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+11:42:22 AM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+11:42:22 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/NotificationDropdown.tsx, /src/components/UserDropdown.tsx
+11:42:22 AM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+11:42:22 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/LoginPage.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx
+11:57:37 AM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+11:58:01 AM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+12:35:18 PM [vite] hmr update /src/components/TestDataDisplay.tsx, /src/index.css, /src/components/TestRoundsData.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx
+12:35:18 PM [vite] hmr update /src/components/SimpleDashboard.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/TestApi.tsx, /src/context/AuthContext.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestDataDisplay.tsx, /src/components/TestRoundsData.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/UsersManagement.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+12:35:18 PM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+12:35:18 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/NotificationDropdown.tsx, /src/components/UserDropdown.tsx
+12:35:18 PM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+12:35:18 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/TestRoundCreation.tsx, /src/components/TestCreateRound.tsx, /src/components/LoginPage.tsx, /src/components/TestMyRounds.tsx, /src/components/RegisterPage.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx

@@ -117,6 +117,20 @@ CREATE TABLE IF NOT EXISTS evaluation_results (
     evaluated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 8. جدول قوالب الملاحظات الشائعة
+CREATE TABLE IF NOT EXISTS evaluation_comment_templates (
+    id SERIAL PRIMARY KEY,
+    evaluation_item_id INTEGER REFERENCES evaluation_items(id),
+    category_id INTEGER REFERENCES evaluation_categories(id),
+    comment_text_ar TEXT NOT NULL,
+    comment_text_en TEXT,
+    usage_count INTEGER DEFAULT 0,
+    created_by INTEGER REFERENCES users(id),
+    is_public BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- إنشاء الفهارس لتحسين الأداء
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
@@ -130,6 +144,9 @@ CREATE INDEX IF NOT EXISTS idx_capas_department ON capas(department);
 CREATE INDEX IF NOT EXISTS idx_evaluation_items_category ON evaluation_items(category_id);
 CREATE INDEX IF NOT EXISTS idx_evaluation_items_code ON evaluation_items(code);
 CREATE INDEX IF NOT EXISTS idx_evaluation_results_round ON evaluation_results(round_id);
+CREATE INDEX IF NOT EXISTS idx_evaluation_comment_templates_evaluation_item_id ON evaluation_comment_templates(evaluation_item_id);
+CREATE INDEX IF NOT EXISTS idx_evaluation_comment_templates_category_id ON evaluation_comment_templates(category_id);
+CREATE INDEX IF NOT EXISTS idx_evaluation_comment_templates_usage_count ON evaluation_comment_templates(usage_count);
 
 -- إدراج البيانات الأولية
 
@@ -166,6 +183,21 @@ INSERT INTO evaluation_items (code, title, title_en, description, objective, cat
 ('PS001', 'تحديد هوية المريض', 'Patient Identification', 'التأكد من تحديد هوية المريض بشكل صحيح', 'منع الأخطاء الطبية', 2, 'سلامة المرضى', 'blue', true, 5, 'CRITICAL', 'OBSERVATION', 'يجب التحقق من هوية المريض قبل أي إجراء', 'Patient identity must be verified before any procedure'),
 ('Q001', 'توثيق العمليات', 'Process Documentation', 'التأكد من توثيق جميع العمليات بشكل صحيح', 'ضمان الجودة والتحسين', 3, 'الجودة', 'green', true, 3, 'MAJOR', 'DOCUMENT', 'يجب توثيق جميع العمليات والنتائج', 'All processes and results must be documented')
 ON CONFLICT (code) DO NOTHING;
+
+-- إدراج قوالب الملاحظات الشائعة
+INSERT INTO evaluation_comment_templates (evaluation_item_id, category_id, comment_text_ar, comment_text_en, usage_count, is_public) VALUES
+(NULL, 1, 'لم يتم تطبيق المعيار بالكامل', 'Standard not fully implemented', 15, true),
+(NULL, 1, 'نقص في التدريب على المعيار', 'Insufficient training on the standard', 12, true),
+(NULL, 1, 'الموارد غير متوفرة', 'Resources not available', 8, true),
+(NULL, 1, 'تم التطبيق بنجاح', 'Successfully implemented', 25, true),
+(NULL, 1, 'يحتاج متابعة مستمرة', 'Requires continuous monitoring', 6, true),
+(NULL, 2, 'تم التحقق من هوية المريض بشكل صحيح', 'Patient identity verified correctly', 18, true),
+(NULL, 2, 'لم يتم التحقق من هوية المريض', 'Patient identity not verified', 5, true),
+(NULL, 2, 'نقص في التدريب على عملية التحقق', 'Insufficient training on verification process', 7, true),
+(NULL, 3, 'التوثيق مكتمل ومنظم', 'Documentation is complete and organized', 20, true),
+(NULL, 3, 'نقص في التوثيق', 'Insufficient documentation', 9, true),
+(NULL, 3, 'التوثيق غير واضح', 'Documentation is unclear', 4, true)
+ON CONFLICT DO NOTHING;
 
 COMMENT ON DATABASE salamaty_system IS 'قاعدة بيانات نظام سلامتي لإدارة جولات الجودة وسلامة المرضى';
 COMMENT ON TABLE users IS 'جدول المستخدمين والصلاحيات';
