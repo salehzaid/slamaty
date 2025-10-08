@@ -638,15 +638,44 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
             print(f"❌ [API] Database connection test failed: {conn_error}")
             raise HTTPException(status_code=500, detail=f"خطأ في الاتصال بقاعدة البيانات: {str(conn_error)}")
         
-        # Get rounds from database
-        rounds = get_rounds(db, skip=skip, limit=limit)
-        print(f"✅ [API] Successfully fetched {len(rounds)} rounds")
+        # Get rounds from database using raw SQL to avoid schema issues
+        from sqlalchemy import text
+        
+        query = text("""
+            SELECT id, round_code, title, description, round_type, 
+                   department, status, priority, scheduled_date, created_at,
+                   assigned_to, created_by_id
+            FROM rounds 
+            ORDER BY created_at DESC 
+            LIMIT :limit OFFSET :offset
+        """)
+        
+        result = db.execute(query, {'limit': limit, 'offset': skip})
+        rounds_data = []
+        
+        for row in result.fetchall():
+            rounds_data.append({
+                "id": row[0],
+                "round_code": row[1],
+                "title": row[2],
+                "description": row[3],
+                "round_type": row[4],
+                "department": row[5],
+                "status": row[6],
+                "priority": row[7],
+                "scheduled_date": row[8].isoformat() if row[8] else None,
+                "created_at": row[9].isoformat() if row[9] else None,
+                "assigned_to": row[10],
+                "created_by_id": row[11]
+            })
+        
+        print(f"✅ [API] Successfully fetched {len(rounds_data)} rounds")
         
         # Log first few rounds for debugging
-        if rounds:
-            print(f"📋 [API] First round: ID={rounds[0].id}, Title={rounds[0].title}")
+        if rounds_data:
+            print(f"📋 [API] First round: ID={rounds_data[0]['id']}, Title={rounds_data[0]['title']}")
         
-        return rounds
+        return rounds_data
         
     except HTTPException:
         raise
