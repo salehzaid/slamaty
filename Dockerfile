@@ -13,7 +13,7 @@ ENV VITE_API_URL=https://qpsrounds-production.up.railway.app
 RUN npm run build
 
 # Backend runtime stage
-FROM python:3.11-slim
+FROM python:3.11-slim AS backend
 WORKDIR /app
 
 # Install system dependencies
