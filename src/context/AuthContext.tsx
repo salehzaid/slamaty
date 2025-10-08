@@ -21,23 +21,8 @@ const USE_DIRECT_ADMIN_LOGIN = false; // إيقاف تسجيل الدخول ال
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   console.log('🔧 AuthProvider: Component initialized');
   
-  // Direct admin user for immediate login
-  const defaultAdminUser: User = {
-    id: 1,
-    username: 'test_admin',
-    email: 'testadmin@salamaty.com',
-    first_name: 'مدير',
-    last_name: 'النظام',
-    role: 'super_admin',
-    department: 'الإدارة العامة',
-    position: 'مدير النظام',
-    phone: '+966500000000',
-    is_active: true,
-    created_at: new Date().toISOString()
-  };
-  
-  const [user, setUser] = useState<User | null>(defaultAdminUser);
-  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -105,19 +90,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               console.log('👤 User set:', user.email);
             } else {
               console.error('❌ API login failed:', response.status);
-              // Fallback to direct admin login
-              setUser(defaultAdminUser);
-              localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
-              localStorage.setItem('access_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
-              apiClient.setToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
+              // Don't use expired token - require real login
+              console.log('⚠️ Skipping expired token fallback - user must login');
             }
           } catch (error) {
             console.error('❌ API login failed:', error);
-            // Fallback to direct admin login
-            setUser(defaultAdminUser);
-            localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
-            localStorage.setItem('access_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
-            apiClient.setToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
+            // Don't use expired token - require real login
+            console.log('⚠️ Skipping expired token fallback - user must login');
           }
         } else {
           // 🔄 تسجيل دخول عبر API (أبطأ)
@@ -147,23 +126,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               console.log('✅ API login successful!');
             } else {
               console.error('❌ API login failed: No access token');
-              // Fallback to direct admin login
-              setUser(defaultAdminUser);
-              localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
-              localStorage.setItem('access_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
-              apiClient.setToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
+              // Don't use expired token - require real login
+              console.log('⚠️ Skipping expired token fallback - user must login');
             }
           } catch (error) {
             console.error('❌ API login failed:', error);
-            // Fallback to direct admin login
-            setUser(defaultAdminUser);
-            localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
-            localStorage.setItem('access_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
-            apiClient.setToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s');
+            // Don't use expired token - require real login
+            console.log('⚠️ Skipping expired token fallback - user must login');
           }
         }
-      } else if (!AUTO_LOGIN_ENABLED) {
-        setUser(null);
       }
       
       setIsLoading(false);
@@ -207,27 +178,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginAsAdmin = () => {
-    const defaultAdminUser: User = {
-      id: 1,
-      username: 'test_admin',
-      email: 'testadmin@salamaty.com',
-      first_name: 'مدير',
-      last_name: 'النظام',
-      role: 'super_admin',
-      department: 'الإدارة العامة',
-      position: 'مدير النظام',
-      phone: '+966500000000',
-      is_active: true,
-      created_at: new Date().toISOString()
-    };
-    
-    const defaultToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0YWRtaW5Ac2FsYW1hdHkuY29tIiwiZXhwIjoxNzU5NjQ3OTgwfQ.y-0JLyzewqHc3DBAdgUHTsAXVrdeHDms16jNf5O-l3s';
-    
-    setUser(defaultAdminUser);
-    localStorage.setItem('sallamaty_user', JSON.stringify(defaultAdminUser));
-    localStorage.setItem('access_token', defaultToken);
-    apiClient.setToken(defaultToken);
+  const loginAsAdmin = async () => {
+    // Use real API login instead of expired token
+    console.log('🔄 loginAsAdmin: Using real API login...');
+    try {
+      const success = await login('testadmin@salamaty.com', 'test123');
+      if (!success) {
+        console.error('❌ Admin login failed');
+      }
+    } catch (error) {
+      console.error('❌ Admin login error:', error);
+    }
   };
 
   const logout = () => {

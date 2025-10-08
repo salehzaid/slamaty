@@ -29,7 +29,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log in to Docker Hub (optional)
-        if: secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN
+        if: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
         uses: docker/login-action@v2
         with:
           registry: docker.io
@@ -47,7 +47,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
       
       - name: Also push backend to Docker Hub (optional)
-        if: secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN
+        if: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
         uses: docker/build-push-action@v4
         with:
           context: ./backend
@@ -69,7 +69,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
       - name: Also push frontend to Docker Hub (optional)
-        if: secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN
+        if: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
         uses: docker/build-push-action@v4
         with:
           context: .
