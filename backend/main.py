@@ -210,6 +210,50 @@ async def create_emergency_test_round():
         traceback.print_exc()
         return {"error": str(e), "message": "فشل في إنشاء الجولة التجريبية"}
 
+# Test rounds with authentication (for debugging)
+@app.get("/api/test/auth/rounds", include_in_schema=False)
+async def test_rounds_with_auth(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    """Test rounds endpoint with authentication"""
+    try:
+        from sqlalchemy import text
+        
+        print(f"🔍 [TEST-AUTH] User: {current_user.email}")
+        
+        query = text("""
+            SELECT id, round_code, title, description, round_type, 
+                   department, status, priority, scheduled_date, created_at
+            FROM rounds 
+            ORDER BY created_at DESC 
+            LIMIT 10
+        """)
+        
+        result = db.execute(query)
+        rounds_data = []
+        
+        for row in result.fetchall():
+            rounds_data.append({
+                "id": row[0],
+                "round_code": row[1],
+                "title": row[2],
+                "description": row[3],
+                "round_type": row[4],
+                "department": row[5],
+                "status": row[6],
+                "priority": row[7],
+                "scheduled_date": row[8].isoformat() if row[8] else None,
+                "created_at": row[9].isoformat() if row[9] else None
+            })
+        
+        return {
+            "status": "success",
+            "user": current_user.email,
+            "count": len(rounds_data),
+            "rounds": rounds_data
+        }
+        
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
 # Simple test round creation (no constraints)
 @app.post("/api/emergency/create-simple-round", include_in_schema=False)
 async def create_simple_test_round():
