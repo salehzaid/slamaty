@@ -25,6 +25,24 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { useLayout } from '@/context/LayoutContext'
 
+interface MenuItem {
+  id: string
+  label: string
+  icon: any
+  badge: any
+  color: string
+  path: string
+  hidden?: boolean
+  hasSubmenu?: boolean
+  submenu?: Array<{
+    id: string
+    label: string
+    icon: any
+    color: string
+    path: string
+  }>
+}
+
 interface AnimatedSidebarProps {
   onLogout: () => void
 }
@@ -157,7 +175,8 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       icon: FileText,
       badge: null,
       color: 'text-emerald-600',
-      path: '/templates'
+      path: '/templates',
+      hidden: true // مؤقتاً
     },
     {
       id: 'unified-evaluation',
@@ -190,7 +209,8 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       icon: Trophy,
       badge: null,
       color: 'text-yellow-600',
-      path: '/gamified-system'
+      path: '/gamified-system',
+      hidden: true // مؤقتاً
     }
   ]
 
@@ -201,7 +221,8 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       icon: Bell,
       badge: null,
       color: 'text-yellow-600',
-      path: '/notifications'
+      path: '/notifications',
+      hidden: true // مؤقتاً
     },
     {
       id: 'settings',
@@ -217,7 +238,8 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       icon: HelpCircle,
       badge: null,
       color: 'text-red-600',
-      path: '/test-api'
+      path: '/test-api',
+      hidden: true // مؤقتاً
     },
     {
       id: 'layout-test',
@@ -225,7 +247,8 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       icon: LayoutDashboard,
       badge: null,
       color: 'text-indigo-600',
-      path: '/layout-test'
+      path: '/layout-test',
+      hidden: true // مؤقتاً
     },
     {
       id: 'help',
@@ -233,7 +256,8 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       icon: HelpCircle,
       badge: null,
       color: 'text-gray-600',
-      path: '/help'
+      path: '/help',
+      hidden: true // مؤقتاً
     }
   ]
 
@@ -331,7 +355,7 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4">
           <div className="px-3 space-y-1">
-            {menuItems.map((item) => {
+            {menuItems.filter(item => !item.hidden).map((item) => {
               const Icon = item.icon
               const active = isActive(item.path) || (item.submenu && item.submenu.some(sub => isActive(sub.path)))
               const isHovered = hoveredItem === item.id
@@ -461,7 +485,7 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
 
           {/* Bottom Items */}
           <div className="px-3 space-y-1">
-            {bottomItems.map((item) => {
+            {bottomItems.filter(item => !item.hidden).map((item) => {
               const Icon = item.icon
               const active = isActive(item.path)
               const isHovered = hoveredItem === item.id
