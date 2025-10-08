@@ -253,6 +253,48 @@ async def create_simple_test_round():
         traceback.print_exc()
         return {"error": str(e), "message": "فشل في إنشاء الجولة التجريبية البسيطة"}
 
+# Debug constraints endpoint
+@app.get("/api/debug/constraints", include_in_schema=False)
+async def debug_constraints():
+    """Debug database constraints"""
+    try:
+        db = next(get_db())
+        
+        # Get round status constraints
+        constraints_query = text("""
+            SELECT conname, pg_get_constraintdef(oid) 
+            FROM pg_constraint 
+            WHERE conrelid = 'rounds'::regclass 
+            AND contype = 'c'
+        """)
+        
+        result = db.execute(constraints_query)
+        constraints = [{"name": row[0], "definition": row[1]} for row in result.fetchall()]
+        
+        # Get enum values for round status
+        enum_query = text("""
+            SELECT enumlabel 
+            FROM pg_enum 
+            WHERE enumtypid = (
+                SELECT oid 
+                FROM pg_type 
+                WHERE typname = 'roundstatus'
+            )
+        """)
+        
+        result = db.execute(enum_query)
+        enum_values = [row[0] for row in result.fetchall()]
+        
+        db.close()
+        
+        return {
+            "constraints": constraints,
+            "round_status_enum": enum_values
+        }
+        
+    except Exception as e:
+        return {"error": str(e)}
+
 # Database diagnostic endpoint
 @app.get("/api/health/database", include_in_schema=False)
 async def check_database_health(db: Session = Depends(get_db)):
