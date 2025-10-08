@@ -7,7 +7,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --silent
 COPY . .
 # Cachebust build to force full rebuild on CI when needed
-ARG CACHEBUST=1
+ARG CACHEBUST=2
 # Set production API URL for build
 ENV VITE_API_URL=https://qpsrounds-production.up.railway.app
 RUN npm run build
