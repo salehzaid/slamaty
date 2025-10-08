@@ -153,7 +153,7 @@ async def create_emergency_test_round():
             "round_code": "TEST001",
             "title": "جولة تجريبية - اختبار النظام",
             "description": "جولة تجريبية لاختبار عمل النظام",
-            "round_type": "general",  # Use 'general' which should be allowed
+            "round_type": "MEDICATION_SAFETY",  # Use same type as existing round
             "department": "الطوارئ",
             "assigned_to": json.dumps([admin_user_id]),
             "scheduled_date": datetime.now() + timedelta(hours=1),
