@@ -16,16 +16,14 @@ jobs:
           echo "RAILWAY_PROJECT_ID=$RAILWAY_PROJECT_ID"
           echo "RAILWAY_ENVIRONMENT_ID=$RAILWAY_ENVIRONMENT_ID"
 
-      - name: Trigger Railway deployment (via API)
+      - name: Wait for images and trigger redeploy
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-          ENV_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
         run: |
-          echo "Triggering Railway redeploy..."
-          # Railway doesn't have a stable public REST deploy endpoint; if you
-          # have Railway CLI available you can use `railway up`. As fallback
-          # we call the internal projects redeploy endpoint used by the web UI.
+          echo "Waiting a short moment for GHCR images to be fully available..."
+          sleep 10
+          echo "Triggering Railway redeploy via internal endpoint..."
           curl -s -X POST "https://backboard.railway.app/project/${PROJECT_ID}/redeploy" \
             -H "Authorization: Bearer ${RAILWAY_TOKEN}" -H "Content-Type: application/json" -d '{}'
 
