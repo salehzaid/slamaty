@@ -69,13 +69,94 @@ app = FastAPI(
 async def _list_routes():
     return {"routes": sorted({route.path for route in app.routes})}
 
+# Simple health check endpoint (no authentication required)
+@app.get("/health", include_in_schema=False)
+async def health_check():
+    """Simple health check endpoint"""
+    return {"status": "ok", "message": "Server is running"}
+
+# Emergency endpoint to create test data (no authentication required)
+@app.post("/api/emergency/create-test-round", include_in_schema=False)
+async def create_emergency_test_round():
+    """Create a test round without authentication for debugging"""
+    try:
+        from datetime import datetime, timedelta
+        import json
+        
+        # Get database session directly
+        db = next(get_db())
+        
+        # Check if admin user exists
+        admin_user = db.query(User).filter(User.email == "testadmin@salamaty.com").first()
+        if not admin_user:
+            # Create admin user first
+            from auth import get_password_hash
+            from models_updated import UserRole
+            
+            admin_user = User(
+                username="testadmin",
+                email="testadmin@salamaty.com",
+                first_name="مدير",
+                last_name="النظام",
+                hashed_password=get_password_hash("test123"),
+                role=UserRole.SUPER_ADMIN,
+                department="الإدارة العامة",
+                position="مدير النظام",
+                phone="+966500000000",
+                is_active=True
+            )
+            db.add(admin_user)
+            db.commit()
+            db.refresh(admin_user)
+            print("✅ Created admin user")
+        
+        # Create test round
+        test_round = Round(
+            round_code="TEST001",
+            title="جولة تجريبية - اختبار النظام",
+            description="جولة تجريبية لاختبار عمل النظام",
+            round_type="patient_safety",
+            department="الطوارئ",
+            assigned_to=json.dumps([admin_user.id]),
+            scheduled_date=datetime.now() + timedelta(hours=1),
+            status="scheduled",
+            priority="medium",
+            created_by_id=admin_user.id
+        )
+        
+        # Check if test round already exists
+        existing = db.query(Round).filter(Round.round_code == "TEST001").first()
+        if existing:
+            return {"message": "Test round already exists", "round_id": existing.id}
+        
+        db.add(test_round)
+        db.commit()
+        db.refresh(test_round)
+        
+        db.close()
+        
+        return {
+            "message": "تم إنشاء جولة تجريبية بنجاح",
+            "round_id": test_round.id,
+            "admin_user_id": admin_user.id
+        }
+        
+    except Exception as e:
+        print(f"❌ Error creating emergency test round: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"error": str(e), "message": "فشل في إنشاء الجولة التجريبية"}
+
 # Database diagnostic endpoint
 @app.get("/api/health/database", include_in_schema=False)
 async def check_database_health(db: Session = Depends(get_db)):
     """Check database connection and table existence"""
     try:
+        print("🔍 [HEALTH] Starting database health check...")
+        
         # Test basic connection
         db.execute(text("SELECT 1"))
+        print("✅ [HEALTH] Basic connection test passed")
         
         # Check if tables exist
         tables_query = text("""
@@ -85,23 +166,38 @@ async def check_database_health(db: Session = Depends(get_db)):
         """)
         result = db.execute(tables_query)
         tables = [row[0] for row in result.fetchall()]
+        print(f"📋 [HEALTH] Found tables: {tables}")
         
         # Check if rounds table has data
         rounds_count = 0
         try:
             count_result = db.execute(text("SELECT COUNT(*) FROM rounds"))
             rounds_count = count_result.scalar()
+            print(f"📊 [HEALTH] Rounds count: {rounds_count}")
         except Exception as e:
-            print(f"Error counting rounds: {e}")
+            print(f"❌ [HEALTH] Error counting rounds: {e}")
+        
+        # Check users table
+        users_count = 0
+        try:
+            count_result = db.execute(text("SELECT COUNT(*) FROM users"))
+            users_count = count_result.scalar()
+            print(f"👥 [HEALTH] Users count: {users_count}")
+        except Exception as e:
+            print(f"❌ [HEALTH] Error counting users: {e}")
         
         return {
             "status": "healthy",
             "connection": "ok",
             "tables": tables,
             "rounds_count": rounds_count,
+            "users_count": users_count,
             "database_url": os.getenv("DATABASE_URL", "not_set")[:50] + "..." if os.getenv("DATABASE_URL") else "not_set"
         }
     except Exception as e:
+        print(f"❌ [HEALTH] Database health check failed: {e}")
+        import traceback
+        traceback.print_exc()
         return {
             "status": "error",
             "connection": "failed",

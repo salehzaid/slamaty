@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import and_
+from sqlalchemy import and_, text
 from typing import List, Optional
 from datetime import datetime
 from models_updated import User, Round, Capa, Department, EvaluationResult, Notification, UserNotificationSettings, NotificationType, NotificationStatus, RoundTypeSettings, CapaStatus, VerificationStatus
@@ -219,7 +219,22 @@ def create_round(db: Session, round: RoundCreate, created_by_id: int):
     return db_round
 
 def get_rounds(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Round).offset(skip).limit(limit).all()
+    try:
+        print(f"🔍 [CRUD] Getting rounds from database (skip={skip}, limit={limit})")
+        
+        # Test connection first
+        db.execute(text("SELECT 1"))
+        
+        # Get rounds
+        rounds = db.query(Round).offset(skip).limit(limit).all()
+        print(f"✅ [CRUD] Retrieved {len(rounds)} rounds")
+        
+        return rounds
+    except Exception as e:
+        print(f"❌ [CRUD] Error getting rounds: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
 
 def get_round_by_id(db: Session, round_id: int):
     return db.query(Round).filter(Round.id == round_id).first()
