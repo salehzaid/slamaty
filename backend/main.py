@@ -110,34 +110,40 @@ async def create_emergency_test_round():
             db.refresh(admin_user)
             print("✅ Created admin user")
         
-        # Create test round
-        test_round = Round(
-            round_code="TEST001",
-            title="جولة تجريبية - اختبار النظام",
-            description="جولة تجريبية لاختبار عمل النظام",
-            round_type="patient_safety",
-            department="الطوارئ",
-            assigned_to=json.dumps([admin_user.id]),
-            scheduled_date=datetime.now() + timedelta(hours=1),
-            status="scheduled",
-            priority="medium",
-            created_by_id=admin_user.id
-        )
+        # Create test round with minimal required fields
+        test_round_data = {
+            "round_code": "TEST001",
+            "title": "جولة تجريبية - اختبار النظام",
+            "description": "جولة تجريبية لاختبار عمل النظام",
+            "round_type": "patient_safety",
+            "department": "الطوارئ",
+            "assigned_to": json.dumps([admin_user.id]),
+            "scheduled_date": datetime.now() + timedelta(hours=1),
+            "status": "scheduled",
+            "priority": "medium",
+            "created_by_id": admin_user.id
+        }
         
-        # Check if test round already exists
-        existing = db.query(Round).filter(Round.round_code == "TEST001").first()
-        if existing:
-            return {"message": "Test round already exists", "round_id": existing.id}
+        # Try to create round using raw SQL to avoid model issues
+        insert_query = text("""
+            INSERT INTO rounds (round_code, title, description, round_type, department, 
+                              assigned_to, scheduled_date, status, priority, created_by_id)
+            VALUES (:round_code, :title, :description, :round_type, :department,
+                   :assigned_to, :scheduled_date, :status, :priority, :created_by_id)
+            RETURNING id
+        """)
         
-        db.add(test_round)
+        result = db.execute(insert_query, test_round_data)
+        round_id = result.fetchone()[0]
         db.commit()
-        db.refresh(test_round)
+        
+        print(f"✅ Created test round with ID: {round_id}")
         
         db.close()
         
         return {
             "message": "تم إنشاء جولة تجريبية بنجاح",
-            "round_id": test_round.id,
+            "round_id": round_id,
             "admin_user_id": admin_user.id
         }
         
@@ -443,7 +449,7 @@ async def create_new_round(round: RoundCreate, db: Session = Depends(get_db), cu
     
     return created_round
 
-@app.get("/api/rounds", response_model=List[RoundResponse])
+@app.get("/api/rounds")
 async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     try:
         print(f"🔍 [API] Fetching rounds from database for user {current_user.id}")
@@ -458,12 +464,34 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
             raise HTTPException(status_code=500, detail=f"خطأ في الاتصال بقاعدة البيانات: {str(conn_error)}")
         
         # Get rounds from database
-        rounds = get_rounds(db, skip=skip, limit=limit)
-        print(f"✅ [API] Successfully fetched {len(rounds)} rounds")
+        rounds_data = get_rounds(db, skip=skip, limit=limit)
+        print(f"✅ [API] Successfully fetched {len(rounds_data)} rounds")
+        
+        # Convert to proper response format
+        rounds = []
+        for round_data in rounds_data:
+            round_response = {
+                "id": round_data["id"],
+                "round_code": round_data["round_code"],
+                "title": round_data["title"],
+                "description": round_data["description"],
+                "round_type": round_data["round_type"],
+                "department": round_data["department"],
+                "assigned_to": round_data["assigned_to"],
+                "scheduled_date": round_data["scheduled_date"].isoformat() if round_data["scheduled_date"] else None,
+                "deadline": round_data["deadline"].isoformat() if round_data["deadline"] else None,
+                "status": round_data["status"],
+                "priority": round_data["priority"],
+                "compliance_percentage": round_data["compliance_percentage"] or 0,
+                "notes": round_data["notes"],
+                "created_by_id": round_data["created_by_id"],
+                "created_at": round_data["created_at"].isoformat() if round_data["created_at"] else None
+            }
+            rounds.append(round_response)
         
         # Log first few rounds for debugging
         if rounds:
-            print(f"📋 [API] First round: ID={rounds[0].id}, Title={rounds[0].title}")
+            print(f"📋 [API] First round: ID={rounds[0]['id']}, Title={rounds[0]['title']}")
         
         return rounds
         
