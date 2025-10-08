@@ -55,7 +55,7 @@ class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
+  ): Promise<any> {
     const url = `${this.baseURL}${endpoint}`
     
     // تم إزالة فحص التوكن القديم لاستخدام البيانات الحقيقية من قاعدة البيانات
@@ -103,13 +103,24 @@ class ApiClient {
 
       const data = await response.json()
       console.log('✅ API Response - Data:', data)
-      
-      // إذا كانت الاستجابة مصفوفة مباشرة، نعيدها مع data wrapper
+
+      // Normalize payloads so frontend always receives the underlying data:
+      // - If API returns an array -> return the array
+      // - If API returns { data: [...] } -> return data
+      // - If API returns { rounds: [...], count } -> return rounds
+      // - Otherwise return the raw object
       if (Array.isArray(data)) {
-        return { data, success: true } as ApiResponse<T>
+        return data
       }
-      // إذا كانت الاستجابة كائن، نعيده مع data wrapper
-      return { data, success: true } as ApiResponse<T>
+
+      if (data && typeof data === 'object') {
+        if (Array.isArray(data.data)) return data.data
+        if (Array.isArray((data as any).rounds)) return (data as any).rounds
+        // Some endpoints may wrap inside { data: { ... } }
+        if (data.data && !Array.isArray(data.data)) return data.data
+      }
+
+      return data
     } catch (error) {
       console.error('❌ API request failed:', error)
       if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
