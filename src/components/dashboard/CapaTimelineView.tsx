@@ -136,11 +136,11 @@ const CapaTimelineView: React.FC<CapaTimelineViewProps> = ({
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA')
+    return new Date(dateString).toLocaleDateString('en-US')
   }
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('ar-SA', {
+    return new Date(dateString).toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit'
     })
@@ -205,7 +205,7 @@ const CapaTimelineView: React.FC<CapaTimelineViewProps> = ({
       const endOfWeek = new Date(startOfWeek)
       endOfWeek.setDate(startOfWeek.getDate() + 6)
       
-      return `${startOfWeek.toLocaleDateString('ar-SA')} - ${endOfWeek.toLocaleDateString('ar-SA')}`
+      return `${startOfWeek.toLocaleDateString('en-US')} - ${endOfWeek.toLocaleDateString('en-US')}`
     } else if (viewMode === 'month') {
       return currentDate.toLocaleDateString('ar-SA', { 
         year: 'numeric', 

@@ -487,7 +487,7 @@ const CapaManagement: React.FC = () => {
               <CardContent className="pt-0">
                 <div className="space-y-2 text-sm text-gray-600">
                   <p><strong>المسؤول:</strong> {capa.assignedTo || 'غير محدد'}</p>
-                  <p><strong>التاريخ المستهدف:</strong> {new Date(capa.targetDate).toLocaleDateString('ar-SA')}</p>
+                  <p><strong>التاريخ المستهدف:</strong> {new Date(capa.targetDate).toLocaleDateString('en-US')}</p>
                   {capa.riskScore && (
                     <p><strong>درجة المخاطر:</strong> {capa.riskScore}/10</p>
                   )}

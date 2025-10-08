@@ -355,7 +355,7 @@ const GamifiedEvaluationSystem: React.FC = () => {
                     <p className="text-xs text-gray-600">{achievement.description}</p>
                     {achievement.unlocked && achievement.unlockedAt && (
                       <p className="text-xs text-green-600 mt-1">
-                        تم إنجازه في {new Date(achievement.unlockedAt).toLocaleDateString('ar-SA')}
+                        تم إنجازه في {new Date(achievement.unlockedAt).toLocaleDateString('en-US')}
                       </p>
                     )}
                   </div>

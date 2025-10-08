@@ -282,7 +282,7 @@ const RealTimeNotifications: React.FC<RealTimeNotificationsProps> = ({
   }
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('ar-SA', {
+    return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit'
     })

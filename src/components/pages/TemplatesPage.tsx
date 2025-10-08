@@ -372,7 +372,7 @@ const TemplatesPage: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <span>آخر تعديل:</span>
                   <span className="font-medium">
-                    {new Date(template.lastModified).toLocaleDateString('ar-SA')}
+                    {new Date(template.lastModified).toLocaleDateString('en-US')}
                   </span>
                 </div>
               </div>

@@ -34,6 +34,8 @@ export function useRounds(params?: { skip?: number; limit?: number }) {
         department: round.department,
         assignedTo: round.assigned_to ? JSON.parse(round.assigned_to) : [],
         scheduledDate: round.scheduled_date,
+        deadline: round.deadline,  // إضافة deadline
+        endDate: round.end_date,   // إضافة end_date
         status: round.status,
         priority: round.priority,
         compliancePercentage: round.compliance_percentage || 0,
@@ -43,6 +45,12 @@ export function useRounds(params?: { skip?: number; limit?: number }) {
       })) : []
       
       console.log('Rounds data loaded:', transformedData.length, 'rounds')
+      console.log('📅 Rounds with dates:', transformedData.map(r => ({
+        title: r.title,
+        scheduledDate: r.scheduledDate,
+        deadline: r.deadline,
+        endDate: r.endDate
+      })))
       setState(prev => ({ ...prev, data: transformedData, loading: false, error: null }))
     } catch (error) {
       console.error('API call failed:', error)
@@ -92,6 +100,8 @@ export function useMyRounds(params?: { skip?: number; limit?: number }) {
         department: round.department,
         assignedTo: round.assigned_to ? JSON.parse(round.assigned_to) : [],
         scheduledDate: round.scheduled_date,
+        deadline: round.deadline,  // إضافة deadline
+        endDate: round.end_date,   // إضافة end_date
         status: round.status,
         priority: round.priority,
         compliancePercentage: round.compliance_percentage || 0,

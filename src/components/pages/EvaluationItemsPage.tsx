@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Search, Filter, Edit, Trash2, CheckCircle, AlertTriangle, Target, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -129,29 +130,35 @@ const EvaluationItemsPage: React.FC = () => {
 
       if (!editingItem) return
 
+      // استخدام القيم الجديدة من النموذج، وإذا لم تكن موجودة نستخدم القيم القديمة
       const updatedItemData = {
-        code: data.code || editingItem.code,
-        title: data.title || editingItem.title,
-        title_en: data.title_en || editingItem.title_en,
-        description: data.description || editingItem.description,
-        objective: data.objective || editingItem.objective,
+        code: data.code !== undefined ? data.code : editingItem.code,
+        title: data.title !== undefined ? data.title : editingItem.title,
+        title_en: data.title_en !== undefined ? data.title_en : editingItem.title_en,
+        description: data.description !== undefined ? data.description : editingItem.description,
+        // للحقول التي قد تكون فارغة (checkboxes)، نتحقق من undefined و string فارغ
+        objective: (data.objective !== undefined && data.objective !== '') ? data.objective : editingItem.objective,
         category_id: Number(data.category_id),
-        is_required: data.is_required || editingItem.is_required,
-        weight: Number(data.weight) || editingItem.weight,
-        risk_level: data.risk_level || editingItem.risk_level,
+        is_required: data.is_required !== undefined ? data.is_required : editingItem.is_required,
+        weight: data.weight !== undefined ? Number(data.weight) : editingItem.weight,
+        risk_level: data.risk_level !== undefined ? data.risk_level : editingItem.risk_level,
+        // نوع الدليل - checkboxes تعطي قيم متعددة
         evidence_type: data.evidence_type || editingItem.evidence_type,
-        guidance_ar: data.guidance_ar || editingItem.guidance_ar,
-        guidance_en: data.guidance_en || editingItem.guidance_en,
-        standard_version: data.standard_version || editingItem.standard_version
+        guidance_ar: data.guidance_ar !== undefined ? data.guidance_ar : editingItem.guidance_ar,
+        guidance_en: data.guidance_en !== undefined ? data.guidance_en : editingItem.guidance_en,
+        standard_version: data.standard_version !== undefined ? data.standard_version : editingItem.standard_version
       }
       
+      console.log('تحديث العنصر مع البيانات:', updatedItemData)
       await updateItem(editingItem.id, updatedItemData as any)
       setShowCreateForm(false)
       setEditingItem(null)
       
-      console.log(`تم تحديث العنصر: ${updatedItemData.title} في تصنيف: ${selectedCategory.name}`)
+      console.log(`✅ تم تحديث العنصر بنجاح: ${updatedItemData.title} في تصنيف: ${selectedCategory.name}`)
+      alert('✅ تم تحديث العنصر بنجاح')
     } catch (error) {
-      console.error('Failed to update item:', error)
+      console.error('❌ فشل في تحديث العنصر:', error)
+      alert('حدث خطأ أثناء تحديث العنصر. يرجى المحاولة مرة أخرى.')
     }
   }
 
@@ -200,6 +207,30 @@ const EvaluationItemsPage: React.FC = () => {
     return labels[evidenceType as keyof typeof labels] || evidenceType
   }
 
+  // دالة لعرض أنواع الدليل المتعددة كـ badges منفصلة
+  const renderEvidenceTypes = (evidenceType: string) => {
+    if (!evidenceType) return null
+    
+    // تقسيم القيم المتعددة
+    const types = evidenceType.split(',').map(type => type.trim())
+    
+    return (
+      <div className="flex flex-wrap gap-1 justify-center">
+        {types.map((type, index) => (
+          <span 
+            key={index}
+            className={cn(
+              'px-2 py-1 rounded-full text-xs font-medium border',
+              getEvidenceTypeClasses(type)
+            )}
+          >
+            {getEvidenceTypeLabel(type)}
+          </span>
+        ))}
+      </div>
+    )
+  }
+
   const filteredItems = items.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (item.title_en && item.title_en.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -227,13 +258,22 @@ const EvaluationItemsPage: React.FC = () => {
           onSubmit={(e) => {
             e.preventDefault()
             const formData = new FormData(e.currentTarget)
-            const data = Object.fromEntries(formData.entries())
+            const data: any = Object.fromEntries(formData.entries())
 
+            // معالجة checkboxes للـ evidence types (قيم متعددة)
             const evidenceTypes = formData.getAll('evidenceType')
-            data.evidenceType = evidenceTypes.join(',')
+            data.evidence_type = evidenceTypes.length > 0 ? evidenceTypes.join(',') : 'OBSERVATION'
 
+            // معالجة checkboxes للـ objectives
             const objectives = formData.getAll('objective')
             data.objective = objectives.join(',')
+
+            // معالجة checkbox للـ is_required
+            // إذا كان الـ checkbox محددًا، ستكون القيمة "on"، وإلا لن تكون موجودة في FormData
+            data.is_required = formData.has('is_required')
+
+            console.log('بيانات النموذج المجمعة:', data)
+            console.log('نوع الدليل المجمع:', data.evidence_type)
 
             if (editingItem) {
               handleUpdateItem(data)
@@ -285,6 +325,11 @@ const EvaluationItemsPage: React.FC = () => {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">وصف العنصر</label>
+            <Textarea name="description" defaultValue={editingItem?.description || ''} placeholder="أدخل وصف تفصيلي للعنصر" rows={3} className="resize-none" />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">ارتباط العنصر *</label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 bg-gray-50 rounded-lg border">
               {getActiveObjectiveOptions().map((option) => (
@@ -300,40 +345,50 @@ const EvaluationItemsPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">نوع الدليل *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-3">نوع الدليل * (يمكن اختيار أكثر من نوع)</label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-lg border">
               <label className="flex flex-col items-center gap-2 p-3 bg-white rounded-md border hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
                 <input type="checkbox" name="evidenceType" value="INTERVIEW" defaultChecked={editingItem?.evidence_type?.includes('INTERVIEW') || false} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" />
                 <div className="text-center">
-                  <span className="text-sm font-medium text-gray-900">مقابلة</span>
+                  <span className="text-sm font-medium text-gray-900">💬 مقابلة</span>
                   <p className="text-xs text-gray-500">حوار مباشر</p>
                 </div>
               </label>
               <label className="flex flex-col items-center gap-2 p-3 bg-white rounded-md border hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
-                <input type="checkbox" name="evidenceType" value="OBSERVATION" defaultChecked={editingItem?.evidence_type?.includes('OBSERVATION') || false} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" />
+                <input type="checkbox" name="evidenceType" value="OBSERVATION" defaultChecked={editingItem?.evidence_type?.includes('OBSERVATION') || !editingItem} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" />
                 <div className="text-center">
-                  <span className="text-sm font-medium text-gray-900">ملاحظة</span>
+                  <span className="text-sm font-medium text-gray-900">👁️ ملاحظة</span>
                   <p className="text-xs text-gray-500">مراقبة مباشرة</p>
                 </div>
               </label>
               <label className="flex flex-col items-center gap-2 p-3 bg-white rounded-md border hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
                 <input type="checkbox" name="evidenceType" value="DOCUMENT" defaultChecked={editingItem?.evidence_type?.includes('DOCUMENT') || false} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" />
                 <div className="text-center">
-                  <span className="text-sm font-medium text-gray-900">مستند</span>
+                  <span className="text-sm font-medium text-gray-900">📄 مستند</span>
                   <p className="text-xs text-gray-500">وثيقة مكتوبة</p>
+                </div>
+              </label>
+              <label className="flex flex-col items-center gap-2 p-3 bg-white rounded-md border hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
+                <input type="checkbox" name="evidenceType" value="MEASUREMENT" defaultChecked={editingItem?.evidence_type?.includes('MEASUREMENT') || false} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" />
+                <div className="text-center">
+                  <span className="text-sm font-medium text-gray-900">📏 قياس</span>
+                  <p className="text-xs text-gray-500">قياس كمي</p>
                 </div>
               </label>
               <label className="flex flex-col items-center gap-2 p-3 bg-white rounded-md border hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
                 <input type="checkbox" name="evidenceType" value="PHOTO" defaultChecked={editingItem?.evidence_type?.includes('PHOTO') || false} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" />
                 <div className="text-center">
-                  <span className="text-sm font-medium text-gray-900">صورة</span>
+                  <span className="text-sm font-medium text-gray-900">📷 صورة</span>
                   <p className="text-xs text-gray-500">دليل بصري</p>
                 </div>
               </label>
             </div>
+            <p className="text-xs text-gray-500 mt-2">
+              ✅ يمكن اختيار أكثر من نوع دليل واحد
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">الوزن (1-10)</label>
               <Input name="weight" type="number" min="1" max="10" defaultValue={editingItem?.weight || 5} placeholder="5" />
@@ -345,6 +400,18 @@ const EvaluationItemsPage: React.FC = () => {
                 <option value="MAJOR">جسيم</option>
                 <option value="CRITICAL">حرج</option>
               </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">إلزامي؟</label>
+              <div className="flex items-center gap-2 h-full pt-2">
+                <input 
+                  type="checkbox" 
+                  name="is_required" 
+                  defaultChecked={editingItem?.is_required || false} 
+                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" 
+                />
+                <span className="text-sm text-gray-600">عنصر مطلوب (إلزامي)</span>
+              </div>
             </div>
           </div>
 
@@ -370,11 +437,11 @@ const EvaluationItemsPage: React.FC = () => {
     </Card>
   )
 
-  // render drawer on the right for create/edit on md+ screens
-  const renderDrawer = () => {
+  // Render form inline instead of drawer
+  const renderInlineForm = () => {
     if (!showCreateForm) return null
     return (
-      <div className="fixed inset-y-0 left-0 md:right-0 md:left-auto w-full md:w-1/3 z-50 p-6 bg-white overflow-auto shadow-xl">
+      <div className="mb-8">
         {formContent}
       </div>
     )
@@ -396,6 +463,9 @@ const EvaluationItemsPage: React.FC = () => {
           إضافة عنصر جديد
         </Button>
       </div>
+
+      {/* Inline Form for Create/Edit */}
+      {renderInlineForm()}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -553,10 +623,8 @@ const EvaluationItemsPage: React.FC = () => {
                   <span className="font-medium text-gray-700">الهدف:</span> {item.objective}
                 </p>
               )}
-              <div className="flex items-center justify-center pt-2 border-t">
-                <span className={cn('px-2 py-1 rounded-full text-xs font-medium', getEvidenceTypeClasses(item.evidence_type))}>
-                  نوع الدليل: {getEvidenceTypeLabel(item.evidence_type)}
-                </span>
+              <div className="pt-2 border-t">
+                {renderEvidenceTypes(item.evidence_type)}
               </div>
             </div>
           </div>
@@ -569,7 +637,6 @@ const EvaluationItemsPage: React.FC = () => {
           <p className="text-gray-500 text-lg">لا توجد عناصر مطابقة للبحث</p>
         </div>
       )}
-      {renderDrawer()}
     </div>
   )
 }

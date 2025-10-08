@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, CheckCircle
 import { Card, CardContent } from './card';
 import { Button } from './button';
 import { Input } from './input';
-import { Badge } from './badge';
 
 interface TimelineEvent {
   id: string;
@@ -15,6 +14,12 @@ interface TimelineEvent {
   department: string;
   assignedTo: string[];
   color: string;
+  // معلومات إضافية للعرض
+  scheduledDate?: Date;
+  actualEndDate?: Date;
+  deadline?: Date;
+  roundCode?: string;
+  description?: string;
 }
 
 interface TimelineCalendarProps {
@@ -36,22 +41,7 @@ const TimelineCalendar: React.FC<TimelineCalendarProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
 
-  // Calculate round period based on deadline
-  const calculateRoundPeriod = (scheduledDate: Date, deadline?: Date) => {
-    if (!deadline) {
-      // If no deadline, use scheduled date as both start and end
-      return {
-        start: scheduledDate,
-        end: new Date(scheduledDate.getTime() + 24 * 60 * 60 * 1000) // Add 1 day
-      };
-    }
-    
-    // Calculate period from scheduled date to deadline
-    return {
-      start: scheduledDate,
-      end: deadline
-    };
-  };
+  // Calculate round period based on deadline - removed unused function
 
   // Get unique departments from events
   const departments = useMemo(() => {
@@ -61,13 +51,21 @@ const TimelineCalendar: React.FC<TimelineCalendarProps> = ({
 
   // Filter events based on search and department filters
   const filteredEvents = useMemo(() => {
-    return events.filter(event => {
+    const filtered = events.filter(event => {
       const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            event.department.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesDepartment = selectedDepartments.length === 0 || 
                                selectedDepartments.includes(event.department);
       return matchesSearch && matchesDepartment;
     });
+    
+    console.log('🔍 Filtered events:', {
+      total: events.length,
+      filtered: filtered.length,
+      events: filtered.map(e => ({ title: e.title, start: e.startDate, end: e.endDate }))
+    });
+    
+    return filtered;
   }, [events, searchTerm, selectedDepartments]);
 
   // Get current week or month range
@@ -108,7 +106,24 @@ const TimelineCalendar: React.FC<TimelineCalendarProps> = ({
     return filteredEvents.filter(event => {
       const eventStart = new Date(event.startDate);
       const eventEnd = new Date(event.endDate);
-      return eventStart <= date && eventEnd >= date;
+      
+      // إرجاع الأحداث التي تبدأ في هذا اليوم أو تمر عبره
+      const isEventOnDate = eventStart <= date && eventEnd >= date;
+      
+      // إضافة تسجيل للتشخيص
+      if (isEventOnDate) {
+        console.log('📅 Event found for date:', {
+          date: date.toLocaleDateString('en-US'),
+          event: event.title,
+          start: eventStart.toLocaleDateString('en-US'),
+          end: eventEnd.toLocaleDateString('en-US'),
+          actualEndDate: event.actualEndDate ? event.actualEndDate.toLocaleDateString('en-US') : 'None',
+          duration: Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (1000 * 60 * 60 * 24)) + ' days',
+          isMultiDay: Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (1000 * 60 * 60 * 24)) > 1
+        });
+      }
+      
+      return isEventOnDate;
     });
   };
 
@@ -181,7 +196,7 @@ const TimelineCalendar: React.FC<TimelineCalendarProps> = ({
                 <h2 className="text-2xl font-bold text-gray-900">تقويم الجولات الزمني</h2>
                 <p className="text-gray-600">
                   {viewMode === 'week' ? 'عرض أسبوعي' : 'عرض شهري'} - 
-                  {rangeStart.toLocaleDateString('ar-SA')} إلى {rangeEnd.toLocaleDateString('ar-SA')}
+                  {rangeStart.toLocaleDateString('en-US')} إلى {rangeEnd.toLocaleDateString('en-US')}
                 </p>
               </div>
             </div>
@@ -319,10 +334,10 @@ const TimelineCalendar: React.FC<TimelineCalendarProps> = ({
                         style={{ minWidth: `${120 * zoom}px` }}
                       >
                         <div className="text-sm font-semibold text-gray-900">
-                          {date.toLocaleDateString('ar-SA', { weekday: 'short' })}
+                          {date.toLocaleDateString('en-US', { weekday: 'short' })}
                         </div>
                         <div className="text-xs text-gray-600">
-                          {date.toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' })}
+                          {date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}
                         </div>
                       </div>
                     ))}
@@ -332,7 +347,7 @@ const TimelineCalendar: React.FC<TimelineCalendarProps> = ({
 
               {/* Timeline Body */}
               <div className="divide-y divide-gray-200">
-                {departments.map((department, deptIndex) => {
+                {departments.map((department) => {
                   const departmentEvents = filteredEvents.filter(event => event.department === department);
                   
                   return (
@@ -347,53 +362,162 @@ const TimelineCalendar: React.FC<TimelineCalendarProps> = ({
                         </div>
                       </div>
                       
-                      {/* Timeline Lane */}
+                      {/* Timeline Lane - Gantt Style */}
                       <div className="flex-1 relative">
+                        {/* Background Grid */}
                         <div className="flex h-full">
-                          {timeSlots.map((date, dateIndex) => {
-                            const dayEvents = getEventsForDate(date).filter(event => event.department === department);
-                            
-                            return (
-                              <div
-                                key={dateIndex}
-                                className={`flex-1 border-r border-gray-200 relative ${
-                                  date.toDateString() === new Date().toDateString() 
-                                    ? 'bg-blue-50' 
-                                    : 'bg-white'
-                                }`}
-                                style={{ minWidth: `${120 * zoom}px` }}
-                                onClick={() => onDateClick?.(date)}
-                              >
-                                <div className="h-full p-2 space-y-1">
-                                  {dayEvents.map((event, eventIndex) => (
-                                    <div
-                                      key={event.id}
-                                      className={`text-xs p-2 rounded cursor-pointer hover:shadow-sm transition-all duration-200 border ${getPriorityColor(event.priority)}`}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        onEventClick?.(event);
-                                      }}
-                                      style={{
-                                        backgroundColor: event.color + '20',
-                                        borderColor: event.color,
-                                        color: event.color
-                                      }}
-                                    >
-                                      <div className="flex items-center gap-1 mb-1">
-                                        {getStatusIcon(event.status)}
-                                        <span className="font-medium truncate">{event.title}</span>
+                          {timeSlots.map((date, dateIndex) => (
+                            <div
+                              key={dateIndex}
+                              className={`flex-1 border-r border-gray-200 ${
+                                date.toDateString() === new Date().toDateString() 
+                                  ? 'bg-blue-50' 
+                                  : 'bg-white'
+                              }`}
+                              style={{ minWidth: `${120 * zoom}px` }}
+                              onClick={() => onDateClick?.(date)}
+                            />
+                          ))}
+                        </div>
+                        
+                        {/* Gantt Bars - Continuous Lines */}
+                        <div className="absolute inset-0 pointer-events-none">
+                          {departmentEvents.map((event, eventIndex) => {
+                                    // حساب موضع الجولة في الجدول الزمني
+                                    const eventStart = new Date(event.startDate);
+                                    const eventEnd = new Date(event.endDate);
+                                    const { start: rangeStart } = getDateRange();
+                                    
+                                    // حساب عدد الأيام من بداية النطاق الزمني
+                                    const startDayIndex = Math.floor((eventStart.getTime() - rangeStart.getTime()) / (1000 * 60 * 60 * 24));
+                                    const endDayIndex = Math.floor((eventEnd.getTime() - rangeStart.getTime()) / (1000 * 60 * 60 * 24));
+                                    const currentDayIndex = Math.floor((date.getTime() - rangeStart.getTime()) / (1000 * 60 * 60 * 24));
+                                    
+                                    // تحديد إذا كانت هذه هي البداية أو النهاية أو الوسط
+                                    const isStart = currentDayIndex === startDayIndex;
+                                    const isEnd = currentDayIndex === endDayIndex;
+                                    const isMiddle = currentDayIndex > startDayIndex && currentDayIndex < endDayIndex;
+                                    
+                                    // حساب العرض النسبي للجولة
+                                    const totalDays = endDayIndex - startDayIndex + 1;
+                                    
+                                    // تسجيل للتشخيص
+                                    console.log('📅 Event rendering for date:', {
+                                      date: date.toLocaleDateString('en-US'),
+                                      event: event.title,
+                                      eventStart: eventStart.toLocaleDateString('en-US'),
+                                      eventEnd: eventEnd.toLocaleDateString('en-US'),
+                                      totalDays,
+                                      isStart,
+                                      isEnd,
+                                      isMiddle,
+                                      currentDayIndex,
+                                      startDayIndex,
+                                      endDayIndex,
+                                      isMultiDay: totalDays > 1
+                                    });
+                                    
+                                    // عرض الجولة في جميع الأيام التي تمتد خلالها
+                                    
+                                    return (
+                                      <div
+                                        key={event.id}
+                                        className={`text-xs p-2 rounded cursor-pointer hover:shadow-sm transition-all duration-200 border ${getPriorityColor(event.priority)} ${
+                                          isStart ? 'rounded-r-none' : 
+                                          isEnd ? 'rounded-l-none' : 
+                                          isMiddle ? 'rounded-none' : ''
+                                        }`}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          onEventClick?.(event);
+                                        }}
+                                        style={{
+                                          backgroundColor: event.color + '20',
+                                          borderColor: event.color,
+                                          color: event.color,
+                                          width: '100%',
+                                          position: 'relative',
+                                          zIndex: 10,
+                                          minHeight: '60px',
+                                          // إضافة خط متصل للجولات المتعددة الأيام
+                                          ...(totalDays > 1 && {
+                                            borderRight: isStart ? `2px solid ${event.color}` : 'none',
+                                            borderLeft: isEnd ? `2px solid ${event.color}` : 'none',
+                                            borderTop: isMiddle ? `2px solid ${event.color}` : 'none',
+                                            borderBottom: isMiddle ? `2px solid ${event.color}` : 'none'
+                                          })
+                                        }}
+                                      >
+                                        <div className="flex items-center gap-1 mb-2">
+                                          {getStatusIcon(event.status)}
+                                          <span className="font-medium truncate">{event.title}</span>
+                                        </div>
+                                        
+                                        {/* عرض كود الجولة */}
+                                        {event.roundCode && (
+                                          <div className="text-xs opacity-75 mb-1">
+                                            <span className="font-medium">كود:</span> {event.roundCode}
+                                          </div>
+                                        )}
+                                        
+                                        {/* عرض تواريخ بداية ونهاية الجولة */}
+                                        <div className="text-xs opacity-75 space-y-1">
+                                          <div className="flex items-center gap-1">
+                                            <span className="font-medium">بداية:</span>
+                                            <span>{event.startDate.toLocaleDateString('en-US')}</span>
+                                          </div>
+                                          <div className="flex items-center gap-1">
+                                            <span className="font-medium">نهاية:</span>
+                                            <span>{event.endDate.toLocaleDateString('en-US')}</span>
+                                          </div>
+                                          {totalDays > 1 && (
+                                            <div className="flex items-center gap-1">
+                                              <span className="font-medium">المدة:</span>
+                                              <span>{totalDays} أيام</span>
+                                            </div>
+                                          )}
+                                          {/* تسجيل للتشخيص */}
+                                          {(() => {
+                                            console.log('📅 Event display data:', {
+                                              eventTitle: event.title,
+                                              startDate: event.startDate.toLocaleDateString('en-US'),
+                                              endDate: event.endDate.toLocaleDateString('en-US'),
+                                              actualEndDate: event.actualEndDate ? event.actualEndDate.toLocaleDateString('en-US') : 'None'
+                                            });
+                                            return null;
+                                          })()}
+                                        </div>
+                                        
+                                        {/* عرض القسم */}
+                                        <div className="text-xs opacity-75 mt-1">
+                                          <span className="font-medium">القسم:</span> {event.department}
+                                        </div>
+                                        
+                                        {/* عرض المقيمين */}
+                                        {event.assignedTo && event.assignedTo.length > 0 && (
+                                          <div className="text-xs opacity-75 mt-1">
+                                            <span className="font-medium">المقيمون:</span> {event.assignedTo.join(', ')}
+                                          </div>
+                                        )}
+                                        
+                                        {/* مؤشرات الجولة الممتدة */}
+                                        {totalDays > 1 && (
+                                          <div className="flex items-center gap-1 mt-2">
+                                            <div className={`w-2 h-2 rounded-full border border-current opacity-60 ${
+                                              isStart ? 'bg-green-500' : 
+                                              isEnd ? 'bg-red-500' : 
+                                              'bg-yellow-500'
+                                            }`}></div>
+                                            <span className="text-xs opacity-75 font-medium">
+                                              {isStart ? 'بداية الجولة' : 
+                                               isEnd ? 'نهاية الجولة' : 
+                                               'مستمرة'}
+                                            </span>
+                                          </div>
+                                        )}
                                       </div>
-                                      <div className="text-xs opacity-75">
-                                        {event.startDate.toLocaleTimeString('ar-SA', { 
-                                          hour: '2-digit', 
-                                          minute: '2-digit' 
-                                        })} - {event.endDate.toLocaleTimeString('ar-SA', { 
-                                          hour: '2-digit', 
-                                          minute: '2-digit' 
-                                        })}
-                                      </div>
-                                    </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               </div>
                             );

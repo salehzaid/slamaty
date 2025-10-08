@@ -279,7 +279,7 @@ const EvaluationCapaIntegration: React.FC = () => {
                       
                       <div className="flex items-center gap-4 text-xs text-gray-500">
                         <span>الفئة: {item.category_name}</span>
-                        <span>تاريخ التقييم: {new Date(item.evaluated_at).toLocaleDateString('ar-SA')}</span>
+                        <span>تاريخ التقييم: {new Date(item.evaluated_at).toLocaleDateString('en-US')}</span>
                       </div>
                       
                       {item.comments && (
@@ -334,7 +334,7 @@ const EvaluationCapaIntegration: React.FC = () => {
                         <div className="font-medium">{capa.title}</div>
                         <div className="text-xs">
                           أولوية: {capa.priority} | 
-                          تاريخ الهدف: {new Date(capa.target_date).toLocaleDateString('ar-SA')}
+                          تاريخ الهدف: {new Date(capa.target_date).toLocaleDateString('en-US')}
                         </div>
                       </div>
                     ))}

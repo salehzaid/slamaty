@@ -426,7 +426,7 @@ const CustomReportBuilder: React.FC = () => {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">آخر تحديث:</span>
                     <span className="font-medium">
-                      {new Date(template.updated_at).toLocaleDateString('ar-SA')}
+                      {new Date(template.updated_at).toLocaleDateString('en-US')}
                     </span>
                   </div>
                 </div>

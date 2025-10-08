@@ -3,12 +3,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useRounds } from '@/hooks/useRounds'
 import CompleteRoundForm from '@/components/forms/CompleteRoundForm'
-import TimelineCalendar from '@/components/ui/TimelineCalendar'
+import GanttCalendar from '@/components/ui/GanttCalendar'
 import { apiClient } from '@/lib/api'
 import { 
   Plus, 
   Calendar as CalendarIcon, 
-  BarChart3, 
   AlertTriangle,
   Target,
   Clock,
@@ -64,20 +63,45 @@ const RoundsCalendarView: React.FC = () => {
     setShowCreateForm(false)
   }
 
-  // Calculate round period based on deadline
-  const calculateRoundPeriod = (scheduledDate: Date, deadline?: Date) => {
-    if (!deadline) {
-      // If no deadline, use scheduled date as start and add 1 day as end
+  // Calculate round period based on database data: scheduled_date and end_date
+  const calculateRoundPeriod = (scheduledDate: Date, endDate?: Date, deadline?: Date) => {
+    // Priority 1: Use end_date from database (calculated from scheduled_date + deadline days)
+    if (endDate) {
+      console.log('📅 Using database end_date for timeline:', {
+        scheduledDate: scheduledDate.toLocaleDateString('en-US'),
+        endDate: endDate.toLocaleDateString('en-US'),
+        duration: Math.ceil((endDate.getTime() - scheduledDate.getTime()) / (1000 * 60 * 60 * 24)) + ' days',
+        source: 'database end_date column'
+      });
       return {
-        start: scheduledDate,
-        end: new Date(scheduledDate.getTime() + 24 * 60 * 60 * 1000)
+        start: scheduledDate, // من عمود scheduled_date
+        end: endDate // من عمود end_date
       };
     }
     
-    // Calculate period from scheduled date to deadline
+    // Priority 2: Fallback to deadline if end_date not available
+    if (deadline) {
+      console.log('📅 Using database deadline for timeline:', {
+        scheduledDate: scheduledDate.toLocaleDateString('en-US'),
+        deadline: deadline.toLocaleDateString('en-US'),
+        duration: Math.ceil((deadline.getTime() - scheduledDate.getTime()) / (1000 * 60 * 60 * 24)) + ' days',
+        source: 'database deadline column'
+      });
+      return {
+        start: scheduledDate, // من عمود scheduled_date
+        end: deadline // من عمود deadline
+      };
+    }
+    
+    // Priority 3: Default fallback (should not happen in normal cases)
+    console.log('📅 Using default 1-day period (no database end_date or deadline):', {
+      scheduledDate: scheduledDate.toLocaleDateString('en-US'),
+      defaultEnd: new Date(scheduledDate.getTime() + 24 * 60 * 60 * 1000).toLocaleDateString('en-US'),
+      source: 'default calculation'
+    });
     return {
-      start: scheduledDate,
-      end: deadline
+      start: scheduledDate, // من عمود scheduled_date
+      end: new Date(scheduledDate.getTime() + 24 * 60 * 60 * 1000) // حساب افتراضي
     };
   };
 
@@ -98,9 +122,27 @@ const RoundsCalendarView: React.FC = () => {
     if (!Array.isArray(rounds)) return [];
 
     return rounds.map((round: any, index: number) => {
-      const scheduledDate = new Date(round.scheduled_date || new Date());
+      const scheduledDate = round.scheduled_date ? new Date(round.scheduled_date) : new Date();
+      const endDate = round.end_date ? new Date(round.end_date) : undefined;
       const deadline = round.deadline ? new Date(round.deadline) : undefined;
-      const period = calculateRoundPeriod(scheduledDate, deadline);
+      const period = calculateRoundPeriod(scheduledDate, endDate, deadline);
+      
+      // تسجيل للتشخيص - تأكيد استخدام البيانات من قاعدة البيانات
+      console.log('📅 Round timeline calculation from database:', {
+        roundCode: round.round_code,
+        title: round.title,
+        rawScheduledDate: round.scheduled_date,
+        rawEndDate: round.end_date,
+        rawDeadline: round.deadline,
+        databaseScheduledDate: scheduledDate.toLocaleDateString('en-US'),
+        databaseEndDate: endDate ? endDate.toLocaleDateString('en-US') : 'None',
+        databaseDeadline: deadline ? deadline.toLocaleDateString('en-US') : 'None',
+        calculatedStart: period.start.toLocaleDateString('en-US'),
+        calculatedEnd: period.end.toLocaleDateString('en-US'),
+        finalEndDate: (endDate || period.end).toLocaleDateString('en-US'),
+        duration: Math.ceil(((endDate || period.end).getTime() - period.start.getTime()) / (1000 * 60 * 60 * 24)) + ' days',
+        dataSource: endDate ? 'database end_date column' : deadline ? 'database deadline column' : 'default calculation'
+      });
       
       // Parse assigned users
       let assignedTo: string[] = [];
@@ -116,36 +158,39 @@ const RoundsCalendarView: React.FC = () => {
       const colorIndex = index % departmentColors.length;
       const color = departmentColors[colorIndex];
 
+      // استخدام endDate الفعلي من قاعدة البيانات إذا كان متوفراً، وإلا استخدام period.end
+      const finalEndDate = endDate || period.end;
+      
+      console.log('📅 Final end date calculation from database:', {
+        roundCode: round.round_code,
+        title: round.title,
+        databaseEndDate: endDate ? endDate.toLocaleDateString('en-US') : 'None',
+        calculatedPeriodEnd: period.end.toLocaleDateString('en-US'),
+        finalEndDate: finalEndDate.toLocaleDateString('en-US'),
+        dataSource: endDate ? 'database end_date column' : 'calculated period'
+      });
+
       return {
         id: round.id.toString(),
         title: round.title || 'جولة بدون عنوان',
-        startDate: period.start,
-        endDate: period.end,
+        startDate: period.start, // من عمود scheduled_date في قاعدة البيانات
+        endDate: finalEndDate, // من عمود end_date في قاعدة البيانات
         status: round.status as 'scheduled' | 'in_progress' | 'completed' | 'overdue',
         priority: round.priority as 'low' | 'medium' | 'high' | 'urgent',
         department: round.department || 'غير محدد',
         assignedTo: assignedTo,
-        color: color
+        color: color,
+        // إضافة معلومات إضافية للعرض
+        scheduledDate: scheduledDate, // من عمود scheduled_date
+        actualEndDate: endDate, // من عمود end_date
+        deadline: deadline, // من عمود deadline
+        roundCode: round.round_code,
+        description: round.description
       };
     });
   }, [rounds]);
 
-  // Convert rounds to calendar events (for backward compatibility)
-  const calendarEvents = Array.isArray(rounds) ? rounds.map((round: any) => ({
-    id: round.id,
-    title: round.title || 'جولة بدون عنوان',
-    date: new Date(round.scheduled_date || new Date()),
-    status: round.status as 'scheduled' | 'in_progress' | 'completed' | 'overdue',
-    priority: round.priority as 'low' | 'medium' | 'high' | 'urgent',
-    department: round.department || 'غير محدد',
-    assignedTo: round.assigned_to ? (() => {
-      try {
-        return JSON.parse(round.assigned_to)
-      } catch {
-        return [round.assigned_to]
-      }
-    })() : []
-  })) : []
+  // Convert rounds to calendar events (for backward compatibility) - removed unused variable
 
   // Handle calendar event click
   const handleEventClick = (event: any) => {
@@ -229,19 +274,20 @@ const RoundsCalendarView: React.FC = () => {
 
         {/* Timeline Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-xl">
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-sm font-medium">إجمالي الجولات</p>
                   <p className="text-3xl font-bold">{timelineEvents.length}</p>
+                  <p className="text-blue-200 text-xs mt-1">جميع الجولات المسجلة</p>
                 </div>
                 <Target className="w-12 h-12 text-blue-200" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-xl">
+          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -249,13 +295,18 @@ const RoundsCalendarView: React.FC = () => {
                   <p className="text-3xl font-bold">
                     {timelineEvents.filter((r: any) => r.status === 'completed').length}
                   </p>
+                  <p className="text-green-200 text-xs mt-1">
+                    {timelineEvents.length > 0 ? 
+                      Math.round((timelineEvents.filter((r: any) => r.status === 'completed').length / timelineEvents.length) * 100) : 0
+                    }% من إجمالي الجولات
+                  </p>
                 </div>
                 <CheckCircle2 className="w-12 h-12 text-green-200" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 shadow-xl">
+          <Card className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -263,13 +314,14 @@ const RoundsCalendarView: React.FC = () => {
                   <p className="text-3xl font-bold">
                     {timelineEvents.filter((r: any) => r.status === 'in_progress').length}
                   </p>
+                  <p className="text-yellow-200 text-xs mt-1">جولات نشطة حالياً</p>
                 </div>
                 <PlayCircle className="w-12 h-12 text-yellow-200" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-xl">
+          <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -277,6 +329,7 @@ const RoundsCalendarView: React.FC = () => {
                   <p className="text-3xl font-bold">
                     {timelineEvents.filter((r: any) => r.status === 'overdue').length}
                   </p>
+                  <p className="text-red-200 text-xs mt-1">تتطلب متابعة عاجلة</p>
                 </div>
                 <AlertCircle className="w-12 h-12 text-red-200" />
               </div>
@@ -285,7 +338,7 @@ const RoundsCalendarView: React.FC = () => {
         </div>
 
         {/* Timeline Calendar View */}
-        <TimelineCalendar 
+        <GanttCalendar
           events={timelineEvents}
           onEventClick={handleEventClick}
           onDateClick={handleDateClick}
@@ -297,7 +350,7 @@ const RoundsCalendarView: React.FC = () => {
           <CardContent className="p-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-6">مفتاح الألوان والرموز</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
                 <Clock className="w-6 h-6 text-yellow-600" />
                 <div>
                   <p className="font-semibold text-gray-900">مجدولة</p>
@@ -305,7 +358,7 @@ const RoundsCalendarView: React.FC = () => {
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
                 <PlayCircle className="w-6 h-6 text-blue-600" />
                 <div>
                   <p className="font-semibold text-gray-900">قيد التنفيذ</p>
@@ -313,7 +366,7 @@ const RoundsCalendarView: React.FC = () => {
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
                 <CheckCircle2 className="w-6 h-6 text-green-600" />
                 <div>
                   <p className="font-semibold text-gray-900">مكتملة</p>
@@ -321,11 +374,34 @@ const RoundsCalendarView: React.FC = () => {
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
                 <AlertCircle className="w-6 h-6 text-red-600" />
                 <div>
                   <p className="font-semibold text-gray-900">متأخرة</p>
                   <p className="text-sm text-gray-500">جولات متأخرة عن الموعد</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* معلومات إضافية */}
+            <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+              <h4 className="font-semibold text-blue-900 mb-2">معلومات العرض</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-800">
+                <div>
+                  <p className="font-medium">📅 تواريخ الجولات:</p>
+                  <p>يتم عرض تاريخ بداية ونهاية كل جولة بوضوح</p>
+                </div>
+                <div>
+                  <p className="font-medium">🎯 كود الجولة:</p>
+                  <p>كل جولة لها كود فريد للتعريف السريع</p>
+                </div>
+                <div>
+                  <p className="font-medium">👥 المقيمون:</p>
+                  <p>عرض أسماء المقيمين المسؤولين عن كل جولة</p>
+                </div>
+                <div>
+                  <p className="font-medium">🏢 الأقسام:</p>
+                  <p>تصنيف الجولات حسب الأقسام المختلفة</p>
                 </div>
               </div>
             </div>

@@ -235,7 +235,7 @@ const CapaIntegrationRoundSelector: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        <span>{new Date(round.scheduled_date).toLocaleDateString('ar-SA')}</span>
+                        <span>{new Date(round.scheduled_date).toLocaleDateString('en-US')}</span>
                       </div>
                     </div>
 

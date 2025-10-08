@@ -358,13 +358,13 @@ const MyRoundsPage: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div className="text-center">
                     <div className="text-lg font-bold text-gray-900">
-                      {new Date(round.scheduledDate).toLocaleDateString('ar-SA', { 
+                      {new Date(round.scheduledDate).toLocaleDateString('en-US', { 
                         day: '2-digit',
                         month: 'short'
                       })}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {new Date(round.scheduledDate).toLocaleTimeString('ar-SA', {
+                      {new Date(round.scheduledDate).toLocaleTimeString('en-US', {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}

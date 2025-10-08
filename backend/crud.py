@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
 from typing import List, Optional
+from datetime import datetime
 from models_updated import User, Round, Capa, Department, EvaluationResult, Notification, UserNotificationSettings, NotificationType, NotificationStatus, RoundTypeSettings, CapaStatus, VerificationStatus
 from schemas import UserCreate, RoundCreate, CapaCreate, DepartmentCreate
 # from auth import get_password_hash
@@ -182,6 +183,21 @@ def create_round(db: Session, round: RoundCreate, created_by_id: int):
     else:
         assigned_to_json = json.dumps([])
     
+    # Convert string dates to datetime if needed
+    deadline_dt = None
+    if round.deadline:
+        if isinstance(round.deadline, str):
+            deadline_dt = datetime.fromisoformat(round.deadline.replace('Z', '+00:00'))
+        else:
+            deadline_dt = round.deadline
+    
+    end_date_dt = None
+    if round.end_date:
+        if isinstance(round.end_date, str):
+            end_date_dt = datetime.fromisoformat(round.end_date.replace('Z', '+00:00'))
+        else:
+            end_date_dt = round.end_date
+    
     db_round = Round(
         round_code=round_code,
         title=round.title,
@@ -190,6 +206,8 @@ def create_round(db: Session, round: RoundCreate, created_by_id: int):
         department=round.department,
         assigned_to=assigned_to_json,
         scheduled_date=round.scheduled_date,
+        deadline=deadline_dt,
+        end_date=end_date_dt,  # تاريخ انتهاء الجولة المحسوب
         priority=round.priority,
         notes=round.notes,
         created_by_id=created_by_id,

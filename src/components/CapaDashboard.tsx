@@ -430,7 +430,7 @@ const CapaDashboard: React.FC<CapaDashboardProps> = ({
                           <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4 text-gray-400" />
                             <span className="text-sm text-gray-600">الموعد المستهدف:</span>
-                            <span className="text-sm font-medium">{new Date(capa.target_date).toLocaleDateString('ar-SA')}</span>
+                            <span className="text-sm font-medium">{new Date(capa.target_date).toLocaleDateString('en-US')}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-gray-400" />

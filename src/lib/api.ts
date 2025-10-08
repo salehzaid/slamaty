@@ -79,10 +79,20 @@ class ApiClient {
       console.log('📥 API Response - Status:', response.status)
       console.log('📥 API Response - Headers:', response.headers)
       
-      if (response.status === 401) {
+      // التعامل مع 401 و 403 (غير مصادق أو غير مصرح)
+      if (response.status === 401 || response.status === 403) {
+        console.error('🔒 Authentication Error:', response.status)
         localStorage.removeItem('access_token')
+        localStorage.removeItem('sallamaty_user')
+        
+        // عرض رسالة للمستخدم قبل إعادة التوجيه
+        const message = response.status === 401 
+          ? 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.'
+          : 'غير مصرح بالوصول. يرجى تسجيل الدخول.'
+        
+        alert(message)
         window.location.href = '/login'
-        throw new Error('Session expired')
+        throw new Error('Authentication required')
       }
 
       if (!response.ok) {

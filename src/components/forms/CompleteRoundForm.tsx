@@ -108,7 +108,7 @@ const CompleteRoundForm: React.FC<CompleteRoundFormProps> = ({ onSubmit, onCance
     setFormData(prev => {
       const isSelected = prev.selected_categories.includes(id)
       const newCategories = isSelected 
-        ? prev.selected_categories.filter(x => x !== id)
+        ? prev.selected_categories.filter((x: number) => x !== id)
         : [...prev.selected_categories, id]
       
       // If removing a category, remove only items from that category
@@ -116,7 +116,7 @@ const CompleteRoundForm: React.FC<CompleteRoundFormProps> = ({ onSubmit, onCance
       let newItems = prev.selected_items
       if (isSelected) {
         // Remove items that belong to the deselected category
-        newItems = prev.selected_items.filter(itemId => {
+        newItems = prev.selected_items.filter((itemId: number) => {
           const item = items.find(it => it.id === itemId)
           return item && item.category_id !== id
         })
@@ -136,7 +136,7 @@ const CompleteRoundForm: React.FC<CompleteRoundFormProps> = ({ onSubmit, onCance
       return {
         ...prev,
         selected_items: isSelected 
-          ? prev.selected_items.filter(x => x !== id)
+          ? prev.selected_items.filter((x: number) => x !== id)
           : [...prev.selected_items, id]
       }
     })
@@ -148,7 +148,7 @@ const CompleteRoundForm: React.FC<CompleteRoundFormProps> = ({ onSubmit, onCance
       return {
         ...prev,
         assigned_users: isSelected 
-          ? prev.assigned_users.filter(x => x !== id)
+          ? prev.assigned_users.filter((x: number) => x !== id)
           : [...prev.assigned_users, id]
       }
     })
@@ -187,6 +187,34 @@ const CompleteRoundForm: React.FC<CompleteRoundFormProps> = ({ onSubmit, onCance
     return normalized.toLowerCase().replace(/\s+/g, '_')
   }
 
+  // دالة لحساب تاريخ انتهاء الجولة
+  const calculateEndDate = (scheduledDate: string, deadline: string) => {
+    if (!scheduledDate || !deadline) {
+      console.log('⚠️ Missing data for end date calculation:', { scheduledDate, deadline })
+      return null
+    }
+    
+    const startDate = new Date(scheduledDate)
+    const deadlineDays = parseInt(deadline)
+    
+    if (isNaN(deadlineDays)) {
+      console.log('⚠️ Invalid deadline days:', deadline)
+      return null
+    }
+    
+    const endDate = new Date(startDate)
+    endDate.setDate(startDate.getDate() + deadlineDays)
+    
+    console.log('📅 End date calculation:', {
+      startDate: startDate.toLocaleDateString('en-US'),
+      deadlineDays,
+      endDate: endDate.toLocaleDateString('en-US'),
+      isoString: endDate.toISOString()
+    })
+    
+    return endDate.toISOString()
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -211,11 +239,45 @@ const CompleteRoundForm: React.FC<CompleteRoundFormProps> = ({ onSubmit, onCance
       return
     }
     
+    if (!formData.deadline) {
+      alert('يرجى اختيار المهلة')
+      return
+    }
+    
     if (formData.assigned_users.length === 0) {
       alert('يرجى اختيار مقيم واحد على الأقل')
       return
     }
     
+    // حساب تاريخ انتهاء الجولة
+    const endDate = calculateEndDate(formData.scheduled_date, formData.deadline)
+    
+    if (!endDate) {
+      alert('خطأ في حساب تاريخ انتهاء الجولة. يرجى التحقق من البيانات المدخلة')
+      return
+    }
+    
+    // تسجيل للتشخيص
+    console.log('📅 Round creation - Date calculation:', {
+      scheduledDate: formData.scheduled_date,
+      deadlineDays: formData.deadline,
+      calculatedEndDate: endDate,
+      endDateFormatted: endDate ? new Date(endDate).toLocaleDateString('en-US') : 'None'
+    })
+    
+    // حساب تاريخ المهلة (scheduled_date + deadline days)
+    const deadlineDate = formData.scheduled_date && formData.deadline ? 
+      new Date(new Date(formData.scheduled_date).getTime() + parseInt(formData.deadline) * 24 * 60 * 60 * 1000).toISOString() : 
+      null
+
+    // تسجيل للتشخيص - تأكيد حساب المهلة
+    console.log('📅 Deadline calculation:', {
+      scheduledDate: formData.scheduled_date,
+      deadlineDays: formData.deadline,
+      calculatedDeadlineDate: deadlineDate,
+      deadlineFormatted: deadlineDate ? new Date(deadlineDate).toLocaleDateString('en-US') : 'None'
+    })
+
     // Prepare payload - Backend expects assigned_to as array of user IDs
     const payload = {
       ...formData,
@@ -224,7 +286,9 @@ const CompleteRoundForm: React.FC<CompleteRoundFormProps> = ({ onSubmit, onCance
       round_type: convertNameToEnum(formData.round_type),
       assigned_to: formData.assigned_users, // Send array of user IDs
       evaluation_items: formData.selected_items, // Send array of evaluation item IDs
-      scheduled_date: formData.scheduled_date ? `${formData.scheduled_date}T10:00:00` : null // Convert date to datetime
+      scheduled_date: formData.scheduled_date ? `${formData.scheduled_date}T10:00:00` : null, // Convert date to datetime
+      deadline: deadlineDate, // تاريخ المهلة المحسوب (scheduled_date + deadline days)
+      end_date: endDate // تاريخ انتهاء الجولة المحسوب
     }
     
     console.log('CompleteRoundForm - Submitting payload:', payload)
@@ -427,6 +491,15 @@ const CompleteRoundForm: React.FC<CompleteRoundFormProps> = ({ onSubmit, onCance
                 <Label className="text-sm font-semibold text-gray-700 mb-2 block">
                   المهلة
                 </Label>
+                {/* عرض تاريخ الانتهاء المحسوب */}
+                {formData.scheduled_date && formData.deadline && (
+                  <div className="mb-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                    <p className="text-xs text-blue-700">
+                      <span className="font-medium">تاريخ انتهاء الجولة:</span>{' '}
+                      {new Date(calculateEndDate(formData.scheduled_date, formData.deadline) || '').toLocaleDateString('en-US')}
+                    </p>
+                  </div>
+                )}
                 <Select value={formData.deadline} onValueChange={(value) => setFormData(prev => ({ ...prev, deadline: value }))}>
                   <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-blue-300 focus:border-blue-500 transition-colors duration-200">
                     <SelectValue placeholder="اختر المهلة" />
@@ -509,21 +582,77 @@ const CompleteRoundForm: React.FC<CompleteRoundFormProps> = ({ onSubmit, onCance
 
             {formData.selected_categories.length > 0 && (
               <div>
-                <Label>عناصر التصنيفات (اختر واحد أو أكثر)</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2 max-h-56 overflow-y-auto">
-                  {filteredItems.length === 0 ? <div className="text-sm text-gray-500 col-span-full">لا توجد عناصر للتصنيفات المختارة</div> : filteredItems.map(it => (
-                    <div key={it.id} className={`p-3 border rounded cursor-pointer ${formData.selected_items.includes(it.id) ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`} onClick={() => toggleItem(it.id)}>
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="font-medium">{it.title}</div>
-                          <div className="text-sm text-gray-500">{it.description}</div>
-                          <div className="text-xs text-gray-400 mt-1">{it.code}</div>
+                <Label className="text-sm font-semibold text-gray-700 mb-2 block">عناصر التصنيفات (اختر واحد أو أكثر)</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2 max-h-96 overflow-y-auto p-2">
+                  {filteredItems.length === 0 ? (
+                    <div className="text-sm text-gray-500 col-span-full text-center py-4">
+                      لا توجد عناصر للتصنيفات المختارة
+                    </div>
+                  ) : filteredItems.map(it => (
+                    <div 
+                      key={it.id} 
+                      className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md ${
+                        formData.selected_items.includes(it.id) 
+                          ? 'border-blue-500 bg-blue-50 shadow-md' 
+                          : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                      }`} 
+                      onClick={() => toggleItem(it.id)}
+                    >
+                      <div className="space-y-2">
+                        {/* Header with badges */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge variant="outline" className="text-xs bg-gray-50">
+                                {it.code}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-700">
+                                وزن: {it.weight || 1}
+                              </Badge>
+                            </div>
+                            <div className="font-semibold text-sm text-gray-900 mb-1">{it.title}</div>
+                          </div>
+                          {formData.selected_items.includes(it.id) && (
+                            <div className="p-1 rounded-full bg-blue-500">
+                              <CheckCircle2 className="w-3 h-3 text-white" />
+                            </div>
+                          )}
                         </div>
-                        <div>{formData.selected_items.includes(it.id) ? <Badge>محدد</Badge> : null}</div>
+                        
+                        {/* Guidance - full text with small font */}
+                        {it.guidance_ar && (
+                          <div className="text-xs text-gray-600 leading-relaxed">
+                            {it.guidance_ar}
+                          </div>
+                        )}
+                        
+                        {/* Additional info */}
+                        <div className="flex flex-wrap gap-1">
+                          {it.risk_level && (
+                            <Badge 
+                              variant="outline" 
+                              className={`text-xs ${
+                                it.risk_level === 'CRITICAL' ? 'bg-red-50 text-red-600' :
+                                it.risk_level === 'MAJOR' ? 'bg-orange-50 text-orange-600' :
+                                'bg-yellow-50 text-yellow-600'
+                              }`}
+                            >
+                              {it.risk_level === 'CRITICAL' ? 'حرج' : it.risk_level === 'MAJOR' ? 'رئيسي' : 'بسيط'}
+                            </Badge>
+                          )}
+                          {it.is_required && (
+                            <Badge variant="outline" className="text-xs bg-red-50 text-red-600">
+                              إلزامي
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  اختر عناصر التقييم المطلوبة للجولة - سيتم عرض تفاصيل كاملة أثناء التقييم
+                </p>
               </div>
             )}
 

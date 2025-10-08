@@ -499,7 +499,7 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-gray-400" />
                   <span className="text-sm text-gray-600">الموعد المستهدف:</span>
-                  <span className="text-sm font-medium">{new Date(selectedCapa.target_date).toLocaleDateString('ar-SA')}</span>
+                  <span className="text-sm font-medium">{new Date(selectedCapa.target_date).toLocaleDateString('en-US')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-gray-400" />
@@ -551,7 +551,7 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
                     {action.due_date && (
                       <p className="text-sm text-gray-600 mb-2">
                         <Calendar className="w-4 h-4 inline mr-1" />
-                        تاريخ الاستحقاق: {new Date(action.due_date).toLocaleDateString('ar-SA')}
+                        تاريخ الاستحقاق: {new Date(action.due_date).toLocaleDateString('en-US')}
                       </p>
                     )}
                     {action.notes && (
@@ -584,7 +584,7 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
                     {action.due_date && (
                       <p className="text-sm text-gray-600 mb-2">
                         <Calendar className="w-4 h-4 inline mr-1" />
-                        تاريخ الاستحقاق: {new Date(action.due_date).toLocaleDateString('ar-SA')}
+                        تاريخ الاستحقاق: {new Date(action.due_date).toLocaleDateString('en-US')}
                       </p>
                     )}
                     {action.notes && (

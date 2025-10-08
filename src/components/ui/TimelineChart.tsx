@@ -88,7 +88,7 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ events, title = "الجد
                       <h4 className="text-xl font-bold text-gray-900">{event.title}</h4>
                     </div>
                     <div className="text-sm text-gray-500">
-                      {event.date.toLocaleDateString('ar-SA', {
+                      {event.date.toLocaleDateString('en-US', {
                         weekday: 'short',
                         year: 'numeric',
                         month: 'short',

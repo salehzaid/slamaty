@@ -178,11 +178,11 @@ const AlertSystem: React.FC<AlertSystemProps> = ({
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA')
+    return new Date(dateString).toLocaleDateString('en-US')
   }
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('ar-SA', {
+    return new Date(dateString).toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit'
     })

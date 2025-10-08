@@ -161,7 +161,7 @@ const Dashboard: React.FC = () => {
           <div className="text-primary-100 text-right">
             <p className="text-sm">اليوم</p>
             <p className="text-lg font-semibold">
-              {new Date().toLocaleDateString('ar-SA', { 
+              {new Date().toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
@@ -345,7 +345,7 @@ const Dashboard: React.FC = () => {
                       {getStatusText(round.status)}
                     </Badge>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(round.scheduledDate).toLocaleDateString('ar-SA')}
+                      {new Date(round.scheduledDate).toLocaleDateString('en-US')}
                     </p>
                   </div>
                 </div>
@@ -381,7 +381,7 @@ const Dashboard: React.FC = () => {
                       {getStatusText(capa.status)}
                     </Badge>
                     <p className="text-xs text-muted-foreground mt-1">
-                      المهلة: {new Date(capa.targetDate).toLocaleDateString('ar-SA')}
+                      المهلة: {new Date(capa.targetDate).toLocaleDateString('en-US')}
                     </p>
                   </div>
                 </div>

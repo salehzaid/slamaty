@@ -625,7 +625,7 @@ const EvaluationCategoriesPage: React.FC = () => {
                 )}
                 
                 <div className="text-xs text-gray-500">
-                  آخر تحديث: {new Date(category.updatedAt).toLocaleDateString('ar-SA')}
+                  آخر تحديث: {new Date(category.updatedAt).toLocaleDateString('en-US')}
                 </div>
               </div>
             </CardContent>

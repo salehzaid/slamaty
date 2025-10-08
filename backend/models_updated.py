@@ -107,6 +107,7 @@ class Round(Base):
     assigned_to = Column(Text)  # JSON string of user IDs
     scheduled_date = Column(DateTime(timezone=True), nullable=False)
     deadline = Column(DateTime(timezone=True), nullable=True)  # Deadline for round completion
+    end_date = Column(DateTime(timezone=True), nullable=True)  # Calculated end date (scheduled_date + deadline days)
     status = Column(SQLEnum(RoundStatus), default=RoundStatus.SCHEDULED)
     priority = Column(String, default="medium")  # low, medium, high, urgent
     compliance_percentage = Column(Integer, default=0)
@@ -225,7 +226,7 @@ class EvaluationItem(Base):
     is_required = Column(Boolean, default=False)
     weight = Column(Integer, default=1)
     risk_level = Column(SQLEnum(RiskLevel), default=RiskLevel.MINOR)
-    evidence_type = Column(SQLEnum(EvidenceType), default=EvidenceType.OBSERVATION)
+    evidence_type = Column(Text, default="OBSERVATION")  # يمكن أن تكون قيم متعددة مفصولة بفاصلة
     guidance_ar = Column(Text)
     guidance_en = Column(Text)
     standard_version = Column(String)

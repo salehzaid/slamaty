@@ -310,20 +310,81 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
                         {categoryItems.map((item, index) => {
                           const currentStatus = evaluations[item.id] || 'na'
                           return (
-                            <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-6">
+                            <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                               {/* Item Header */}
                               <div className="flex justify-between items-start mb-4">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
                                     <span className="text-sm text-gray-500">البند {index + 1} من {categoryItems.length}</span>
-                                    <Badge variant="outline" className="text-xs">
+                                    <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-700">
                                       الوزن: {item.weight || 1}
                                     </Badge>
+                                    {item.code && (
+                                      <Badge variant="outline" className="text-xs bg-gray-50">
+                                        {item.code}
+                                      </Badge>
+                                    )}
                                   </div>
-                                  <h4 className="text-lg font-medium text-gray-900 mb-2">{item.title}</h4>
+                                  <h4 className="text-lg font-semibold text-gray-900 mb-3">{item.title}</h4>
+                                  
+                                  {/* Description */}
                                   {item.description && (
-                                    <p className="text-sm text-gray-600">{item.description}</p>
+                                    <div className="mb-3 p-3 bg-gray-50 rounded-md border-r-2 border-gray-300">
+                                      <p className="text-sm font-medium text-gray-700 mb-1">تفاصيل العنصر:</p>
+                                      <p className="text-sm text-gray-600">{item.description}</p>
+                                    </div>
                                   )}
+                                  
+                                  {/* Objective */}
+                                  {item.objective && (
+                                    <div className="mb-3 p-3 bg-blue-50 rounded-md border-r-2 border-blue-400">
+                                      <p className="text-sm font-medium text-blue-800 mb-1">الهدف من التقييم:</p>
+                                      <p className="text-sm text-blue-700">{item.objective}</p>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Guidance */}
+                                  {item.guidance_ar && (
+                                    <div className="mb-3 p-3 bg-green-50 rounded-md border-r-2 border-green-400">
+                                      <p className="text-sm font-medium text-green-800 mb-1">شرح التوجيه للمقيم:</p>
+                                      <p className="text-sm text-green-700 leading-relaxed">{item.guidance_ar}</p>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Additional metadata */}
+                                  <div className="flex flex-wrap gap-2 mt-3">
+                                    {item.risk_level && (
+                                      <Badge 
+                                        variant="outline" 
+                                        className={`text-xs ${
+                                          item.risk_level === 'CRITICAL' ? 'bg-red-50 border-red-300 text-red-700' :
+                                          item.risk_level === 'MAJOR' ? 'bg-orange-50 border-orange-300 text-orange-700' :
+                                          'bg-yellow-50 border-yellow-300 text-yellow-700'
+                                        }`}
+                                      >
+                                        مستوى الخطورة: {
+                                          item.risk_level === 'CRITICAL' ? 'حرج' :
+                                          item.risk_level === 'MAJOR' ? 'رئيسي' :
+                                          'بسيط'
+                                        }
+                                      </Badge>
+                                    )}
+                                    {item.evidence_type && (
+                                      <Badge variant="outline" className="text-xs bg-purple-50 border-purple-200 text-purple-700">
+                                        نوع الدليل: {
+                                          item.evidence_type === 'OBSERVATION' ? 'مشاهدة' :
+                                          item.evidence_type === 'DOCUMENT' ? 'وثيقة' :
+                                          item.evidence_type === 'INTERVIEW' ? 'مقابلة' :
+                                          'قياس'
+                                        }
+                                      </Badge>
+                                    )}
+                                    {item.is_required && (
+                                      <Badge variant="outline" className="text-xs bg-red-50 border-red-200 text-red-700">
+                                        مطلوب ⭐
+                                      </Badge>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                               

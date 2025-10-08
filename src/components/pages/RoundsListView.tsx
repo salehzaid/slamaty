@@ -520,7 +520,7 @@ const RoundsListView: React.FC = () => {
                         <div className="flex-1">
                           <p className="text-xs text-gray-500 font-medium mb-1 tracking-wide">التاريخ المجدول</p>
                           <p className="font-semibold text-gray-900 text-sm leading-tight">
-                            {round.scheduledDate ? new Date(round.scheduledDate).toLocaleDateString('ar-SA') : 'غير محدد'}
+                            {round.scheduledDate ? new Date(round.scheduledDate).toLocaleDateString('en-US') : 'غير محدد'}
                           </p>
                         </div>
                       </div>

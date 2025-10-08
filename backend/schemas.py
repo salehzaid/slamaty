@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List
+from typing import Optional, List, Union
 from datetime import datetime
 from models_updated import UserRole, RoundStatus, RoundType, CapaStatus, VerificationStatus, NotificationType, NotificationStatus
 
@@ -51,7 +51,8 @@ class RoundBase(BaseModel):
     department: str
     assigned_to: List[int] = []  # Changed to List[int] for user IDs
     scheduled_date: datetime
-    deadline: Optional[datetime] = None  # Deadline for round completion
+    deadline: Optional[Union[datetime, str]] = None  # Deadline for round completion - can be datetime or ISO string
+    end_date: Optional[Union[datetime, str]] = None  # Calculated end date - can be datetime or ISO string
     priority: str = "medium"
     notes: Optional[str] = None
     evaluation_items: Optional[List[int]] = []  # Added evaluation items
@@ -212,7 +213,7 @@ class EvaluationItemBase(BaseModel):
     is_required: bool = False
     weight: int = 1
     risk_level: str = "MINOR"
-    evidence_type: str = "OBSERVATION"
+    evidence_type: str = "OBSERVATION"  # يمكن أن تكون قيم متعددة مفصولة بفاصلة
     guidance_ar: Optional[str] = None
     guidance_en: Optional[str] = None
     standard_version: Optional[str] = None

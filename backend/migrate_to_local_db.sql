@@ -56,6 +56,8 @@ CREATE TABLE IF NOT EXISTS rounds (
     department VARCHAR(100) NOT NULL,
     assigned_to TEXT, -- JSON string of user IDs
     scheduled_date TIMESTAMP WITH TIME ZONE NOT NULL,
+    deadline TIMESTAMP WITH TIME ZONE, -- Deadline for round completion
+    end_date TIMESTAMP WITH TIME ZONE, -- Calculated end date (scheduled_date + deadline days)
     status VARCHAR(20) DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'in_progress', 'pending_review', 'under_review', 'completed', 'cancelled', 'on_hold', 'overdue')),
     priority VARCHAR(10) DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'urgent')),
     compliance_percentage INTEGER DEFAULT 0,
@@ -109,7 +111,7 @@ CREATE TABLE IF NOT EXISTS evaluation_items (
     is_required BOOLEAN DEFAULT FALSE,
     weight INTEGER DEFAULT 1,
     risk_level VARCHAR(20) DEFAULT 'MINOR' CHECK (risk_level IN ('MINOR', 'MAJOR', 'CRITICAL')),
-    evidence_type VARCHAR(20) DEFAULT 'OBSERVATION' CHECK (evidence_type IN ('OBSERVATION', 'DOCUMENT', 'INTERVIEW', 'MEASUREMENT')),
+    evidence_type TEXT DEFAULT 'OBSERVATION',
     guidance_ar TEXT,
     guidance_en TEXT,
     standard_version VARCHAR(20),
