@@ -1,0 +1,7 @@
+# Trigger Railway Deployment
+# Last update: 2025-10-08 - Frontend rounds fix applied
+# This file triggers Railway to rebuild and redeploy the application
+
+DEPLOYMENT_TRIGGER=ce90331
+REASON=Fix rounds data parsing in frontend
+
