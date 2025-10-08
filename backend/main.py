@@ -80,26 +80,46 @@ async def health_check():
 async def test_rounds_endpoint():
     """Test rounds endpoint without authentication"""
     try:
+        from sqlalchemy import text
+        
         db = next(get_db())
-        rounds = db.query(Round).limit(10).all()
-        db.close()
         
-        rounds_data = []
-        for round in rounds:
-            rounds_data.append({
-                "id": round.id,
-                "title": round.title,
-                "round_code": round.round_code,
-                "department": round.department,
-                "status": round.status.value if hasattr(round.status, 'value') else str(round.status),
-                "scheduled_date": round.scheduled_date.isoformat() if round.scheduled_date else None
-            })
-        
-        return {
-            "status": "success",
-            "count": len(rounds_data),
-            "rounds": rounds_data
-        }
+        try:
+            # Use raw SQL to avoid schema issues
+            query = text("""
+                SELECT id, round_code, title, description, round_type, 
+                       department, status, priority, scheduled_date, created_at
+                FROM rounds 
+                ORDER BY created_at DESC 
+                LIMIT 10
+            """)
+            
+            result = db.execute(query)
+            rounds_data = []
+            
+            for row in result.fetchall():
+                rounds_data.append({
+                    "id": row[0],
+                    "round_code": row[1],
+                    "title": row[2],
+                    "description": row[3],
+                    "round_type": row[4],
+                    "department": row[5],
+                    "status": row[6],
+                    "priority": row[7],
+                    "scheduled_date": row[8].isoformat() if row[8] else None,
+                    "created_at": row[9].isoformat() if row[9] else None
+                })
+            
+            return {
+                "status": "success",
+                "count": len(rounds_data),
+                "rounds": rounds_data
+            }
+            
+        finally:
+            db.close()
+            
     except Exception as e:
         return {"status": "error", "error": str(e)}
 
