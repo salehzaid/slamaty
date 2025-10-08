@@ -20,7 +20,7 @@ fi
 if [ "$INIT_DATABASE" = "true" ]; then
     echo "Initializing database..."
     cd backend
-    python3 init_database.py || echo "Database initialization failed or already initialized"
+    python3 init_production_db.py || echo "Database initialization failed or already initialized"
     cd ..
 fi
 

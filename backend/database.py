@@ -1,6 +1,7 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
 import os
 from dotenv import load_dotenv
 
@@ -19,7 +20,23 @@ try:
 except Exception:
     print("[DB] Using DATABASE_URL (unable to parse name)")
 
-engine = create_engine(DATABASE_URL)
+# Create engine with better error handling and connection pooling
+try:
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,  # Verify connections before use
+        pool_recycle=300,    # Recycle connections every 5 minutes
+        echo=False,          # Set to True for SQL debugging
+        connect_args={
+            "connect_timeout": 10,
+            "application_name": "salamaty_app"
+        }
+    )
+    print("[DB] Engine created successfully")
+except Exception as e:
+    print(f"[DB] Error creating engine: {e}")
+    raise
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
@@ -27,6 +44,16 @@ Base = declarative_base()
 def get_db():
     db = SessionLocal()
     try:
+        # Test the connection before yielding
+        db.execute(text("SELECT 1"))
         yield db
+    except SQLAlchemyError as e:
+        print(f"[DB] Database session error: {e}")
+        db.rollback()
+        raise
+    except Exception as e:
+        print(f"[DB] Unexpected database error: {e}")
+        db.rollback()
+        raise
     finally:
         db.close()

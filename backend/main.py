@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status, Form, Body, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, text
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse
@@ -68,6 +68,111 @@ app = FastAPI(
 @app.get("/__routes", include_in_schema=False)
 async def _list_routes():
     return {"routes": sorted({route.path for route in app.routes})}
+
+# Database diagnostic endpoint
+@app.get("/api/health/database", include_in_schema=False)
+async def check_database_health(db: Session = Depends(get_db)):
+    """Check database connection and table existence"""
+    try:
+        # Test basic connection
+        db.execute(text("SELECT 1"))
+        
+        # Check if tables exist
+        tables_query = text("""
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public'
+        """)
+        result = db.execute(tables_query)
+        tables = [row[0] for row in result.fetchall()]
+        
+        # Check if rounds table has data
+        rounds_count = 0
+        try:
+            count_result = db.execute(text("SELECT COUNT(*) FROM rounds"))
+            rounds_count = count_result.scalar()
+        except Exception as e:
+            print(f"Error counting rounds: {e}")
+        
+        return {
+            "status": "healthy",
+            "connection": "ok",
+            "tables": tables,
+            "rounds_count": rounds_count,
+            "database_url": os.getenv("DATABASE_URL", "not_set")[:50] + "..." if os.getenv("DATABASE_URL") else "not_set"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "connection": "failed",
+            "error": str(e),
+            "database_url": os.getenv("DATABASE_URL", "not_set")[:50] + "..." if os.getenv("DATABASE_URL") else "not_set"
+        }
+
+# Create sample data endpoint
+@app.post("/api/admin/create-sample-data", include_in_schema=False)
+async def create_sample_data(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    """Create sample rounds for testing"""
+    try:
+        # Check if user is admin
+        if current_user.role not in ['super_admin', 'quality_manager']:
+            raise HTTPException(status_code=403, detail="غير مصرح بالوصول")
+        
+        from datetime import datetime, timedelta
+        import json
+        
+        # Get admin user ID
+        admin_user = db.query(User).filter(User.email == "testadmin@salamaty.com").first()
+        if not admin_user:
+            raise HTTPException(status_code=404, detail="Admin user not found")
+        
+        # Sample rounds data
+        sample_rounds = [
+            {
+                "round_code": "R001",
+                "title": "جولة روتينية - الطوارئ",
+                "description": "جولة تفتيشية روتينية لقسم الطوارئ",
+                "round_type": "patient_safety",
+                "department": "الطوارئ",
+                "assigned_to": json.dumps([admin_user.id]),
+                "scheduled_date": datetime.now() + timedelta(days=1),
+                "status": "scheduled",
+                "priority": "medium",
+                "created_by_id": admin_user.id
+            },
+            {
+                "round_code": "R002", 
+                "title": "جولة مكافحة العدوى",
+                "description": "جولة للتحقق من إجراءات مكافحة العدوى",
+                "round_type": "infection_control",
+                "department": "العناية المركزة",
+                "assigned_to": json.dumps([admin_user.id]),
+                "scheduled_date": datetime.now() + timedelta(days=2),
+                "status": "scheduled",
+                "priority": "high",
+                "created_by_id": admin_user.id
+            }
+        ]
+        
+        created_count = 0
+        for round_data in sample_rounds:
+            existing = db.query(Round).filter(Round.round_code == round_data["round_code"]).first()
+            if not existing:
+                new_round = Round(**round_data)
+                db.add(new_round)
+                created_count += 1
+        
+        db.commit()
+        
+        return {
+            "message": f"تم إنشاء {created_count} جولة تجريبية",
+            "created_count": created_count
+        }
+        
+    except Exception as e:
+        db.rollback()
+        print(f"Error creating sample data: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في إنشاء البيانات التجريبية: {str(e)}")
 
 
 # Custom 404 handler: return SPA index for non-API GET requests so client-side routing works
@@ -244,8 +349,36 @@ async def create_new_round(round: RoundCreate, db: Session = Depends(get_db), cu
 
 @app.get("/api/rounds", response_model=List[RoundResponse])
 async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    rounds = get_rounds(db, skip=skip, limit=limit)
-    return rounds
+    try:
+        print(f"🔍 [API] Fetching rounds from database for user {current_user.id}")
+        print(f"🔍 [API] Database session: {db}")
+        
+        # Test database connection first
+        try:
+            db.execute(text("SELECT 1"))
+            print("✅ [API] Database connection test successful")
+        except Exception as conn_error:
+            print(f"❌ [API] Database connection test failed: {conn_error}")
+            raise HTTPException(status_code=500, detail=f"خطأ في الاتصال بقاعدة البيانات: {str(conn_error)}")
+        
+        # Get rounds from database
+        rounds = get_rounds(db, skip=skip, limit=limit)
+        print(f"✅ [API] Successfully fetched {len(rounds)} rounds")
+        
+        # Log first few rounds for debugging
+        if rounds:
+            print(f"📋 [API] First round: ID={rounds[0].id}, Title={rounds[0].title}")
+        
+        return rounds
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ [API] Error fetching rounds: {str(e)}")
+        print(f"❌ [API] Error type: {type(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"خطأ في تحميل الجولات من قاعدة البيانات: {str(e)}")
 
 @app.get("/api/rounds/my", response_model=List[RoundResponse])
 async def get_my_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
