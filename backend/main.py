@@ -635,6 +635,12 @@ async def signin(login_request: dict = Body(...), db: Session = Depends(get_db))
         email = login_request.get("email")
         password = login_request.get("password")
 
+        # Ensure search_path to public (defensive - some deployments may not set it)
+        try:
+            db.execute(text("SET search_path TO public;"))
+        except Exception:
+            pass
+
         # البحث بـ username أولاً، ثم email
         user = None
         if username:
