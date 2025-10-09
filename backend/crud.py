@@ -205,13 +205,15 @@ def create_round(db: Session, round: RoundCreate, created_by_id: int):
         round_type=round.round_type,
         department=round.department,
         assigned_to=assigned_to_json,
+        assigned_to_ids=json.dumps([int(x) for x in round.assigned_to]) if round.assigned_to and isinstance(round.assigned_to, list) else json.dumps([]),
         scheduled_date=round.scheduled_date,
         deadline=deadline_dt,
         end_date=end_date_dt,  # تاريخ انتهاء الجولة المحسوب
         priority=round.priority,
         notes=round.notes,
         created_by_id=created_by_id,
-        evaluation_items=json.dumps(round.evaluation_items) if round.evaluation_items else json.dumps([])
+        evaluation_items=json.dumps(round.evaluation_items) if round.evaluation_items else json.dumps([]),
+        selected_categories=json.dumps(round.round_code and (getattr(round, 'selected_categories', None) or []))
     )
     db.add(db_round)
     db.commit()
