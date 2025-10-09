@@ -22,10 +22,18 @@ export const useRoundTypes = (): UseRoundTypesReturn => {
       setLoading(true)
       setError(null)
       const response = await apiClient.getRoundTypes()
-      
-      if (response.success && response.data) {
-        const types = Array.isArray(response.data) ? response.data : []
-        setRoundTypes(types)
+
+      // Accept either an array response or an object with { success, data }
+      if (Array.isArray(response)) {
+        setRoundTypes(response)
+      } else if (response && typeof response === 'object') {
+        if (response.success && Array.isArray(response.data)) {
+          setRoundTypes(response.data)
+        } else if (Array.isArray(response.data)) {
+          setRoundTypes(response.data)
+        } else {
+          setError('فشل في جلب أنواع الجولات')
+        }
       } else {
         setError('فشل في جلب أنواع الجولات')
       }
