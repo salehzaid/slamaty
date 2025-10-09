@@ -1521,10 +1521,13 @@ async def get_round_types_endpoint(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
 ):
-    """الحصول على قائمة أنواع الجولات"""
-    return get_round_types(db, skip=skip, limit=limit)
+    """الحصول على قائمة أنواع الجولات (علني - لا يتطلب مصادقة)"""
+    try:
+        return get_round_types(db, skip=skip, limit=limit)
+    except Exception as e:
+        print(f"❌ [API] Error listing round types: {e}")
+        raise HTTPException(status_code=500, detail="فشل في جلب أنواع الجولات")
 
 @app.post("/api/round-types", response_model=RoundTypeResponse)
 async def create_round_type_endpoint(
@@ -1543,13 +1546,18 @@ async def create_round_type_endpoint(
 async def get_round_type_endpoint(
     round_type_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
 ):
-    """الحصول على نوع جولة محدد"""
-    round_type = get_round_type_by_id(db, round_type_id)
-    if not round_type:
-        raise HTTPException(status_code=404, detail="نوع الجولة غير موجود")
-    return round_type
+    """الحصول على نوع جولة محدد (علني - لا يتطلب مصادقة)"""
+    try:
+        round_type = get_round_type_by_id(db, round_type_id)
+        if not round_type:
+            raise HTTPException(status_code=404, detail="نوع الجولة غير موجود")
+        return round_type
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ [API] Error fetching round type id={round_type_id}: {e}")
+        raise HTTPException(status_code=500, detail="فشل في جلب نوع الجولة")
 
 @app.put("/api/round-types/{round_type_id}", response_model=RoundTypeResponse)
 async def update_round_type_endpoint(
