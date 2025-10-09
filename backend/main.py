@@ -736,7 +736,25 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
         result = db.execute(query, {'limit': limit, 'offset': skip})
         rounds_data = []
         
+        import json
         for row in result.fetchall():
+            # Normalize assigned_to to a JSON string to satisfy response_model
+            raw_assigned = row[10]
+            try:
+                if raw_assigned is None:
+                    assigned_to_str = '[]'
+                elif isinstance(raw_assigned, (list, dict)):
+                    assigned_to_str = json.dumps(raw_assigned, ensure_ascii=False)
+                else:
+                    # Try to parse if it's a JSON string already
+                    try:
+                        parsed = json.loads(raw_assigned)
+                        assigned_to_str = json.dumps(parsed, ensure_ascii=False)
+                    except Exception:
+                        assigned_to_str = str(raw_assigned)
+            except Exception:
+                assigned_to_str = '[]'
+
             rounds_data.append({
                 "id": row[0],
                 "round_code": row[1],
@@ -748,7 +766,7 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
                 "priority": row[7],
                 "scheduled_date": row[8].isoformat() if row[8] else None,
                 "created_at": row[9].isoformat() if row[9] else None,
-                "assigned_to": row[10],
+                "assigned_to": assigned_to_str,
                 "created_by_id": row[11]
             })
         
