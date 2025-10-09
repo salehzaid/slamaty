@@ -696,8 +696,11 @@ async def create_new_round(round: RoundCreate, db: Session = Depends(get_db), cu
     # Send notifications to assigned users
     if created_round and round.assigned_to:
         try:
+            # Get creator user from DB to ensure it's attached to session
+            creator = db.query(User).filter(User.id == current_user.id).first()
+            creator_name = f"{creator.first_name} {creator.last_name}" if creator else "المستخدم"
+            
             notification_service = get_notification_service(db)
-            creator_name = f"{current_user.first_name} {current_user.last_name}"
             
             # Convert user names to user IDs for notifications
             assigned_user_ids = []
@@ -721,7 +724,7 @@ async def create_new_round(round: RoundCreate, db: Session = Depends(get_db), cu
                 )
         except Exception as e:
             # Log error but don't fail the round creation
-            print(f"Error sending round assignment notifications: {str(e)}")
+            print(f"⚠️ Error sending round assignment notifications: {str(e)}")
     
     return created_round
 
