@@ -44,6 +44,8 @@ Base = declarative_base()
 def get_db():
     db = SessionLocal()
     try:
+        # Ensure the session uses the public schema so table names resolve correctly
+        db.execute(text("SET search_path TO public;"))
         # Test the connection before yielding
         db.execute(text("SELECT 1"))
         yield db
