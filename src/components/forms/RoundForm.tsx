@@ -64,6 +64,93 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
     notes: initialData?.notes || ''
   })
 
+  // Keep formData in sync when initialData (edit payload) arrives or users/items load
+  useEffect(() => {
+    if (!initialData) return
+
+    const parseAssignedUsers = () => {
+      const raw = initialData.assignedTo ?? initialData.assigned_to ?? initialData.assigned_to_json
+      try {
+        if (!raw) return []
+        if (Array.isArray(raw)) {
+          // If array of numbers -> use as IDs
+          if (raw.length === 0) return []
+          if (typeof raw[0] === 'number') return raw
+          // If array of names, try map to user ids
+          if (typeof raw[0] === 'string') {
+            const mapped = raw.map((name: string) => {
+              const parts = name.trim().split(/\s+/)
+              const first = parts[0]
+              const last = parts.slice(1).join(' ')
+              const u = users.find((uu: any) => (uu.first_name + ' ' + uu.last_name).trim() === name.trim() || uu.email === name || uu.username === name)
+              return u ? u.id : null
+            }).filter(Boolean)
+            return mapped
+          }
+        }
+        if (typeof raw === 'string') {
+          try {
+            const parsed = JSON.parse(raw)
+            return Array.isArray(parsed) ? parsed : []
+          } catch (err) {
+            // maybe single name
+            const u = users.find((uu: any) => (uu.first_name + ' ' + uu.last_name).trim() === raw.trim() || uu.email === raw || uu.username === raw)
+            return u ? [u.id] : []
+          }
+        }
+      } catch (err) {
+        return []
+      }
+      return []
+    }
+
+    const parseSelectedItems = () => {
+      const raw = initialData.evaluation_items ?? initialData.evaluationItems ?? initialData.evaluation_items_json
+      try {
+        if (!raw) return []
+        if (Array.isArray(raw)) return raw.map((v: any) => typeof v === 'number' ? v : Number(v)).filter(Boolean)
+        if (typeof raw === 'string') {
+          try {
+            const parsed = JSON.parse(raw)
+            return Array.isArray(parsed) ? parsed.map((v: any) => typeof v === 'number' ? v : Number(v)).filter(Boolean) : []
+          } catch (err) {
+            // comma separated
+            return raw.split(',').map(s => Number(s.trim())).filter(Boolean)
+          }
+        }
+      } catch (err) {
+        return []
+      }
+      return []
+    }
+
+    const parsedItems = parseSelectedItems()
+
+    // derive categories from items if not explicitly provided
+    const parsedCategories = initialData.selected_categories && initialData.selected_categories.length > 0
+      ? initialData.selected_categories
+      : (parsedItems && parsedItems.length > 0 ?
+          Array.from(new Set(parsedItems.map((id: number) => {
+            const it = evaluationItems.find(i => i.id === id)
+            return it ? it.category_id : null
+          }).filter(Boolean))) : [])
+
+    setFormData(prev => ({
+      ...prev,
+      title: initialData.title ?? prev.title,
+      description: initialData.description ?? prev.description,
+      round_type: initialData.roundType ?? initialData.round_type ?? prev.round_type,
+      department: initialData.department ?? prev.department,
+      scheduled_date: initialData.scheduledDate ? new Date(initialData.scheduledDate).toISOString().split('T')[0] : (initialData.scheduled_date ? new Date(initialData.scheduled_date).toISOString().split('T')[0] : prev.scheduled_date),
+      deadline: initialData.deadline ?? prev.deadline,
+      priority: initialData.priority ?? prev.priority,
+      assigned_users: parseAssignedUsers(),
+      selected_categories: parsedCategories,
+      selected_items: parsedItems,
+      notes: initialData.notes ?? prev.notes
+    }))
+  }, [initialData, users, evaluationItems])
+
   // Data fetching - Use simple useState and useEffect
   const [users, setUsers] = useState<User[]>([])
   const [categories, setCategories] = useState<Category[]>([])
