@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, text
 import uvicorn
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse, JSONResponse
 from fastapi.exception_handlers import http_exception_handler
 from typing import List, Optional
 from datetime import datetime, timedelta
@@ -776,7 +776,8 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
         if rounds_data:
             print(f"📋 [API] First round: ID={rounds_data[0]['id']}, Title={rounds_data[0]['title']}")
         
-        return rounds_data
+        # Return raw JSONResponse to avoid pydantic response_model validation errors
+        return JSONResponse(content=rounds_data)
         
     except HTTPException:
         raise
