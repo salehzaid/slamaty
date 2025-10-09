@@ -105,6 +105,7 @@ class Round(Base):
     round_type = Column(SQLEnum(RoundType), nullable=False)
     department = Column(String, nullable=False)
     assigned_to = Column(Text)  # JSON string of user IDs
+    assigned_to_ids = Column(Text)  # JSON string of user IDs (numeric) for programmatic usage
     scheduled_date = Column(DateTime(timezone=True), nullable=False)
     deadline = Column(DateTime(timezone=True), nullable=True)  # Deadline for round completion
     end_date = Column(DateTime(timezone=True), nullable=True)  # Calculated end date (scheduled_date + deadline days)
@@ -114,6 +115,7 @@ class Round(Base):
     completion_percentage = Column(Integer, default=0)  # Percentage of evaluation items completed
     notes = Column(Text)
     evaluation_items = Column(Text)  # JSON string of evaluation item IDs
+    selected_categories = Column(Text)  # JSON string of selected category IDs
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
