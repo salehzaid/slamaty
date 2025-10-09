@@ -322,7 +322,8 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
       // convert display name to enum key expected by backend
       round_type: convertNameToEnum(formData.round_type),
       assigned_to: formData.assigned_users, // Send user IDs directly
-      evaluation_items: formData.selected_items // Add evaluation items
+      evaluation_items: formData.selected_items, // Add evaluation items
+      selected_categories: formData.selected_categories // Persist selected categories
     }
 
     onSubmit(submitData)
