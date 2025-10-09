@@ -736,11 +736,11 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
         result = db.execute(query, {'limit': limit, 'offset': skip})
         rounds_data = []
         
-        import json
+        import json, traceback
         for row in result.fetchall():
-            # Normalize assigned_to to a JSON string to satisfy response_model
-            raw_assigned = row[10]
             try:
+                # Normalize assigned_to to a JSON string
+                raw_assigned = row[10]
                 if raw_assigned is None:
                     assigned_to_str = '[]'
                 elif isinstance(raw_assigned, (list, dict)):
@@ -752,23 +752,50 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
                         assigned_to_str = json.dumps(parsed, ensure_ascii=False)
                     except Exception:
                         assigned_to_str = str(raw_assigned)
-            except Exception:
-                assigned_to_str = '[]'
 
-            rounds_data.append({
-                "id": row[0],
-                "round_code": row[1],
-                "title": row[2],
-                "description": row[3],
-                "round_type": row[4],
-                "department": row[5],
-                "status": row[6],
-                "priority": row[7],
-                "scheduled_date": row[8].isoformat() if row[8] else None,
-                "created_at": row[9].isoformat() if row[9] else None,
-                "assigned_to": assigned_to_str,
-                "created_by_id": row[11]
-            })
+                # Safely format dates
+                try:
+                    scheduled_iso = row[8].isoformat() if row[8] else None
+                except Exception:
+                    scheduled_iso = None
+                try:
+                    created_iso = row[9].isoformat() if row[9] else None
+                except Exception:
+                    created_iso = None
+
+                rounds_data.append({
+                    "id": row[0],
+                    "round_code": str(row[1]) if row[1] is not None else None,
+                    "title": str(row[2]) if row[2] is not None else None,
+                    "description": str(row[3]) if row[3] is not None else None,
+                    "round_type": str(row[4]) if row[4] is not None else None,
+                    "department": str(row[5]) if row[5] is not None else None,
+                    "status": str(row[6]) if row[6] is not None else None,
+                    "priority": str(row[7]) if row[7] is not None else None,
+                    "scheduled_date": scheduled_iso,
+                    "created_at": created_iso,
+                    "assigned_to": assigned_to_str,
+                    "created_by_id": row[11]
+                })
+            except Exception as e:
+                # Log per-row error and continue with placeholder so the API doesn't 500
+                print(f"❌ [API] Error serializing round id={row[0] if row is not None else 'unknown'}: {e}")
+                traceback.print_exc()
+                rounds_data.append({
+                    "id": row[0] if row is not None else None,
+                    "round_code": row[1] if row is not None else None,
+                    "title": None,
+                    "description": None,
+                    "round_type": None,
+                    "department": None,
+                    "status": None,
+                    "priority": None,
+                    "scheduled_date": None,
+                    "created_at": None,
+                    "assigned_to": '[]',
+                    "created_by_id": row[11] if row is not None else None,
+                    "_error": str(e)
+                })
         
         print(f"✅ [API] Successfully fetched {len(rounds_data)} rounds")
         
