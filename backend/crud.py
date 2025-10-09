@@ -258,8 +258,15 @@ def update_round(db: Session, round_id: int, round_data: dict):
         # Convert assigned_to to JSON string if it's a list
         if isinstance(round_data['assigned_to'], list):
             db_round.assigned_to = json.dumps(round_data['assigned_to'])
+            # also store numeric IDs if items are numeric
+            try:
+                numeric_ids = [int(x) for x in round_data['assigned_to'] if isinstance(x, (int, str)) and str(x).isdigit()]
+                db_round.assigned_to_ids = json.dumps(numeric_ids)
+            except Exception:
+                db_round.assigned_to_ids = json.dumps([])
         else:
             db_round.assigned_to = round_data['assigned_to']
+            db_round.assigned_to_ids = json.dumps([])
     if 'scheduled_date' in round_data and round_data['scheduled_date'] is not None:
         db_round.scheduled_date = round_data['scheduled_date']
     if 'priority' in round_data and round_data['priority'] is not None:
@@ -272,6 +279,12 @@ def update_round(db: Session, round_id: int, round_data: dict):
             db_round.evaluation_items = json.dumps(round_data['evaluation_items'])
         else:
             db_round.evaluation_items = round_data['evaluation_items']
+    # Persist selected categories if provided
+    if 'selected_categories' in round_data and round_data['selected_categories'] is not None:
+        if isinstance(round_data['selected_categories'], list):
+            db_round.selected_categories = json.dumps(round_data['selected_categories'])
+        else:
+            db_round.selected_categories = round_data['selected_categories']
     
     db.commit()
     db.refresh(db_round)
