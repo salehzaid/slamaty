@@ -53,8 +53,18 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return False
 
 def get_password_hash(password: str) -> str:
-    safe = _truncate_for_bcrypt(password)
-    return pwd_context.hash(safe)
+    try:
+        # Use bcrypt directly to avoid passlib version issues
+        import bcrypt
+        safe = _truncate_for_bcrypt(password)
+        # bcrypt.hashpw returns bytes, decode to string for storage
+        hashed = bcrypt.hashpw(safe.encode('utf-8'), bcrypt.gensalt())
+        return hashed.decode('utf-8')
+    except Exception as e:
+        print(f"Password hashing error: {e}")
+        # Fallback to passlib if bcrypt fails
+        safe = _truncate_for_bcrypt(password)
+        return pwd_context.hash(safe)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
