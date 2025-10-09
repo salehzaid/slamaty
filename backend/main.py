@@ -680,8 +680,18 @@ async def create_new_round(round: RoundCreate, db: Session = Depends(get_db), cu
             detail="ليس لديك صلاحية لإنشاء جولات جديدة. هذه الصلاحية محصورة على مدير النظام ومدير الجودة فقط."
         )
     
-    # Create the round
-    created_round = create_round(db, round, current_user.id)
+    # Create the round with error handling
+    try:
+        created_round = create_round(db, round, current_user.id)
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"❌ Error creating round: {str(e)}")
+        print(f"Stack trace:\n{error_details}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"فشل في إنشاء الجولة: {str(e)}"
+        )
     
     # Send notifications to assigned users
     if created_round and round.assigned_to:
