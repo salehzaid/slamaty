@@ -198,6 +198,19 @@ def create_round(db: Session, round: RoundCreate, created_by_id: int):
         else:
             end_date_dt = round.end_date
     
+    # Handle assigned_to_ids separately with error handling
+    assigned_to_ids_json = json.dumps([])
+    if round.assigned_to and isinstance(round.assigned_to, list):
+        try:
+            # Convert to integers only if items are numeric
+            assigned_to_ids_json = json.dumps([int(x) for x in round.assigned_to if str(x).isdigit()])
+        except Exception as e:
+            print(f"⚠️ Warning: Could not convert assigned_to to IDs: {e}")
+            assigned_to_ids_json = json.dumps([])
+    
+    # Handle selected_categories with error handling
+    selected_categories_json = json.dumps(getattr(round, 'selected_categories', None) or [])
+    
     db_round = Round(
         round_code=round_code,
         title=round.title,
@@ -205,7 +218,7 @@ def create_round(db: Session, round: RoundCreate, created_by_id: int):
         round_type=round.round_type,
         department=round.department,
         assigned_to=assigned_to_json,
-        assigned_to_ids=json.dumps([int(x) for x in round.assigned_to]) if round.assigned_to and isinstance(round.assigned_to, list) else json.dumps([]),
+        assigned_to_ids=assigned_to_ids_json,
         scheduled_date=round.scheduled_date,
         deadline=deadline_dt,
         end_date=end_date_dt,  # تاريخ انتهاء الجولة المحسوب
@@ -213,7 +226,7 @@ def create_round(db: Session, round: RoundCreate, created_by_id: int):
         notes=round.notes,
         created_by_id=created_by_id,
         evaluation_items=json.dumps(round.evaluation_items) if round.evaluation_items else json.dumps([]),
-        selected_categories=json.dumps(round.round_code and (getattr(round, 'selected_categories', None) or []))
+        selected_categories=selected_categories_json
     )
     db.add(db_round)
     db.commit()
