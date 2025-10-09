@@ -103,5 +103,11 @@ async def get_current_user(
     user = get_user_by_email(db, email=email)
     if user is None:
         raise credentials_exception
-    
+    # Normalize role casing to avoid authorization mismatches (DB may store uppercase)
+    try:
+        if hasattr(user, 'role') and isinstance(user.role, str):
+            user.role = user.role.lower()
+    except Exception:
+        pass
+
     return user
