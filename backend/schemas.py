@@ -50,6 +50,7 @@ class RoundBase(BaseModel):
     round_type: RoundType
     department: str
     assigned_to: List[int] = []  # Changed to List[int] for user IDs
+    selected_categories: Optional[List[int]] = []  # Selected evaluation categories
     scheduled_date: datetime
     deadline: Optional[Union[datetime, str]] = None  # Deadline for round completion - can be datetime or ISO string
     end_date: Optional[Union[datetime, str]] = None  # Calculated end date - can be datetime or ISO string
