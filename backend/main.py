@@ -823,6 +823,62 @@ async def get_my_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(g
     print(f"📊 API: Returning {len(rounds)} rounds")
     return rounds
 
+
+# Round types endpoints
+@app.get("/api/round_types", response_model=List[RoundTypeResponse])
+async def list_round_types(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    try:
+        types = get_round_types(db, skip=skip, limit=limit)
+        return types
+    except Exception as e:
+        print(f"❌ [API] Error fetching round types: {e}")
+        raise HTTPException(status_code=500, detail="فشل في جلب أنواع الجولات")
+
+
+@app.post("/api/round_types", response_model=RoundTypeResponse)
+async def create_round_type_endpoint(payload: dict = Body(...), db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    # Only allow super_admin or quality_manager to create types
+    if current_user.role not in ["super_admin", "quality_manager"]:
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية لإضافة نوع جولة")
+    try:
+        rt = create_round_type(db, payload)
+        return rt
+    except Exception as e:
+        print(f"❌ [API] Error creating round type: {e}")
+        raise HTTPException(status_code=500, detail="فشل في إنشاء نوع الجولة")
+
+
+@app.put("/api/round_types/{type_id}", response_model=RoundTypeResponse)
+async def update_round_type_endpoint(type_id: int, payload: dict = Body(...), db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    if current_user.role not in ["super_admin", "quality_manager"]:
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية لتعديل نوع الجولة")
+    try:
+        rt = update_round_type(db, type_id, payload)
+        if not rt:
+            raise HTTPException(status_code=404, detail="نوع الجولة غير موجود")
+        return rt
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ [API] Error updating round type: {e}")
+        raise HTTPException(status_code=500, detail="فشل في تحديث نوع الجولة")
+
+
+@app.delete("/api/round_types/{type_id}")
+async def delete_round_type_endpoint(type_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    if current_user.role not in ["super_admin", "quality_manager"]:
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية لحذف نوع الجولة")
+    try:
+        rt = delete_round_type(db, type_id)
+        if not rt:
+            raise HTTPException(status_code=404, detail="نوع الجولة غير موجود")
+        return {"status": "success", "message": "تم حذف نوع الجولة"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ [API] Error deleting round type: {e}")
+        raise HTTPException(status_code=500, detail="فشل في حذف نوع الجولة")
+
 @app.get("/api/rounds/{round_id}", response_model=RoundResponse)
 async def get_round_endpoint(round_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Get a specific round by ID"""
