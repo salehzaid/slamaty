@@ -12,16 +12,12 @@ import { useNavigate } from 'react-router-dom'
 import { 
   Plus, 
   Search, 
-  Calendar as CalendarIcon, 
   User, 
-  Building2, 
   BarChart3, 
-  Clock, 
   CheckCircle2, 
   AlertTriangle,
   Target,
   Filter,
-  Download,
   Eye,
   Edit,
   Play,
@@ -37,7 +33,7 @@ const RoundsListView: React.FC = () => {
   const [selectedRound, setSelectedRound] = useState<any>(null)
   
   const { data: rounds, loading, error, refetch } = useRounds()
-  const { user, hasPermission } = useAuth()
+  const { hasPermission } = useAuth()
   const navigate = useNavigate()
   const deleteRoundMutation = useDeleteRound()
 
@@ -115,8 +111,11 @@ const RoundsListView: React.FC = () => {
         priority: data.priority,
         notes: data.notes,
         evaluation_items: data.evaluation_items || data.selected_items,
+        selected_categories: data.selected_categories,  // إرسال التصنيفات المحددة
         round_code: data.round_code
       }
+      
+      console.log('Update payload:', updateData)
       
       // Call API to update round
       await apiClient.updateRound(selectedRound.id, updateData)
@@ -134,20 +133,24 @@ const RoundsListView: React.FC = () => {
 
   // Handle delete round
   const handleDeleteRound = async (roundId: number, roundTitle: string) => {
-    if (!hasPermission(['super_admin'])) {
-      alert('ليس لديك صلاحية لحذف الجولات. هذه الصلاحية مخصصة لمدير النظام فقط.')
+    // Check permissions - allow super_admin and quality_manager
+    if (!hasPermission(['super_admin', 'quality_manager'])) {
+      alert('ليس لديك صلاحية لحذف الجولات. هذه الصلاحية مخصصة لمدير النظام ومدير الجودة فقط.')
       return
     }
 
     const confirmed = window.confirm(`هل أنت متأكد من حذف الجولة "${roundTitle}"؟\n\nهذا الإجراء لا يمكن التراجع عنه.`)
     if (!confirmed) return
 
+    console.log('🗑️ Attempting to delete round:', roundId)
+    
     try {
-      await deleteRoundMutation.mutate(roundId)
-      console.log('Round deleted successfully')
+      const result = await deleteRoundMutation.mutate(roundId)
+      console.log('✅ Round deleted successfully:', result)
+      alert('تم حذف الجولة بنجاح')
       refetch()
     } catch (error) {
-      console.error('Error deleting round:', error)
+      console.error('❌ Error deleting round:', error)
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       alert('حدث خطأ في حذف الجولة: ' + errorMessage)
     }
@@ -252,14 +255,14 @@ const RoundsListView: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="p-6 space-y-8">
         {/* Enhanced Header */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <div className="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl">
-                <BarChart3 className="w-8 h-8 text-white" />
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <BarChart3 className="w-7 h-7 text-gray-700" />
               </div>
               <div>
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">عرض الجولات</h1>
@@ -269,9 +272,9 @@ const RoundsListView: React.FC = () => {
             <div className="flex items-center gap-4">
               <Button 
                 onClick={handleCreateRound}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white flex items-center gap-3 px-8 py-3 h-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                className="bg-blue-600 text-white flex items-center gap-2 px-4 py-2 h-10 text-sm font-semibold rounded-md shadow-sm hover:shadow-md transition"
               >
-                <Plus className="w-6 h-6" />
+                <Plus className="w-5 h-5" />
                 إنشاء جولة جديدة
               </Button>
             </div>
@@ -385,181 +388,100 @@ const RoundsListView: React.FC = () => {
           />
         </div>
 
-        {/* Enhanced Filters */}
-        <Card className="bg-white rounded-2xl shadow-xl border border-gray-100">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <Filter className="w-6 h-6 text-blue-600" />
-              <h3 className="text-xl font-semibold text-gray-900">فلاتر البحث</h3>
+        {/* Filters - simple and formal */}
+        <div className="bg-white border border-gray-200 rounded-md p-4 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Filter className="w-5 h-5 text-gray-600" />
+              <h3 className="text-lg font-medium text-gray-800">فلاتر البحث</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="relative">
-                <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  placeholder="البحث في الجولات..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-12 h-14 text-lg border-2 border-gray-200 focus:border-blue-500 rounded-xl"
-                />
-              </div>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 h-14 text-lg"
-              >
-                <option value="all">جميع الحالات</option>
-                <option value="scheduled">مجدولة</option>
-                <option value="in_progress">قيد التنفيذ</option>
-                <option value="completed">مكتملة</option>
-                <option value="cancelled">ملغاة</option>
-              </select>
-              <div className="flex gap-3">
-                <Button variant="outline" className="flex-1 h-14 text-lg">
-                  <Download className="w-5 h-5 ml-2" />
-                  تصدير
-                </Button>
-                <Button variant="outline" className="h-14 px-4">
-                  <MoreHorizontal className="w-5 h-5" />
-                </Button>
-              </div>
+            <div>
+              <Button variant="outline" className="text-sm px-3 py-1">تطبيق</Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Enhanced Rounds List */}
-        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative">
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="بحث..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pr-10 h-10 text-sm border border-gray-200 rounded-md"
+              />
+            </div>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-2 border border-gray-200 rounded-md text-sm"
+            >
+              <option value="all">جميع الحالات</option>
+              <option value="scheduled">مجدولة</option>
+              <option value="in_progress">قيد التنفيذ</option>
+              <option value="completed">مكتملة</option>
+              <option value="cancelled">ملغاة</option>
+            </select>
+            <div className="flex gap-2">
+              <Button variant="outline" className="text-sm px-3 py-2">تصدير</Button>
+              <Button variant="outline" className="text-sm px-3 py-2"><MoreHorizontal className="w-4 h-4" /></Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Enhanced Rounds List - two cards per row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {filteredRounds.length > 0 ? (
             filteredRounds.map((round: any) => (
-              <Card key={round.id} className="bg-white rounded-3xl shadow-xl border-0 hover:shadow-2xl transition-all duration-500 overflow-hidden group">
-                <CardContent className="p-0">
-                  {/* Enhanced Header Section */}
-                  <div className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6 border-b border-gray-100">
-                    {/* Background Pattern */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-100/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-100/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
-                    
-                    <div className="relative flex items-start justify-between mb-4">
-                      {/* Left side - Icon and Title */}
-                      <div className="flex items-start gap-4 flex-1">
-                        <div className="relative">
-                          <div className="p-4 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                            <Target className="w-8 h-8 text-white" />
-                          </div>
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                        </div>
-                        <div className="flex-1 pt-2">
-                          <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight">
-                            {round.title || 'جولة بدون عنوان'}
-                          </h3>
-                          <div className="flex items-center gap-3 mb-3">
-                            <Badge className={`${getStatusColor(round.status)} text-xs px-3 py-1.5 rounded-full font-medium shadow-sm`}>
-                              {getStatusText(round.status)}
-                            </Badge>
-                            <Badge className={`${getPriorityColor(round.priority)} text-xs px-3 py-1.5 rounded-full font-medium shadow-sm`}>
-                              {getPriorityText(round.priority)}
-                            </Badge>
-                          </div>
-                        </div>
+              <Card key={round.id} className="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden h-full">
+                <CardContent className="p-4 flex flex-col justify-between h-full">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-gray-100 rounded-md">
+                        <Target className="w-6 h-6 text-gray-600" />
                       </div>
-                      
-                      {/* Right side - Action Buttons */}
-                      <div className="flex gap-3 pt-2">
-                        {round.status === 'scheduled' && (
-                          <Button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2 h-10 text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                            <Play className="w-4 h-4 ml-2" />
-                            بدء
-                          </Button>
-                        )}
-                        {hasPermission(['super_admin', 'quality_manager', 'department_head']) && (
-                          <Button 
-                            variant="outline" 
-                            className="px-6 py-2 h-10 text-sm font-semibold border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 rounded-lg transition-all duration-300"
-                            onClick={() => handleEditRound(round)}
-                          >
-                            <Edit className="w-4 h-4 ml-2" />
-                            تعديل
-                          </Button>
-                        )}
-                        {hasPermission(['super_admin']) && (
-                          <Button 
-                            variant="outline" 
-                            className="px-6 py-2 h-10 text-sm font-semibold border-2 border-red-200 hover:bg-red-50 hover:border-red-300 text-red-600 hover:text-red-700 rounded-lg transition-all duration-300"
-                            onClick={() => handleDeleteRound(round.id, round.title)}
-                            disabled={deleteRoundMutation.loading}
-                          >
-                            <Trash2 className="w-4 h-4 ml-2" />
-                            {deleteRoundMutation.loading ? 'جاري الحذف...' : 'حذف'}
-                          </Button>
-                        )}
-                        <Button 
-                          variant="outline" 
-                          className="px-6 py-2 h-10 text-sm font-semibold border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 rounded-lg transition-all duration-300"
-                          onClick={() => navigate(`/rounds/evaluate/${round.id}`)}
-                        >
-                          <Eye className="w-4 h-4 ml-2" />
-                          عرض
-                        </Button>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">{round.title || 'جولة بدون عنوان'}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{round.description ? (round.description.length > 120 ? round.description.slice(0, 117) + '...' : round.description) : '—'}</p>
+                        <div className="flex items-center gap-2 mt-3">
+                          <Badge className={`${getStatusColor(round.status)} text-xs px-2 py-1 rounded-full`}>{getStatusText(round.status)}</Badge>
+                          <Badge className={`${getPriorityColor(round.priority)} text-xs px-2 py-1 rounded-full`}>{getPriorityText(round.priority)}</Badge>
+                        </div>
                       </div>
                     </div>
-                    
-                    {/* Enhanced Description */}
-                    <div className="relative">
-                      <p className="text-gray-600 text-sm leading-relaxed font-medium bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/50">
-                        {round.description || 'جولة للتأكد من تطبيق معايير مكافحة العدوى والالتزام بالبروتوكولات المطلوبة'}
-                      </p>
+
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" className="text-sm px-3 py-1" onClick={() => navigate(`/rounds/evaluate/${round.id}`, { state: { from: '/rounds/list' } })}>
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      {hasPermission(['super_admin', 'quality_manager', 'department_head']) && (
+                        <Button variant="ghost" className="text-sm px-3 py-1" onClick={() => handleEditRound(round)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      )}
+                      {hasPermission(['super_admin']) && (
+                        <Button variant="ghost" className="text-sm px-3 py-1 text-red-600" onClick={() => handleDeleteRound(round.id, round.title)} disabled={deleteRoundMutation.loading}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
-                  
-                  {/* Enhanced Information Cards Section */}
-                  <div className="p-6 bg-gradient-to-br from-gray-50 to-white">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <div className="group/card flex items-center gap-4 p-4 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200">
-                        <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg group-hover/card:scale-110 transition-transform duration-300">
-                          <CalendarIcon className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs text-gray-500 font-medium mb-1 tracking-wide">التاريخ المجدول</p>
-                          <p className="font-semibold text-gray-900 text-sm leading-tight">
-                            {round.scheduledDate ? new Date(round.scheduledDate).toLocaleDateString('en-US') : 'غير محدد'}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="group/card flex items-center gap-4 p-4 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-green-200">
-                        <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg group-hover/card:scale-110 transition-transform duration-300">
-                          <User className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs text-gray-500 font-medium mb-1 tracking-wide">المسؤول</p>
-                          <p className="font-semibold text-gray-900 text-sm leading-tight">
-                            {round.assignedTo && round.assignedTo.length > 0 ? round.assignedTo.join(', ') : 'غير محدد'}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="group/card flex items-center gap-4 p-4 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-purple-200">
-                        <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg group-hover/card:scale-110 transition-transform duration-300">
-                          <Building2 className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs text-gray-500 font-medium mb-1 tracking-wide">القسم</p>
-                          <p className="font-semibold text-gray-900 text-sm leading-tight">
-                            {round.department || 'التمريض'}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="group/card flex items-center gap-4 p-4 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-orange-200">
-                        <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg group-hover/card:scale-110 transition-transform duration-300">
-                          <Clock className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs text-gray-500 font-medium mb-1 tracking-wide">كود الجولة</p>
-                          <p className="font-semibold text-gray-900 text-sm leading-tight font-mono tracking-wider">
-                            {round.roundCode || 'غير محدد'}
-                          </p>
-                        </div>
-                      </div>
+
+                  <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
+                    <div>
+                      <div className="text-xs text-gray-500">التاريخ المجدول</div>
+                      <div className="font-medium text-gray-800">{round.scheduledDate ? new Date(round.scheduledDate).toLocaleDateString('en-US') : 'غير محدد'}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-500">المسؤول</div>
+                      <div className="font-medium text-gray-800">{round.assignedTo && round.assignedTo.length > 0 ? round.assignedTo.join(', ') : 'غير محدد'}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-500">القسم</div>
+                      <div className="font-medium text-gray-800">{round.department || '—'}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-500">كود الجولة</div>
+                      <div className="font-medium text-gray-800 font-mono">{round.roundCode || 'غير محدد'}</div>
                     </div>
                   </div>
                 </CardContent>
@@ -567,7 +489,7 @@ const RoundsListView: React.FC = () => {
             ))
           ) : (
             <Card className="bg-white rounded-3xl shadow-xl border-0 overflow-hidden">
-              <CardContent className="p-20 text-center relative">
+                <CardContent className="p-20 text-center relative">
                 {/* Background Pattern */}
                 <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-100/20 to-transparent rounded-full -translate-y-20 translate-x-20"></div>
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-100/20 to-transparent rounded-full translate-y-16 -translate-x-16"></div>

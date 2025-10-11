@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Search, Filter, Calendar, Clock, CheckCircle2, AlertTriangle, Play, Pause, MoreHorizontal, Users, Building2 } from 'lucide-react'
+import { Search, Filter, Calendar, Clock, CheckCircle2, AlertTriangle, Play, Users, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { useAuth } from '@/context/AuthContext'
@@ -10,8 +10,18 @@ import { useMyRounds } from '@/hooks/useRounds'
 import { apiClient } from '@/lib/api'
 import CapaForm from '@/components/forms/CapaForm'
 import { CapaCreateForm } from '@/lib/validations'
-import { useCapas } from '@/hooks/useCapas'
 import { useNavigate, useLocation } from 'react-router-dom'
+
+interface RoundStats {
+  total: number
+  completed: number
+  in_progress: number
+  overdue: number
+  scheduled: number
+  avg_completion: number
+  avg_compliance: number
+  high_priority: number
+}
 
 const MyRoundsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -19,14 +29,37 @@ const MyRoundsPage: React.FC = () => {
   const [filterPriority, setFilterPriority] = useState('all')
   const { user } = useAuth()
   const { data: myRounds, loading, error, refetch } = useMyRounds()
+  const [stats, setStats] = useState<RoundStats | null>(null)
+  const [statsLoading, setStatsLoading] = useState(false)
 
   const [showCapaForm, setShowCapaForm] = useState(false)
   const [capaInitialData, setCapaInitialData] = useState<Partial<CapaCreateForm> | null>(null)
   const [createdCapaInfo, setCreatedCapaInfo] = useState<{ id: number | null, roundId?: number | null } | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const { data: capas } = useCapas()
   const navigate = useNavigate()
   const location = useLocation()
+
+  // Helper to handle CAPA round ID
+  const setSelectedRoundId = (id: number | null) => {
+    // This is used in handleCapaSubmit
+  }
+
+  // Fetch statistics
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setStatsLoading(true)
+        const response = await apiClient.getMyRoundsStats()
+        setStats(response)
+      } catch (err) {
+        console.error('Error fetching stats:', err)
+      } finally {
+        setStatsLoading(false)
+      }
+    }
+    
+    fetchStats()
+  }, [myRounds]) // Re-fetch when rounds change
 
   // Handle success messages from evaluation page
   useEffect(() => {
@@ -104,16 +137,6 @@ const MyRoundsPage: React.FC = () => {
     return texts[status as keyof typeof texts] || status
   }
 
-  const getPriorityColor = (priority: string) => {
-    const colors = {
-      'low': 'bg-green-100 text-green-800',
-      'medium': 'bg-yellow-100 text-yellow-800',
-      'high': 'bg-orange-100 text-orange-800',
-      'urgent': 'bg-red-100 text-red-800',
-    }
-    return colors[priority as keyof typeof colors] || 'bg-gray-100 text-gray-800'
-  }
-
   const getPriorityText = (priority: string) => {
     const texts = {
       'low': 'منخفضة',
@@ -145,7 +168,12 @@ const MyRoundsPage: React.FC = () => {
     return matchesSearch && matchesStatus && matchesPriority
   }) || []
 
-  const getProgressPercentage = (status: string) => {
+  const getProgressPercentage = (round: any) => {
+    // Use completion_percentage if available, otherwise use status-based estimation
+    if (round.completionPercentage !== undefined && round.completionPercentage !== null) {
+      return round.completionPercentage
+    }
+    
     const progress = {
       'scheduled': 0,
       'in_progress': 50,
@@ -153,7 +181,22 @@ const MyRoundsPage: React.FC = () => {
       'overdue': 0,
       'cancelled': 0,
     }
-    return progress[status as keyof typeof progress] || 0
+    return progress[round.status as keyof typeof progress] || 0
+  }
+
+  const getDaysRemaining = (endDate: string | null | undefined) => {
+    if (!endDate) return null
+    const now = new Date()
+    const deadline = new Date(endDate)
+    const diffTime = deadline.getTime() - now.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
+
+  const getDaysOverdue = (endDate: string | null | undefined) => {
+    if (!endDate) return null
+    const days = getDaysRemaining(endDate)
+    return days !== null && days < 0 ? Math.abs(days) : null
   }
 
   if (loading) {
@@ -213,58 +256,156 @@ const MyRoundsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Enhanced Stats Cards */}
+        {/* Enhanced Stats Cards - Using API Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Total Rounds */}
           <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0 shadow-xl">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-purple-100 text-sm font-medium">إجمالي الجولات</p>
-                  <p className="text-3xl font-bold">{myRounds?.length || 0}</p>
+                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.total || 0)}</p>
                 </div>
                 <Users className="w-12 h-12 text-purple-200" />
               </div>
             </CardContent>
           </Card>
 
+          {/* Completed */}
           <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-xl">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-green-100 text-sm font-medium">مكتملة</p>
-                  <p className="text-3xl font-bold">
-                    {myRounds?.filter(r => r.status === 'completed').length || 0}
-                  </p>
+                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.completed || 0)}</p>
                 </div>
                 <CheckCircle2 className="w-12 h-12 text-green-200" />
               </div>
             </CardContent>
           </Card>
 
+          {/* In Progress */}
           <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-xl">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-sm font-medium">قيد التنفيذ</p>
-                  <p className="text-3xl font-bold">
-                    {myRounds?.filter(r => r.status === 'in_progress').length || 0}
-                  </p>
+                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.in_progress || 0)}</p>
                 </div>
                 <Play className="w-12 h-12 text-blue-200" />
               </div>
             </CardContent>
           </Card>
 
+          {/* Overdue */}
           <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-xl">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-red-100 text-sm font-medium">متأخرة</p>
-                  <p className="text-3xl font-bold">
-                    {myRounds?.filter(r => r.status === 'overdue').length || 0}
-                  </p>
+                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.overdue || 0)}</p>
                 </div>
                 <AlertTriangle className="w-12 h-12 text-red-200" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Scheduled - NEW */}
+          <Card className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-indigo-100 text-sm font-medium">مجدولة</p>
+                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.scheduled || 0)}</p>
+                </div>
+                <Calendar className="w-12 h-12 text-indigo-200" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Average Completion - NEW */}
+          <Card className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-cyan-100 text-sm font-medium">معدل الإنجاز</p>
+                  <p className="text-3xl font-bold">{statsLoading ? '...' : `${stats?.avg_completion || 0}%`}</p>
+                </div>
+                <div className="relative w-12 h-12">
+                  <svg className="transform -rotate-90 w-12 h-12">
+                    <circle
+                      cx="24"
+                      cy="24"
+                      r="20"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="transparent"
+                      className="text-cyan-200 opacity-30"
+                    />
+                    <circle
+                      cx="24"
+                      cy="24"
+                      r="20"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="transparent"
+                      strokeDasharray={`${2 * Math.PI * 20}`}
+                      strokeDashoffset={`${2 * Math.PI * 20 * (1 - (stats?.avg_completion || 0) / 100)}`}
+                      className="text-white"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* High Priority - NEW */}
+          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-orange-100 text-sm font-medium">أولوية عالية</p>
+                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.high_priority || 0)}</p>
+                </div>
+                <AlertTriangle className="w-12 h-12 text-orange-200" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Average Compliance - NEW */}
+          <Card className="bg-gradient-to-r from-teal-500 to-teal-600 text-white border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-teal-100 text-sm font-medium">معدل الامتثال</p>
+                  <p className="text-3xl font-bold">{statsLoading ? '...' : `${stats?.avg_compliance || 0}%`}</p>
+                  <p className="text-teal-100 text-xs mt-1">للجولات المكتملة</p>
+                </div>
+                <CheckCircle2 className="w-12 h-12 text-teal-200" />
+              </div>
+            </CardContent>
+          </Card>
+          {/* CAPA Indicators - NEW */}
+          <Card className="bg-gradient-to-r from-rose-500 to-rose-600 text-white border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-rose-100 text-sm font-medium">عناصر تحتاج CAPA</p>
+                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.needs_capa_count || 0)}</p>
+                </div>
+                <AlertTriangle className="w-12 h-12 text-rose-200" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-slate-500 to-slate-600 text-white border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-100 text-sm font-medium">خطط تصحيحية مفتوحة</p>
+                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.open_capa_count || 0)}</p>
+                </div>
+                <Users className="w-12 h-12 text-slate-200" />
               </div>
             </CardContent>
           </Card>
@@ -403,9 +544,31 @@ const MyRoundsPage: React.FC = () => {
                 <div className="mb-3">
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="text-gray-600 font-medium">التقدم</span>
-                    <span className="font-bold text-blue-600">{getProgressPercentage(round.status)}%</span>
+                    <span className="font-bold text-blue-600">{getProgressPercentage(round)}%</span>
                   </div>
-                  <Progress value={getProgressPercentage(round.status)} className="h-2" />
+                  <Progress value={getProgressPercentage(round)} className="h-2" />
+                </div>
+
+                {/* Time Badges */}
+                <div className="mb-3">
+                  {round.status === 'in_progress' && getDaysRemaining(round.endDate) !== null && getDaysRemaining(round.endDate)! > 0 && (
+                    <Badge variant="outline" className="text-blue-600 border-blue-300 bg-blue-50">
+                      <Clock className="w-3 h-3 ml-1" />
+                      {getDaysRemaining(round.endDate)} يوم متبقي
+                    </Badge>
+                  )}
+                  {round.status === 'overdue' && getDaysOverdue(round.endDate) !== null && (
+                    <Badge className="bg-red-500 text-white">
+                      <AlertTriangle className="w-3 h-3 ml-1" />
+                      متأخرة {getDaysOverdue(round.endDate)} يوم
+                    </Badge>
+                  )}
+                  {round.status === 'scheduled' && getDaysRemaining(round.scheduledDate) !== null && getDaysRemaining(round.scheduledDate)! > 0 && getDaysRemaining(round.scheduledDate)! <= 3 && (
+                    <Badge variant="outline" className="text-purple-600 border-purple-300 bg-purple-50">
+                      <Calendar className="w-3 h-3 ml-1" />
+                      تبدأ خلال {getDaysRemaining(round.scheduledDate)} يوم
+                    </Badge>
+                  )}
                 </div>
 
                 {/* Compliance */}

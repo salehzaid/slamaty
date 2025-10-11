@@ -10,10 +10,10 @@ const TestApi: React.FC = () => {
       setLoading(true);
       setResult('جاري اختبار تسجيل الدخول...');
       
-      const response = await apiClient.login('admin@salamaty.com', 'admin123');
+      const response = await apiClient.login('admin@salamaty.com', '123456');
       setResult(`تسجيل الدخول نجح: ${JSON.stringify(response, null, 2)}`);
     } catch (error) {
-      setResult(`خطأ في تسجيل الدخول: ${error.message}`);
+      setResult(`خطأ في تسجيل الدخول: ${String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -27,7 +27,7 @@ const TestApi: React.FC = () => {
       const response = await apiClient.getDepartments();
       setResult(`جلب الأقسام نجح: ${JSON.stringify(response, null, 2)}`);
     } catch (error) {
-      setResult(`خطأ في جلب الأقسام: ${error.message}`);
+      setResult(`خطأ في جلب الأقسام: ${String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,7 @@ const TestApi: React.FC = () => {
       const response = await apiClient.createDepartment(departmentData);
       setResult(`إنشاء القسم نجح: ${JSON.stringify(response, null, 2)}`);
     } catch (error) {
-      setResult(`خطأ في إنشاء القسم: ${error.message}`);
+      setResult(`خطأ في إنشاء القسم: ${String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -89,10 +89,9 @@ const TestApi: React.FC = () => {
         <div style={{ 
           background: '#f8f9fa', 
           padding: '15px', 
-          borderRadius: '5px', 
+          borderRadius: '5px',
           border: '1px solid #dee2e6',
           whiteSpace: 'pre-wrap',
-          fontFamily: 'monospace',
           fontSize: '12px'
         }}>
           {result}

@@ -64,6 +64,20 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+# CORS middleware - Must be added immediately after creating the app
+# Allow all localhost origins for development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r"http://localhost:\d+|http://127\.0\.0\.1:\d+",  # Allow any localhost port
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
+)
+
+print(f"✅ CORS enabled for all localhost origins")
+
 # Temporary diagnostic endpoint to list registered routes (hidden from docs)
 @app.get("/__routes", include_in_schema=False)
 async def _list_routes():
@@ -551,26 +565,6 @@ async def spa_http_exception_handler(request: Request, exc: HTTPException):
     # Fallback to default handler
     return await http_exception_handler(request, exc)
 
-# CORS middleware
-cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5174").split(",")
-cors_origins = [origin.strip() for origin in cors_origins]
-
-# Add more origins for development
-cors_origins.extend([
-    "http://localhost:5174",
-    "http://127.0.0.1:5174",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000"
-])
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=cors_origins,  # Use environment variable for origins
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 security = HTTPBearer()
 
 # Serve built frontend at root if available
@@ -728,6 +722,36 @@ async def create_new_round(round: RoundCreate, db: Session = Depends(get_db), cu
     
     return created_round
 
+
+# Debug endpoint: create round without authentication (development only)
+@app.post("/api/debug/rounds-noauth", response_model=RoundResponse, include_in_schema=False)
+async def create_round_noauth(round: RoundCreate, db: Session = Depends(get_db)):
+    """Development helper: create a round without authentication. Uses user id 1 as creator.
+    Only enabled in local/dev environments and hidden from OpenAPI (include_in_schema=False).
+    """
+    try:
+        # Use created_by_id = 1 by default. If user 1 doesn't exist, fallback to first user in DB.
+        try:
+            creator = db.query(User).filter(User.id == 1).first()
+            created_by_id = creator.id if creator else None
+        except Exception:
+            created_by_id = None
+
+        if not created_by_id:
+            first_user = db.query(User).first()
+            if first_user:
+                created_by_id = first_user.id
+            else:
+                raise HTTPException(status_code=500, detail="No users in DB to assign as creator")
+
+        created_round = create_round(db, round, created_by_id)
+        return created_round
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ [DEBUG ENDPOINT] Error creating round without auth: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/rounds", response_model=List[RoundResponse])
 async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     try:
@@ -746,7 +770,9 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
         query = text("""
             SELECT id, round_code, title, description, round_type, 
                    department, status, priority, scheduled_date, created_at,
-                   assigned_to, created_by_id
+                   assigned_to, created_by_id, compliance_percentage, completion_percentage,
+                   selected_categories, evaluation_items, assigned_to_ids,
+                   deadline, end_date, notes
             FROM rounds 
             ORDER BY created_at DESC 
             LIMIT :limit OFFSET :offset
@@ -782,6 +808,21 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
                 except Exception:
                     created_iso = None
 
+                # Handle JSONB fields (selected_categories, evaluation_items, assigned_to_ids)
+                selected_categories = row[14] if row[14] is not None else []
+                evaluation_items = row[15] if row[15] is not None else []
+                assigned_to_ids = row[16] if row[16] is not None else []
+                
+                # Format deadline and end_date
+                try:
+                    deadline_iso = row[17].isoformat() if row[17] else None
+                except Exception:
+                    deadline_iso = None
+                try:
+                    end_date_iso = row[18].isoformat() if row[18] else None
+                except Exception:
+                    end_date_iso = None
+
                 rounds_data.append({
                     "id": row[0],
                     "round_code": str(row[1]) if row[1] is not None else None,
@@ -794,7 +835,15 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
                     "scheduled_date": scheduled_iso,
                     "created_at": created_iso,
                     "assigned_to": assigned_to_str,
-                    "created_by_id": row[11]
+                    "created_by_id": row[11],
+                    "compliance_percentage": row[12] if row[12] is not None else 0,
+                    "completion_percentage": row[13] if row[13] is not None else 0,
+                    "selected_categories": selected_categories,
+                    "evaluation_items": evaluation_items,
+                    "assigned_to_ids": assigned_to_ids,
+                    "deadline": deadline_iso,
+                    "end_date": end_date_iso,
+                    "notes": str(row[19]) if row[19] is not None else None
                 })
             except Exception as e:
                 # Log per-row error and continue with placeholder so the API doesn't 500
@@ -841,6 +890,89 @@ async def get_my_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(g
     rounds = get_rounds_by_user(db, current_user.id, skip=skip, limit=limit)
     print(f"📊 API: Returning {len(rounds)} rounds")
     return rounds
+
+
+@app.get("/api/rounds/my/stats")
+async def get_my_rounds_stats(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    """Get comprehensive statistics for rounds assigned to the current user"""
+    try:
+        print(f"📊 API: Getting stats for user ID: {current_user.id}")
+        
+        # Get all rounds for the user (without pagination to get full stats)
+        rounds = get_rounds_by_user(db, current_user.id, skip=0, limit=1000)
+        
+        if not rounds:
+            return {
+                "total": 0,
+                "completed": 0,
+                "in_progress": 0,
+                "overdue": 0,
+                "scheduled": 0,
+                "avg_completion": 0,
+                "avg_compliance": 0,
+                "high_priority": 0
+            }
+        
+        # حساب الإحصائيات الأساسية
+        completed = [r for r in rounds if r.status == 'completed']
+        in_progress = [r for r in rounds if r.status == 'in_progress']
+        overdue = [r for r in rounds if r.status == 'overdue']
+        scheduled = [r for r in rounds if r.status == 'scheduled']
+        high_priority = [r for r in rounds if r.priority in ['urgent', 'high']]
+        
+        # حساب المتوسطات
+        avg_completion = round(
+            sum(r.completion_percentage or 0 for r in rounds) / len(rounds)
+        ) if rounds else 0
+        
+        # حساب متوسط الامتثال للجولات المكتملة فقط
+        completed_with_compliance = [r for r in completed if r.compliance_percentage is not None]
+        avg_compliance = round(
+            sum(r.compliance_percentage for r in completed_with_compliance) / len(completed_with_compliance)
+        ) if completed_with_compliance else 0
+        
+        stats = {
+            "total": len(rounds),
+            "completed": len(completed),
+            "in_progress": len(in_progress),
+            "overdue": len(overdue),
+            "scheduled": len(scheduled),
+            "avg_completion": avg_completion,
+            "avg_compliance": avg_compliance,
+            "high_priority": len(high_priority)
+        }
+        # Additional CAPA-related counts
+        try:
+            from models_updated import EvaluationResult, Capa
+            round_ids = [r.id for r in rounds]
+            needs_capa_count = 0
+            open_capa_count = 0
+            if round_ids:
+                needs_capa_count = db.query(EvaluationResult).filter(
+                    EvaluationResult.round_id.in_(round_ids),
+                    EvaluationResult.needs_capa == True
+                ).count()
+
+                open_capa_count = db.query(Capa).filter(
+                    Capa.round_id.in_(round_ids),
+                    Capa.status.in_(['pending', 'in_progress', 'assigned'])
+                ).count()
+
+            stats["needs_capa_count"] = int(needs_capa_count)
+            stats["open_capa_count"] = int(open_capa_count)
+        except Exception as e:
+            print(f"Warning calculating CAPA stats: {e}")
+            stats["needs_capa_count"] = 0
+            stats["open_capa_count"] = 0
+        
+        print(f"✅ Stats calculated: {stats}")
+        return stats
+        
+    except Exception as e:
+        print(f"❌ Error calculating stats: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"خطأ في حساب الإحصائيات: {str(e)}")
 
 
 # Round types endpoints

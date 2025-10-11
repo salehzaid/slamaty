@@ -95,8 +95,8 @@ const AppContent: React.FC = () => {
       <AnimatedSidebar onLogout={logout} />
       <MainContent onLogout={logout}>
         <Routes>
-            <Route path="/" element={<SimpleDashboard />} />
-            <Route path="/dashboard" element={<SimpleDashboard />} />
+            <Route path="/" element={<ReportsPage />} />
+            <Route path="/dashboard" element={<ReportsPage />} />
             <Route path="/rounds" element={<RoundsManagement />} />
             <Route path="/rounds/list" element={<RoundsListView />} />
             <Route path="/rounds/calendar" element={<RoundsCalendarView />} />
@@ -105,9 +105,9 @@ const AppContent: React.FC = () => {
             <Route path="/rounds/capa-integration" element={<CapaIntegrationRoundSelector />} />
             <Route path="/rounds/:roundId/capa-integration" element={<EvaluationCapaIntegration />} />
             {/* Deprecated traditional CAPA pages removed in favor of enhanced page */}
-            {/* Routes for /capa removed. Use /capa-enhanced instead. */}
-            <Route path="/capa-enhanced" element={<EnhancedCapaManagement />} />
-        <Route path="/capa-dashboard" element={<EnhancedCapaDashboardMain />} />
+            {/* Redirect old `/capa-enhanced` to `/capa-dashboard` */}
+            <Route path="/capa-dashboard" element={<EnhancedCapaDashboardMain />} />
+            <Route path="/capa-enhanced" element={<Navigate to="/capa-dashboard" replace />} />
             <Route path="/my-rounds" element={<MyRoundsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/departments" element={<DepartmentsManagement />} />

@@ -145,7 +145,10 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
       evaluations: Object.keys(evaluations).map(key => ({ 
         item_id: Number(key), 
         status: evaluations[Number(key)],
-        comments: comments[Number(key)] || ''
+        comments: comments[Number(key)] || '',
+        // include CAPA flag and note if user marked it
+        mark_needs_capa: (comments[Number(key)] || '').toString().toLowerCase().includes('#capa'),
+        capa_note: undefined
       })),
       notes
     }
@@ -482,10 +485,38 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
                                 <Textarea
                                   value={comments[item.id] || ''}
                                   onChange={(e) => !isCompleted && handleCommentChange(item.id, e.target.value)}
-                                  placeholder="أضف ملاحظاتك هنا...."
+                                  placeholder="أضف ملاحظاتك هنا.... (اكتب #capa إذا يلزم خطة تصحيحية)"
                                   disabled={isCompleted}
                                   className={`min-h-[80px] resize-none ${isCompleted ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 />
+                                {/* Quick CAPA start button if evaluator flagged the note */}
+                                { (comments[item.id] || '').toLowerCase().includes('#capa') && (
+                                  <div className="mt-2">
+                                    <Button size="sm" variant="outline" onClick={async () => {
+                                      try {
+                                        const confirmMsg = 'هل أنت متأكد أنك تريد بدء خطة تصحيحية لهذا العنصر؟'
+                                        if (!window.confirm(confirmMsg)) return
+
+                                        const payload = {
+                                          title: `CAPA - Round ${roundId} - Item ${item.id}`,
+                                          description: (comments[item.id] || '').slice(0, 250) || item.description || item.title,
+                                          round_id: roundId,
+                                          evaluation_item_id: item.id,
+                                          department: item.category_name || 'عام',
+                                          assigned_to_id: undefined,
+                                          sla_days: 14
+                                        }
+                                        const res = await apiClient.createCapa(payload)
+                                        alert('تم إنشاء خطة تصحيحية (إذا لم تكن موجودة مسبقاً).')
+                                      } catch (err) {
+                                        console.error('Failed to create CAPA:', err)
+                                        alert('حدث خطأ أثناء إنشاء خطة التصحيحية')
+                                      }
+                                    }}>
+                                      ابدأ خطة تصحيحية
+                                    </Button>
+                                  </div>
+                                )}
                               </div>
 
                             </div>

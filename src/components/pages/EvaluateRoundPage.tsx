@@ -9,6 +9,9 @@ const EvaluateRoundPage: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { user } = useAuth()
+  
+  // Get the previous page from location state, default to rounds list
+  const previousPage = (location.state as any)?.from || '/rounds/list'
 
   const handleSubmit = async (payload: any) => {
     try {
@@ -43,8 +46,8 @@ const EvaluateRoundPage: React.FC = () => {
         }
       })
       } else {
-        // All items passed, no CAPA needed
-        navigate('/rounds/my-rounds', { 
+        // All items passed, no CAPA needed - return to previous page
+        navigate(previousPage, { 
           state: { 
             message: 'تم إرسال التقييم بنجاح - جميع العناصر مطبقة',
             success: true 
@@ -58,7 +61,8 @@ const EvaluateRoundPage: React.FC = () => {
   }
 
   const handleCancel = () => {
-    navigate('/rounds/my-rounds')
+    // Return to the page the user came from
+    navigate(previousPage)
   }
 
   if (!roundId) {
@@ -67,10 +71,10 @@ const EvaluateRoundPage: React.FC = () => {
         <div className="text-center py-8">
           <h1 className="text-xl font-bold text-gray-900 mb-4">معرف الجولة غير صحيح</h1>
           <button 
-            onClick={() => navigate('/rounds/my-rounds')}
+            onClick={() => navigate(previousPage)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            العودة إلى جولاتي
+            العودة إلى الجولات
           </button>
         </div>
       </div>

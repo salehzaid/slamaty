@@ -49,14 +49,14 @@ class RoundBase(BaseModel):
     description: Optional[str] = None
     round_type: RoundType
     department: str
-    assigned_to: List[int] = []  # Changed to List[int] for user IDs
-    selected_categories: Optional[List[int]] = []  # Selected evaluation categories
+    assigned_to: List[int] = []  # List of user IDs
+    selected_categories: List[int] = []  # Selected evaluation category IDs (required, defaults to empty)
     scheduled_date: datetime
     deadline: Optional[Union[datetime, str]] = None  # Deadline for round completion - can be datetime or ISO string
     end_date: Optional[Union[datetime, str]] = None  # Calculated end date - can be datetime or ISO string
     priority: str = "medium"
     notes: Optional[str] = None
-    evaluation_items: Optional[List[int]] = []  # Added evaluation items
+    evaluation_items: List[int] = []  # List of evaluation item IDs (required, defaults to empty)
 
 class RoundCreate(RoundBase):
     round_code: Optional[str] = None  # Auto-generated
@@ -69,8 +69,11 @@ class RoundResponse(RoundBase):
     created_by_id: int
     created_at: datetime
     assigned_to: str  # JSON string in database for display
-    evaluation_items: Optional[str] = None  # JSON string of evaluation item IDs
-    
+    # Now stored as JSONB in DB, always returned as lists
+    selected_categories: List[int] = []  # JSONB array of category IDs
+    evaluation_items: List[int] = []  # JSONB array of evaluation item IDs
+    assigned_to_ids: List[int] = []  # JSONB array of assigned user IDs
+
     class Config:
         from_attributes = True
 
@@ -239,6 +242,9 @@ class EvaluationResultCreate(BaseModel):
     status: str  # expected: 'applied'|'not_applied'|'partial'|'na'
     comments: Optional[str] = None
     evidence_files: Optional[List[str]] = None
+    # Mark that this item needs a CAPA (user may add a short note)
+    mark_needs_capa: Optional[bool] = False
+    capa_note: Optional[str] = None
 
 
 class EvaluationsPayload(BaseModel):
@@ -253,6 +259,8 @@ class EvaluationResultResponse(BaseModel):
     score: int
     comments: Optional[str] = None
     evidence_files: Optional[str] = None
+    needs_capa: Optional[bool] = False
+    capa_note: Optional[str] = None
     evaluated_by: int
     evaluated_at: datetime
     

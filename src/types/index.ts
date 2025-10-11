@@ -67,10 +67,13 @@ export interface Round {
   assignedTo: string[];
   scheduledDate: string;
   deadline?: string; // Deadline for round completion
+  endDate?: string; // Calculated end date
   status: RoundStatus;
   priority: 'low' | 'medium' | 'high' | 'urgent';
   compliancePercentage: number;
   notes?: string;
+  evaluation_items?: number[]; // IDs of selected evaluation items
+  selected_categories?: number[]; // IDs of selected categories
   createdBy: string;
   createdAt: string;
 }

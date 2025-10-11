@@ -56,6 +56,11 @@ class EmailService:
             msg.attach(part1)
             msg.attach(part2)
             
+            # If sender credentials are not configured, skip sending email
+            if not self.sender_email or not self.sender_password:
+                logger.info(f"Email credentials not configured, skipping email to {to_email}")
+                return False
+
             # Send email
             context = ssl.create_default_context()
             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:

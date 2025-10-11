@@ -74,13 +74,13 @@ const ReportsPage: React.FC = () => {
         apiClient.getMonthlyRounds(months)
       ])
 
-      // Set the data
-      setDashboardStats(statsResponse.data)
-      setComplianceTrends((trendsResponse.data as any)?.trends || [])
-      setDepartmentPerformance((deptResponse.data as any)?.departments || [])
-      setRoundsByType((roundsTypeResponse.data as any)?.round_types || [])
-      setCapaStatusDistribution((capaStatusResponse.data as any)?.capa_status || [])
-      setMonthlyRounds((monthlyResponse.data as any)?.monthly_rounds || [])
+      // Set the data (support APIs that return either { data: ... } or raw object)
+      setDashboardStats(statsResponse?.data || statsResponse || null)
+      setComplianceTrends((trendsResponse?.data as any)?.trends || (trendsResponse as any)?.trends || [])
+      setDepartmentPerformance((deptResponse?.data as any)?.departments || (deptResponse as any)?.departments || [])
+      setRoundsByType((roundsTypeResponse?.data as any)?.round_types || (roundsTypeResponse as any)?.round_types || [])
+      setCapaStatusDistribution((capaStatusResponse?.data as any)?.capa_status || (capaStatusResponse as any)?.capa_status || [])
+      setMonthlyRounds((monthlyResponse?.data as any)?.monthly_rounds || (monthlyResponse as any)?.monthly_rounds || [])
 
     } catch (err) {
       console.error('Error loading reports data:', err)

@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey, Enum as SQLEnum, SmallInteger, Numeric
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
@@ -104,8 +105,8 @@ class Round(Base):
     description = Column(Text)
     round_type = Column(SQLEnum(RoundType), nullable=False)
     department = Column(String, nullable=False)
-    assigned_to = Column(Text, default='[]')  # JSON string of user IDs
-    assigned_to_ids = Column(Text, default='[]')  # JSON string of user IDs (numeric) for programmatic usage
+    assigned_to = Column(Text, default='[]')  # JSON string of user IDs (kept as Text for display)
+    assigned_to_ids = Column(JSONB, default='[]', nullable=False)  # JSONB array of user IDs (numeric) for programmatic usage
     scheduled_date = Column(DateTime(timezone=True), nullable=False)
     deadline = Column(DateTime(timezone=True), nullable=True)  # Deadline for round completion
     end_date = Column(DateTime(timezone=True), nullable=True)  # Calculated end date (scheduled_date + deadline days)
@@ -114,8 +115,8 @@ class Round(Base):
     compliance_percentage = Column(Integer, default=0)
     completion_percentage = Column(Integer, default=0)  # Percentage of evaluation items completed
     notes = Column(Text)
-    evaluation_items = Column(Text, default='[]')  # JSON string of evaluation item IDs
-    selected_categories = Column(Text, default='[]')  # JSON string of selected category IDs
+    evaluation_items = Column(JSONB, default='[]', nullable=False)  # JSONB array of evaluation item IDs
+    selected_categories = Column(JSONB, default='[]', nullable=False)  # JSONB array of selected category IDs
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
@@ -281,6 +282,10 @@ class EvaluationResult(Base):
     score = Column(Integer, nullable=False)  # 0-100
     comments = Column(Text)
     evidence_files = Column(Text)  # JSON array of file paths
+    # Flag indicating this evaluation item requires a CAPA
+    needs_capa = Column(Boolean, default=False)
+    # Short note provided by the evaluator about the needed CAPA
+    capa_note = Column(Text, nullable=True)
     evaluated_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     evaluated_at = Column(DateTime(timezone=True), server_default=func.now())
     

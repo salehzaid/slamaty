@@ -188,6 +188,10 @@ class ApiClient {
     return this.request(endpoint)
   }
 
+  async getMyRoundsStats() {
+    return this.request('/api/rounds/my/stats')
+  }
+
   async getRound(roundId: number) {
     return this.request(`/api/rounds/${roundId}`)
   }
@@ -395,8 +399,24 @@ class ApiClient {
     })
   }
 
+  async getCapasByRound(roundId: number) {
+    return this.request(`/api/capas?roundId=${roundId}`)
+  }
+
   async getEvaluationResults(roundId: number) {
-    return this.request(`/api/rounds/${roundId}/evaluation-results`)
+    return this.request(`/api/rounds/${roundId}/evaluations`)
+  }
+
+  async saveEvaluationDraft(roundId: number, payload: { evaluations: any[], notes?: string }) {
+    return this.request(`/api/rounds/${roundId}/evaluations/draft`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  // Backwards-compatible wrapper used elsewhere
+  async getRoundEvaluations(roundId: number) {
+    return this.getEvaluationResults(roundId)
   }
 }
 

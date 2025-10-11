@@ -111,14 +111,7 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
         },
       ]
     },
-    {
-      id: 'capa-enhanced',
-      label: 'الخطط التصحيحية المحسنة',
-      icon: Shield,
-      badge: 'NEW',
-      color: 'text-orange-600',
-      path: '/capa-enhanced'
-    },
+    // removed deprecated capa-enhanced menu item; redirect handles old links
     {
       id: 'capa-dashboard',
       label: 'داشبورد الخطط',
@@ -127,14 +120,7 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       color: 'text-blue-600',
       path: '/capa-dashboard'
     },
-    {
-      id: 'reports',
-      label: 'التقارير',
-      icon: BarChart3,
-      badge: null,
-      color: 'text-indigo-600',
-      path: '/reports'
-    },
+    // Reports removed from sidebar as requested
     {
       id: 'departments',
       label: 'الأقسام',

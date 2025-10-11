@@ -19,18 +19,55 @@ interface CompleteRoundFormProps {
 }
 
 const CompleteRoundForm: React.FC<CompleteRoundFormProps> = ({ onSubmit, onCancel, initialData, isEdit = false }) => {
-  const [formData, setFormData] = useState({
-    title: initialData?.title || '',
-    description: initialData?.description || '',
-    round_type: initialData?.roundType || initialData?.round_type || '',
-    department: initialData?.department || '', // Will be set from departments data
-    scheduled_date: initialData?.scheduledDate ? new Date(initialData.scheduledDate).toISOString().split('T')[0] : '',
-    deadline: initialData?.deadline || '7',
-    priority: initialData?.priority || 'medium',
-    selected_categories: initialData?.selected_categories || [] as number[],
-    selected_items: initialData?.evaluation_items ? (Array.isArray(initialData.evaluation_items) ? initialData.evaluation_items : JSON.parse(initialData.evaluation_items)) : [] as number[],
-    assigned_users: initialData?.assignedTo ? (Array.isArray(initialData.assignedTo) ? initialData.assignedTo : JSON.parse(initialData.assignedTo)) : [] as number[],
-    notes: initialData?.notes || ''
+  // Log initialData for debugging
+  React.useEffect(() => {
+    if (isEdit && initialData) {
+      console.log('CompleteRoundForm - Edit Mode initialData:', {
+        selected_categories: initialData.selected_categories,
+        evaluation_items: initialData.evaluation_items,
+        fullData: initialData
+      })
+    }
+  }, [isEdit, initialData])
+
+  const [formData, setFormData] = useState(() => {
+    const parsedCategories = initialData?.selected_categories 
+      ? (Array.isArray(initialData.selected_categories) 
+          ? initialData.selected_categories 
+          : JSON.parse(initialData.selected_categories)) 
+      : [] as number[]
+    
+    const parsedItems = initialData?.evaluation_items 
+      ? (Array.isArray(initialData.evaluation_items) 
+          ? initialData.evaluation_items 
+          : JSON.parse(initialData.evaluation_items)) 
+      : [] as number[]
+    
+    const parsedAssigned = initialData?.assignedTo 
+      ? (Array.isArray(initialData.assignedTo) 
+          ? initialData.assignedTo 
+          : JSON.parse(initialData.assignedTo)) 
+      : [] as number[]
+
+    console.log('CompleteRoundForm - Initializing formData:', {
+      parsedCategories,
+      parsedItems,
+      parsedAssigned
+    })
+
+    return {
+      title: initialData?.title || '',
+      description: initialData?.description || '',
+      round_type: initialData?.roundType || initialData?.round_type || '',
+      department: initialData?.department || '', // Will be set from departments data
+      scheduled_date: initialData?.scheduledDate ? new Date(initialData.scheduledDate).toISOString().split('T')[0] : '',
+      deadline: initialData?.deadline || '7',
+      priority: initialData?.priority || 'medium',
+      selected_categories: parsedCategories,
+      selected_items: parsedItems,
+      assigned_users: parsedAssigned,
+      notes: initialData?.notes || ''
+    }
   })
 
   const [roundCode] = useState(() => {
@@ -286,6 +323,7 @@ const CompleteRoundForm: React.FC<CompleteRoundFormProps> = ({ onSubmit, onCance
       round_type: convertNameToEnum(formData.round_type),
       assigned_to: formData.assigned_users, // Send array of user IDs
       evaluation_items: formData.selected_items, // Send array of evaluation item IDs
+      selected_categories: formData.selected_categories, // Ensure selected categories are sent
       scheduled_date: formData.scheduled_date ? `${formData.scheduled_date}T10:00:00` : null, // Convert date to datetime
       deadline: deadlineDate, // تاريخ المهلة المحسوب (scheduled_date + deadline days)
       end_date: endDate // تاريخ انتهاء الجولة المحسوب

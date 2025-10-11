@@ -40,6 +40,38 @@ export function useRounds(params?: { skip?: number; limit?: number }) {
           console.warn('Failed to parse assigned_to for round:', round.id, round.assigned_to)
         }
 
+        // Safely parse evaluation_items
+        let evaluationItems = []
+        try {
+          if (round.evaluation_items) {
+            if (typeof round.evaluation_items === 'string') {
+              evaluationItems = JSON.parse(round.evaluation_items)
+            } else if (Array.isArray(round.evaluation_items)) {
+              evaluationItems = round.evaluation_items
+            }
+          } else if (round.evaluationItems) {
+            evaluationItems = Array.isArray(round.evaluationItems) ? round.evaluationItems : []
+          }
+        } catch (e) {
+          console.warn('Failed to parse evaluation_items for round:', round.id, round.evaluation_items)
+        }
+
+        // Safely parse selected_categories
+        let selectedCategories = []
+        try {
+          if (round.selected_categories) {
+            if (typeof round.selected_categories === 'string') {
+              selectedCategories = JSON.parse(round.selected_categories)
+            } else if (Array.isArray(round.selected_categories)) {
+              selectedCategories = round.selected_categories
+            }
+          } else if (round.selectedCategories) {
+            selectedCategories = Array.isArray(round.selectedCategories) ? round.selectedCategories : []
+          }
+        } catch (e) {
+          console.warn('Failed to parse selected_categories for round:', round.id, round.selected_categories)
+        }
+
         return {
           id: round.id,
           roundCode: round.round_code || round.roundCode,
@@ -55,6 +87,8 @@ export function useRounds(params?: { skip?: number; limit?: number }) {
           priority: round.priority || 'medium',
           compliancePercentage: round.compliance_percentage || round.compliancePercentage || 0,
           notes: round.notes || '',
+          evaluation_items: evaluationItems,
+          selected_categories: selectedCategories,
           createdBy: round.created_by_id ? `مستخدم ${round.created_by_id}` : 'غير محدد',
           createdAt: round.created_at || round.createdAt || new Date().toISOString()
         }
@@ -136,6 +170,38 @@ export function useMyRounds(params?: { skip?: number; limit?: number }) {
           console.warn('Failed to parse assigned_to for round:', round.id, round.assigned_to)
         }
 
+        // Safely parse evaluation_items
+        let evaluationItems = []
+        try {
+          if (round.evaluation_items) {
+            if (typeof round.evaluation_items === 'string') {
+              evaluationItems = JSON.parse(round.evaluation_items)
+            } else if (Array.isArray(round.evaluation_items)) {
+              evaluationItems = round.evaluation_items
+            }
+          } else if (round.evaluationItems) {
+            evaluationItems = Array.isArray(round.evaluationItems) ? round.evaluationItems : []
+          }
+        } catch (e) {
+          console.warn('Failed to parse evaluation_items for round:', round.id, round.evaluation_items)
+        }
+
+        // Safely parse selected_categories
+        let selectedCategories = []
+        try {
+          if (round.selected_categories) {
+            if (typeof round.selected_categories === 'string') {
+              selectedCategories = JSON.parse(round.selected_categories)
+            } else if (Array.isArray(round.selected_categories)) {
+              selectedCategories = round.selected_categories
+            }
+          } else if (round.selectedCategories) {
+            selectedCategories = Array.isArray(round.selectedCategories) ? round.selectedCategories : []
+          }
+        } catch (e) {
+          console.warn('Failed to parse selected_categories for round:', round.id, round.selected_categories)
+        }
+
         return {
           id: round.id,
           roundCode: round.round_code || round.roundCode,
@@ -151,6 +217,8 @@ export function useMyRounds(params?: { skip?: number; limit?: number }) {
           priority: round.priority || 'medium',
           compliancePercentage: round.compliance_percentage || round.compliancePercentage || 0,
           notes: round.notes || '',
+          evaluation_items: evaluationItems,
+          selected_categories: selectedCategories,
           createdBy: round.created_by_id ? `مستخدم ${round.created_by_id}` : 'غير محدد',
           createdAt: round.created_at || round.createdAt || new Date().toISOString()
         }

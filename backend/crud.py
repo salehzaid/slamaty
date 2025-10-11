@@ -76,7 +76,7 @@ def update_user_data(db: Session, user_id: int, user, hashed_password: str):
         if 'phone' in user and user['phone'] is not None:
             db_user.phone = user['phone']
         if 'position' in user and user['position'] is not None:
-            db_user.position = user['position']
+            db_user.position = user.position
         if 'photo_url' in user and user['photo_url'] is not None:
             print(f"🔍 CRUD - Setting photo_url to: {user['photo_url']}")
             db_user.photo_url = user['photo_url']
@@ -198,18 +198,59 @@ def create_round(db: Session, round: RoundCreate, created_by_id: int):
         else:
             end_date_dt = round.end_date
     
-    # Handle assigned_to_ids separately with error handling
-    assigned_to_ids_json = json.dumps([])
+    # Handle assigned_to_ids - now using JSONB, store as Python list
+    assigned_to_ids_list = []
     if round.assigned_to and isinstance(round.assigned_to, list):
         try:
             # Convert to integers only if items are numeric
-            assigned_to_ids_json = json.dumps([int(x) for x in round.assigned_to if str(x).isdigit()])
+            assigned_to_ids_list = [int(x) for x in round.assigned_to if str(x).isdigit()]
+            print(f"✅ Parsed assigned_to_ids: {assigned_to_ids_list}")
         except Exception as e:
             print(f"⚠️ Warning: Could not convert assigned_to to IDs: {e}")
-            assigned_to_ids_json = json.dumps([])
+            assigned_to_ids_list = []
     
-    # Handle selected_categories with error handling
-    selected_categories_json = json.dumps(getattr(round, 'selected_categories', None) or [])
+    # Handle selected_categories - now using JSONB, store as Python list
+    selected_categories_list = []
+    try:
+        raw_selected = getattr(round, 'selected_categories', None)
+        if raw_selected is None:
+            selected_categories_list = []
+        elif isinstance(raw_selected, list):
+            # Validate all items are integers
+            selected_categories_list = [int(x) for x in raw_selected if isinstance(x, (int, str)) and str(x).isdigit()]
+            print(f"✅ Parsed selected_categories: {selected_categories_list}")
+        elif isinstance(raw_selected, str):
+            # if stored as JSON string like '[]' parse it
+            try:
+                parsed = json.loads(raw_selected)
+                if isinstance(parsed, list):
+                    selected_categories_list = [int(x) for x in parsed if isinstance(x, (int, str)) and str(x).isdigit()]
+                else:
+                    selected_categories_list = []
+            except json.JSONDecodeError:
+                print(f"⚠️ Warning: Could not parse selected_categories as JSON: {raw_selected}")
+                selected_categories_list = []
+        else:
+            # unknown type - coerce to empty list
+            print(f"⚠️ Warning: selected_categories has unexpected type: {type(raw_selected)}")
+            selected_categories_list = []
+    except Exception as e:
+        print(f"⚠️ Warning parsing selected_categories: {e}")
+        selected_categories_list = []
+    
+    # Handle evaluation_items - now using JSONB, store as Python list
+    evaluation_items_list = []
+    if round.evaluation_items:
+        try:
+            if isinstance(round.evaluation_items, list):
+                evaluation_items_list = [int(x) for x in round.evaluation_items if isinstance(x, (int, str)) and str(x).isdigit()]
+                print(f"✅ Parsed evaluation_items: {evaluation_items_list}")
+            else:
+                print(f"⚠️ Warning: evaluation_items has unexpected type: {type(round.evaluation_items)}")
+                evaluation_items_list = []
+        except Exception as e:
+            print(f"⚠️ Warning parsing evaluation_items: {e}")
+            evaluation_items_list = []
     
     db_round = Round(
         round_code=round_code,
@@ -218,15 +259,15 @@ def create_round(db: Session, round: RoundCreate, created_by_id: int):
         round_type=round.round_type,
         department=round.department,
         assigned_to=assigned_to_json,
-        assigned_to_ids=assigned_to_ids_json,
+        assigned_to_ids=assigned_to_ids_list,  # Now a Python list, stored as JSONB
         scheduled_date=round.scheduled_date,
         deadline=deadline_dt,
         end_date=end_date_dt,  # تاريخ انتهاء الجولة المحسوب
         priority=round.priority,
         notes=round.notes,
         created_by_id=created_by_id,
-        evaluation_items=json.dumps(round.evaluation_items) if round.evaluation_items else json.dumps([]),
-        selected_categories=selected_categories_json
+        evaluation_items=evaluation_items_list,  # Now a Python list, stored as JSONB
+        selected_categories=selected_categories_list  # Now a Python list, stored as JSONB
     )
     db.add(db_round)
     db.commit()
@@ -273,15 +314,17 @@ def update_round(db: Session, round_id: int, round_data: dict):
         # Convert assigned_to to JSON string if it's a list
         if isinstance(round_data['assigned_to'], list):
             db_round.assigned_to = json.dumps(round_data['assigned_to'])
-            # also store numeric IDs if items are numeric
+            # also store numeric IDs as Python list (JSONB)
             try:
                 numeric_ids = [int(x) for x in round_data['assigned_to'] if isinstance(x, (int, str)) and str(x).isdigit()]
-                db_round.assigned_to_ids = json.dumps(numeric_ids)
-            except Exception:
-                db_round.assigned_to_ids = json.dumps([])
+                db_round.assigned_to_ids = numeric_ids  # Store as Python list (JSONB)
+                print(f"✅ Updated assigned_to_ids: {numeric_ids}")
+            except Exception as e:
+                print(f"⚠️ Warning updating assigned_to_ids: {e}")
+                db_round.assigned_to_ids = []
         else:
             db_round.assigned_to = round_data['assigned_to']
-            db_round.assigned_to_ids = json.dumps([])
+            db_round.assigned_to_ids = []
     if 'scheduled_date' in round_data and round_data['scheduled_date'] is not None:
         db_round.scheduled_date = round_data['scheduled_date']
     if 'priority' in round_data and round_data['priority'] is not None:
@@ -289,17 +332,24 @@ def update_round(db: Session, round_id: int, round_data: dict):
     if 'notes' in round_data and round_data['notes'] is not None:
         db_round.notes = round_data['notes']
     if 'evaluation_items' in round_data and round_data['evaluation_items'] is not None:
-        # Convert evaluation_items to JSON string if it's a list
+        # Store as Python list (JSONB)
         if isinstance(round_data['evaluation_items'], list):
-            db_round.evaluation_items = json.dumps(round_data['evaluation_items'])
+            validated_items = [int(x) for x in round_data['evaluation_items'] if isinstance(x, (int, str)) and str(x).isdigit()]
+            db_round.evaluation_items = validated_items
+            print(f"✅ Updated evaluation_items: {validated_items}")
         else:
-            db_round.evaluation_items = round_data['evaluation_items']
+            print(f"⚠️ Warning: evaluation_items is not a list, setting to empty")
+            db_round.evaluation_items = []
     # Persist selected categories if provided
     if 'selected_categories' in round_data and round_data['selected_categories'] is not None:
+        # Store as Python list (JSONB)
         if isinstance(round_data['selected_categories'], list):
-            db_round.selected_categories = json.dumps(round_data['selected_categories'])
+            validated_categories = [int(x) for x in round_data['selected_categories'] if isinstance(x, (int, str)) and str(x).isdigit()]
+            db_round.selected_categories = validated_categories
+            print(f"✅ Updated selected_categories: {validated_categories}")
         else:
-            db_round.selected_categories = round_data['selected_categories']
+            print(f"⚠️ Warning: selected_categories is not a list, setting to empty")
+            db_round.selected_categories = []
     
     db.commit()
     db.refresh(db_round)
@@ -326,49 +376,60 @@ def get_rounds_by_status(db: Session, status: str):
     return db.query(Round).filter(Round.status == status).all()
 
 def get_rounds_by_user(db: Session, user_id: int, skip: int = 0, limit: int = 100):
-    """Get rounds assigned to a specific user"""
-    import json
+    """Get rounds assigned to a specific user using JSONB assigned_to_ids"""
     
     print(f"🔍 Getting rounds for user ID: {user_id}")
     
-    # First get the user to get their name
+    # Check if user exists
     user = get_user_by_id(db, user_id)
     if not user:
         print(f"❌ User with ID {user_id} not found")
         return []
     
-    user_name = f"{user.first_name} {user.last_name}"
-    print(f"👤 User name: '{user_name}'")
+    print(f"👤 User: {user.first_name} {user.last_name} (ID: {user_id})")
     
-    # Get all rounds and filter by user name in assigned_to JSON
-    all_rounds = db.query(Round).offset(skip).limit(limit * 2).all()  # Get more to account for filtering
-    print(f"📋 Found {len(all_rounds)} total rounds to check")
+    # Query rounds where assigned_to_ids JSONB array contains the user_id
+    # Using PostgreSQL JSONB operators: @> checks if left JSONB contains right JSONB
+    # We use text() to pass raw SQL for the JSONB comparison
+    user_rounds = db.query(Round).filter(
+        text(f"assigned_to_ids @> '[{user_id}]'::jsonb")
+    ).offset(skip).limit(limit).all()
     
-    user_rounds = []
+    print(f"🎯 Found {len(user_rounds)} rounds assigned to user ID {user_id}")
     
-    for round in all_rounds:
-        if round.assigned_to:
-            try:
-                # Parse the JSON string to get list of user names
-                assigned_user_names = json.loads(round.assigned_to)
-                print(f"🔍 Round {round.id}: assigned_to = {assigned_user_names}")
-                
-                if isinstance(assigned_user_names, list) and user_name in assigned_user_names:
-                    print(f"✅ Round {round.id} assigned to user '{user_name}'")
-                    user_rounds.append(round)
-                elif isinstance(assigned_user_names, str) and assigned_user_names == user_name:
-                    print(f"✅ Round {round.id} assigned to user '{user_name}'")
-                    user_rounds.append(round)
-            except (json.JSONDecodeError, TypeError):
-                # If JSON parsing fails, check if it's a string representation of the user name
-                if user_name in str(round.assigned_to):
-                    print(f"✅ Round {round.id} assigned to user '{user_name}' (fallback)")
-                    user_rounds.append(round)
+    # تحديث الحالة تلقائياً لكل جولة
+    from utils.status_calculator import calculate_round_status
     
-    print(f"🎯 Found {len(user_rounds)} rounds assigned to user '{user_name}'")
+    updated_count = 0
+    for round in user_rounds:
+        # حساب الحالة الجديدة
+        calculated_status = calculate_round_status(
+            round.scheduled_date,
+            round.deadline,
+            round.end_date,
+            round.completion_percentage or 0,
+            round.status
+        )
+        
+        # تحديث فقط إذا تغيرت الحالة
+        if round.status != calculated_status:
+            old_status = round.status
+            round.status = calculated_status
+            updated_count += 1
+            print(f"  🔄 Updated round {round.id} status: {old_status} → {calculated_status}")
+        
+        print(f"  ✓ Round {round.id}: {round.title} - Status: {round.status} - assigned_to_ids: {round.assigned_to_ids}")
     
-    # Return only the requested limit
-    return user_rounds[:limit]
+    # حفظ التغييرات إذا كانت هناك تحديثات
+    if updated_count > 0:
+        try:
+            db.commit()
+            print(f"✅ Updated {updated_count} round statuses")
+        except Exception as e:
+            db.rollback()
+            print(f"⚠️ Error updating round statuses: {e}")
+    
+    return user_rounds
 
 # CAPA CRUD operations
 def get_department_managers(db: Session, department_name: str):
@@ -444,11 +505,15 @@ def create_capa(db: Session, capa_data: dict, created_by_id: int):
         # ensure datetime if string provided
         if isinstance(target_date, str):
             try:
-                from dateutil import parser
-                target_date = parser.parse(target_date)
+                # Avoid optional dependency on python-dateutil; use fromisoformat as fallback
+                try:
+                    target_date = datetime.fromisoformat(target_date)
+                except Exception:
+                    from datetime import datetime as _dt, timedelta as _td
+                    target_date = _dt.now() + _td(days=30)
             except Exception:
-                from datetime import datetime, timedelta as _td
-                target_date = datetime.now() + _td(days=30)
+                from datetime import datetime as _dt, timedelta as _td
+                target_date = _dt.now() + _td(days=30)
     else:
         target_date = datetime.now() + timedelta(days=30)
     
@@ -593,6 +658,18 @@ def create_capa(db: Session, capa_data: dict, created_by_id: int):
     except Exception as e:
         print(f"⚠️ Failed to send CAPA notifications: {e}")
     
+    # Create an audit log entry for CAPA creation
+    try:
+        create_audit_log(db, {
+            "user_id": created_by_id,
+            "action": "create_capa",
+            "entity_type": "capa",
+            "entity_id": db_capa.id,
+            "new_values": json.dumps({"title": db_capa.title, "department": db_capa.department}, ensure_ascii=False)
+        })
+    except Exception as e:
+        print(f"⚠️ Warning: failed to create audit log for CAPA: {e}")
+
     return db_capa
 
 def get_capas(db: Session, skip: int = 0, limit: int = 100):
@@ -1211,6 +1288,13 @@ def create_evaluation_results(db: Session, round_id: int, evaluations: list, eva
             evidence_files=json.dumps(evidence) if evidence else None,
             evaluated_by=evaluator_id
         )
+        # If evaluator provided a flag/note for CAPA, store it on the evaluation result
+        try:
+            if isinstance(ev, dict) and ev.get('mark_needs_capa'):
+                db_result.needs_capa = True
+                db_result.capa_note = ev.get('capa_note') or comments
+        except Exception:
+            pass
         db.add(db_result)
         db.commit()
         db.refresh(db_result)
