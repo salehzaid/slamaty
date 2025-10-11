@@ -74,19 +74,19 @@ async def create_capa_endpoint(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Create a new CAPA plan"""
-    # Check permissions - only quality managers and super admins can create CAPAs
-    if current_user.role not in ["quality_manager", "super_admin"]:
-        raise HTTPException(
-            status_code=403,
-            detail="Only quality managers and super admins can create CAPA plans"
-        )
-    
+    """Create a new CAPA plan (permission enforced)
+
+    Allowed roles: super_admin, quality_manager, department_head
+    """
+    # Permission check
+    if current_user.role not in ["super_admin", "quality_manager", "department_head"]:
+        raise HTTPException(status_code=403, detail="You don't have permission to create CAPA plans")
+
     # Convert Pydantic models to JSON strings for database storage
     corrective_actions_json = json.dumps([action.dict() for action in capa.corrective_actions])
     preventive_actions_json = json.dumps([action.dict() for action in capa.preventive_actions])
     verification_steps_json = json.dumps([step.dict() for step in capa.verification_steps])
-    
+
     # Create CAPA data dict
     capa_data = {
         "title": capa.title,
@@ -103,11 +103,9 @@ async def create_capa_endpoint(
         "estimated_cost": capa.estimated_cost,
         "sla_days": capa.sla_days,
     }
-    
-    # Create CAPA in database
+
+    # Create CAPA in database with audit log
     db_capa = create_capa(db, capa_data, current_user.id)
-    
-    # Create audit log
     create_audit_log(db, {
         "user_id": current_user.id,
         "action": "create_capa",
@@ -115,7 +113,7 @@ async def create_capa_endpoint(
         "entity_id": db_capa.id,
         "new_values": json.dumps({"title": db_capa.title, "department": db_capa.department})
     })
-    
+
     return {
         "status": "success",
         "message": "CAPA plan created successfully",

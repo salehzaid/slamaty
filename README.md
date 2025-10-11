@@ -1,3 +1,28 @@
+# Sallamaty - Local dev & tests
+
+Prerequisites:
+- Docker & Docker Compose
+- Python 3.11
+
+Quick start (local using docker-compose):
+
+1. Start services:
+
+```bash
+docker-compose up -d --build
+```
+
+2. Wait for Postgres to be ready, then run migrations (if using Alembic) and seed if needed.
+
+3. Run backend tests locally (inside project root):
+
+```bash
+pytest backend/tests -q
+```
+
+Notes:
+- CI is configured in `.github/workflows/backend-ci.yml` to run pytest against a Postgres service.
+
 # نظام سلامتي - نظام إدارة جولات الجودة وسلامة المرضى
 
 نظام ويب متكامل لإدارة جولات الجودة وسلامة المرضى في المؤسسات الصحية.

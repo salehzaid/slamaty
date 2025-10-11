@@ -22,7 +22,7 @@ def create_users():
             "role": UserRole.SUPER_ADMIN,
             "position": "مدير النظام",
             "phone": "0501234567",
-            "password": "admin123"
+            "password": "123456"
         },
         {
             "username": "quality_manager",
@@ -32,7 +32,7 @@ def create_users():
             "role": UserRole.QUALITY_MANAGER,
             "position": "مديرة الجودة",
             "phone": "0501234568",
-            "password": "admin123"
+            "password": "123456"
         },
         {
             "username": "ed_head",
@@ -42,7 +42,7 @@ def create_users():
             "role": UserRole.DEPARTMENT_HEAD,
             "position": "رئيس قسم الطوارئ",
             "phone": "0501234569",
-            "password": "admin123"
+            "password": "123456"
         },
         {
             "username": "assessor1",
@@ -52,7 +52,7 @@ def create_users():
             "role": UserRole.ASSESSOR,
             "position": "مقيم جودة",
             "phone": "0501234570",
-            "password": "admin123"
+            "password": "123456"
         },
         {
             "username": "viewer1",
@@ -62,7 +62,7 @@ def create_users():
             "role": UserRole.VIEWER,
             "position": "مشاهد",
             "phone": "0501234571",
-            "password": "admin123"
+            "password": "123456"
         }
     ]
     

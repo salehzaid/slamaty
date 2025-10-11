@@ -413,7 +413,7 @@ const Dashboard: React.FC = () => {
               </button>
             )}
             
-            <button className="flex items-center gap-3 p-4 bg-orange-500/5 hover:bg-orange-500/10 rounded-lg transition-colors group">
+            <button onClick={() => window.location.href = '/capa-dashboard'} className="flex items-center gap-3 p-4 bg-orange-500/5 hover:bg-orange-500/10 rounded-lg transition-colors group">
               <div className="p-2 bg-orange-500 rounded-lg group-hover:bg-orange-500/90">
                 <AlertTriangle className="w-5 h-5 text-white" />
               </div>

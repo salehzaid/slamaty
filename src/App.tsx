@@ -8,12 +8,11 @@ import { RTLProvider } from './components/RTLProvider';
 import { ThemeProvider } from './components/ThemeProvider';
 import AnimatedSidebar from './components/AnimatedSidebar';
 import MainContent from './components/MainContent';
-import SimpleDashboard from './components/SimpleDashboard';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import TestRegisterPage from './components/TestRegisterPage';
 // Deprecated traditional CAPA components removed; use enhanced CAPA page instead
-import EnhancedCapaManagement from './components/pages/EnhancedCapaManagement'
+// EnhancedCapaManagement deprecated; kept for reference but not imported
 import EnhancedCapaDashboardMain from './components/dashboard/EnhancedCapaDashboardMain';
 import DepartmentsManagement from './components/pages/DepartmentsManagement';
 import DepartmentFormPage from './components/pages/DepartmentFormPage';
@@ -25,6 +24,7 @@ import DebugPage from './components/DebugPage';
 import UsersManagement from './components/pages/UsersManagement';
 import UnifiedEvaluationDashboard from './components/UnifiedEvaluationDashboard';
 import GamifiedEvaluationSystem from './components/GamifiedEvaluationSystem';
+import CapaManagement from './components/pages/CapaManagement';
 import EvaluationCategoriesPage from './components/pages/EvaluationCategoriesPage';
 import EvaluationItemsPage from './components/pages/EvaluationItemsPage';
 import EvaluateRoundPage from './components/pages/EvaluateRoundPage';
@@ -106,6 +106,7 @@ const AppContent: React.FC = () => {
             <Route path="/rounds/:roundId/capa-integration" element={<EvaluationCapaIntegration />} />
             {/* Deprecated traditional CAPA pages removed in favor of enhanced page */}
             {/* Redirect old `/capa-enhanced` to `/capa-dashboard` */}
+            <Route path="/capa" element={<CapaManagement />} />
             <Route path="/capa-dashboard" element={<EnhancedCapaDashboardMain />} />
             <Route path="/capa-enhanced" element={<Navigate to="/capa-dashboard" replace />} />
             <Route path="/my-rounds" element={<MyRoundsPage />} />

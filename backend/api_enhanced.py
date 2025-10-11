@@ -9,6 +9,7 @@ from datetime import date, datetime, timedelta
 import json
 
 from database import get_db
+from auth import get_current_user
 from crud_enhanced import (
     create_capa, get_capa, get_capas, update_capa, delete_capa,
     create_corrective_action, get_corrective_actions, update_corrective_action, delete_corrective_action,
@@ -32,12 +33,22 @@ router = APIRouter()
 # ==================== CAPA Endpoints ====================
 
 @router.post("/capas/", response_model=CapaResponse)
-def create_capa_endpoint(capa: CapaCreate, db: Session = Depends(get_db)):
-    """Create a new CAPA"""
+def create_capa_endpoint(
+    capa: CapaCreate,
+    current_user: any = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Create a new CAPA (permission-checked)"""
+    # Allow department_head, quality_manager and super_admin to create CAPAs
     try:
+        if current_user.role not in ["super_admin", "quality_manager", "department_head"]:
+            raise HTTPException(status_code=403, detail="You don't have permission to create CAPA plans")
+
         capa_data = capa.dict()
-        db_capa = create_capa(db, capa_data)
+        db_capa = create_capa(db, capa_data, current_user.id)
         return db_capa
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

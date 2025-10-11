@@ -8,7 +8,7 @@ const EvaluateRoundPage: React.FC = () => {
   const { roundId } = useParams<{ roundId: string }>()
   const navigate = useNavigate()
   const location = useLocation()
-  const { user } = useAuth()
+  useAuth() // keep auth for side-effects; user not needed here
   
   // Get the previous page from location state, default to rounds list
   const previousPage = (location.state as any)?.from || '/rounds/list'
@@ -37,7 +37,8 @@ const EvaluateRoundPage: React.FC = () => {
       const roundResponse = await apiClient.getRound(parseInt(roundId!))
       const roundObj = (roundResponse as any)?.data || (roundResponse as any)
 
-      navigate('/capa-enhanced', {
+      // Redirect to the new capa dashboard route
+      navigate('/capa-dashboard', {
         state: {
           message: 'تم إرسال التقييم بنجاح. يوجد عناصر غير مكتملة تحتاج إلى خطة تصحيحية',
           success: true,

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -94,6 +95,18 @@ const EnhancedCapaDashboardMain: React.FC = () => {
     const view = dashboardViews.find(v => v.id === viewId)
     return view ? view.description : ''
   }
+
+const DashboardCapaCTA: React.FC = () => {
+  const navigate = useNavigate()
+  return (
+    <button
+      onClick={() => navigate('/capa')}
+      className="ml-4 px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+    >
+      إدارة CAPA
+    </button>
+  )
+}
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -215,6 +228,8 @@ const EnhancedCapaDashboardMain: React.FC = () => {
                       مستخدم #{selectedUserId}
                     </Badge>
                   )}
+                  {/* CTA: Open full CAPA management page */}
+                  <DashboardCapaCTA />
                 </div>
               </div>
             </div>

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import CapaDashboard from '@/components/CapaDashboard'
 import EnhancedCapaForm from '@/components/forms/EnhancedCapaForm'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/context/AuthContext'
 import { apiClient } from '@/lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -146,6 +147,7 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
   }, [])
 
   // If navigated with failing items, show them in a quick panel for creating CAPAs
+  const { hasPermission } = useAuth()
   const [failingItems, setFailingItems] = useState<any[]>(failingItemsFromEval)
 
   useEffect(() => {
@@ -437,7 +439,7 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
         
         <EnhancedCapaForm
           onSubmit={handleFormSubmit}
-          initialData={selectedCapa || undefined}
+          initialData={(selectedCapa as any) || undefined}
           onCancel={handleBackToDashboard}
           departments={departments}
           users={users}
@@ -653,14 +655,18 @@ const EnhancedCapaManagement: React.FC<EnhancedCapaManagementProps> = ({
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {failingItems.map((it, idx) => (
+                {failingItems.map((it, idx) => (
                 <div key={idx} className="flex items-center justify-between p-2 border rounded">
                   <div>
                     <div className="font-medium">{it.item_title || `عنصر ${it.item_id}`}</div>
                     <div className="text-sm text-gray-600">نتيجة: {it.status} - تعليقات: {it.comments || '-'}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button onClick={() => handleCreateCapaForItem(it)}>إنشاء خطة لهذا العنصر</Button>
+                    {hasPermission(['super_admin','quality_manager','department_head']) ? (
+                      <Button onClick={() => handleCreateCapaForItem(it)}>إنشاء خطة لهذا العنصر</Button>
+                    ) : (
+                      <Button disabled title="ليس لديك صلاحية">مقيّد</Button>
+                    )}
                   </div>
                 </div>
               ))}
