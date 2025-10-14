@@ -1,5 +1,18 @@
 // Use VITE_API_URL if provided at build time; otherwise default to same-origin in production
-const API_BASE_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8000')
+const API_BASE_URL = (() => {
+  // Prefer explicit env var at build time
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL
+  // At runtime (dev server) if the frontend is served from vite (ports 5173/5174)
+  // default backend to localhost:8000 so API calls reach the running backend container
+  if (typeof window !== 'undefined') {
+    const port = window.location.port
+    if (port === '5173' || port === '5174') {
+      return 'http://127.0.0.1:8000'
+    }
+    return window.location.origin
+  }
+  return 'http://localhost:8000'
+})()
 
 interface ApiResponse<T> {
   data: T
@@ -301,6 +314,34 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(capaData),
     })
+  }
+
+  async getItemsNeedingCapa(roundId: number) {
+    return this.request(`/api/rounds/${roundId}/items-needing-capa`)
+  }
+
+  async createCapa(payload: any) {
+    return this.request(`/api/capa/`, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+  }
+
+  async markEvaluationNeedsCapa(resultId: number, needsCapa: boolean, capaNote: string = '') {
+    return this.request(`/api/evaluation-results/${resultId}/mark-needs-capa`, {
+      method: 'POST',
+      body: JSON.stringify({ needs_capa: needsCapa, capa_note: capaNote }),
+    })
+  }
+
+  async getAllCapasUnfiltered(params?: { skip?: number; limit?: number }) {
+    const qs = params ? `?skip=${params.skip || 0}&limit=${params.limit || 100}` : ''
+    return this.request(`/api/capa/all${qs}`)
+  }
+
+  // Wrapper for round non-compliant items
+  async getRoundNonCompliantItems(roundId: number) {
+    return this.request(`/api/capas/rounds/${roundId}/non-compliant`)
   }
 
   async updateCapa(capaId: number, capaData: any) {

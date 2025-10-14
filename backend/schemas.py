@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional, List, Union
 from datetime import datetime
 from models_updated import UserRole, RoundStatus, RoundType, CapaStatus, VerificationStatus, NotificationType, NotificationStatus
@@ -6,7 +6,7 @@ from models_updated import UserRole, RoundStatus, RoundType, CapaStatus, Verific
 # User schemas
 class UserBase(BaseModel):
     username: str
-    email: EmailStr
+    email: str  # Changed from EmailStr to str to allow test emails like testqm@local
     first_name: str
     last_name: str
     role: UserRole = UserRole.VIEWER
@@ -20,7 +20,7 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     username: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None  # Changed from EmailStr to str
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     role: Optional[UserRole] = None

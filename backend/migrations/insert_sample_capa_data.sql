@@ -20,38 +20,38 @@
 
 INSERT INTO capas (id, title, description, department, priority, status, target_date, created_by_id, created_at, risk_score) VALUES
 -- Overdue CAPAs
-(1001, 'تحسين إجراءات غسل اليدين', 'تطوير وتنفيذ بروتوكول محسّن لغسل اليدين في قسم الطوارئ لتقليل معدلات العدوى', 'قسم الطوارئ', 'urgent', 'in_progress', NOW() - INTERVAL '5 days', 1, NOW() - INTERVAL '15 days', 18),
-(1002, 'تحديث بروتوكول الأدوية', 'مراجعة وتحديث بروتوكول إدارة الأدوية عالية الخطورة', 'الصيدلية', 'urgent', 'pending', NOW() - INTERVAL '3 days', 1, NOW() - INTERVAL '10 days', 20),
+(1001, 'تحسين إجراءات غسل اليدين', 'تطوير وتنفيذ بروتوكول محسّن لغسل اليدين في قسم الطوارئ لتقليل معدلات العدوى', 'قسم الطوارئ', 'urgent', 'IN_PROGRESS', NOW() - INTERVAL '5 days', 1, NOW() - INTERVAL '15 days', 18),
+(1002, 'تحديث بروتوكول الأدوية', 'مراجعة وتحديث بروتوكول إدارة الأدوية عالية الخطورة', 'الصيدلية', 'urgent', 'PENDING', NOW() - INTERVAL '3 days', 1, NOW() - INTERVAL '10 days', 20),
 
 -- In Progress CAPAs
-(1003, 'تدريب الطاقم على مكافحة العدوى', 'برنامج تدريبي شامل للطاقم الطبي حول بروتوكولات مكافحة العدوى الحديثة', 'العناية المركزة', 'high', 'in_progress', NOW() + INTERVAL '7 days', 1, NOW() - INTERVAL '5 days', 15),
-(1004, 'تحسين نظام تخزين الأدوية', 'تطوير نظام تخزين آمن ومنظم للأدوية في قسم الأطفال', 'قسم الأطفال', 'high', 'in_progress', NOW() + INTERVAL '10 days', 1, NOW() - INTERVAL '8 days', 12),
-(1005, 'مراجعة إجراءات التعقيم', 'مراجعة شاملة لإجراءات التعقيم في غرف العمليات', 'قسم الجراحة', 'high', 'in_progress', NOW() + INTERVAL '12 days', 1, NOW() - INTERVAL '6 days', 16),
-(1006, 'تحسين الوثائق الطبية', 'تطوير نظام محسّن للوثائق الطبية الإلكترونية', 'قسم السجلات', 'medium', 'in_progress', NOW() + INTERVAL '15 days', 1, NOW() - INTERVAL '10 days', 8),
+(1003, 'تدريب الطاقم على مكافحة العدوى', 'برنامج تدريبي شامل للطاقم الطبي حول بروتوكولات مكافحة العدوى الحديثة', 'العناية المركزة', 'high', 'IN_PROGRESS', NOW() + INTERVAL '7 days', 1, NOW() - INTERVAL '5 days', 15),
+(1004, 'تحسين نظام تخزين الأدوية', 'تطوير نظام تخزين آمن ومنظم للأدوية في قسم الأطفال', 'قسم الأطفال', 'high', 'IN_PROGRESS', NOW() + INTERVAL '10 days', 1, NOW() - INTERVAL '8 days', 12),
+(1005, 'مراجعة إجراءات التعقيم', 'مراجعة شاملة لإجراءات التعقيم في غرف العمليات', 'قسم الجراحة', 'high', 'IN_PROGRESS', NOW() + INTERVAL '12 days', 1, NOW() - INTERVAL '6 days', 16),
+(1006, 'تحسين الوثائق الطبية', 'تطوير نظام محسّن للوثائق الطبية الإلكترونية', 'قسم السجلات', 'medium', 'IN_PROGRESS', NOW() + INTERVAL '15 days', 1, NOW() - INTERVAL '10 days', 8),
 
 -- Pending CAPAs
-(1007, 'خطة طوارئ الحرائق', 'تحديث وتحسين خطة إخلاء الطوارئ في حالة الحرائق', 'السلامة والصحة المهنية', 'urgent', 'pending', NOW() + INTERVAL '5 days', 1, NOW() - INTERVAL '2 days', 19),
-(1008, 'تحسين نظام الإنذار', 'صيانة وتحسين نظام الإنذار الطبي في وحدة العناية المركزة', 'العناية المركزة', 'high', 'pending', NOW() + INTERVAL '8 days', 1, NOW() - INTERVAL '3 days', 14),
-(1009, 'مراجعة بروتوكول العزل', 'مراجعة وتحديث بروتوكولات العزل للمرضى المعديين', 'مكافحة العدوى', 'high', 'pending', NOW() + INTERVAL '10 days', 1, NOW() - INTERVAL '4 days', 13),
-(1010, 'تدريب على معدات السلامة', 'برنامج تدريبي على استخدام معدات السلامة الجديدة', 'السلامة والصحة المهنية', 'medium', 'pending', NOW() + INTERVAL '20 days', 1, NOW() - INTERVAL '5 days', 9),
+(1007, 'خطة طوارئ الحرائق', 'تحديث وتحسين خطة إخلاء الطوارئ في حالة الحرائق', 'السلامة والصحة المهنية', 'urgent', 'PENDING', NOW() + INTERVAL '5 days', 1, NOW() - INTERVAL '2 days', 19),
+(1008, 'تحسين نظام الإنذار', 'صيانة وتحسين نظام الإنذار الطبي في وحدة العناية المركزة', 'العناية المركزة', 'high', 'PENDING', NOW() + INTERVAL '8 days', 1, NOW() - INTERVAL '3 days', 14),
+(1009, 'مراجعة بروتوكول العزل', 'مراجعة وتحديث بروتوكولات العزل للمرضى المعديين', 'مكافحة العدوى', 'high', 'PENDING', NOW() + INTERVAL '10 days', 1, NOW() - INTERVAL '4 days', 13),
+(1010, 'تدريب على معدات السلامة', 'برنامج تدريبي على استخدام معدات السلامة الجديدة', 'السلامة والصحة المهنية', 'medium', 'PENDING', NOW() + INTERVAL '20 days', 1, NOW() - INTERVAL '5 days', 9),
 
 -- Verification/Implemented CAPAs
-(1011, 'تحديث بروتوكول نقل الدم', 'تحديث إجراءات نقل الدم والتحقق من الفصيلة', 'المختبر', 'high', 'verification', NOW() + INTERVAL '5 days', 1, NOW() - INTERVAL '20 days', 11),
-(1012, 'تحسين نظافة المرافق', 'تطبيق معايير جديدة لنظافة وتعقيم المرافق العامة', 'خدمات النظافة', 'medium', 'verification', NOW() + INTERVAL '7 days', 1, NOW() - INTERVAL '18 days', 7),
-(1013, 'مراجعة صلاحيات الدخول', 'تحديث نظام صلاحيات الدخول للمناطق الحساسة', 'تقنية المعلومات', 'high', 'implemented', NOW() + INTERVAL '3 days', 1, NOW() - INTERVAL '25 days', 10),
+(1011, 'تحديث بروتوكول نقل الدم', 'تحديث إجراءات نقل الدم والتحقق من الفصيلة', 'المختبر', 'high', 'VERIFICATION', NOW() + INTERVAL '5 days', 1, NOW() - INTERVAL '20 days', 11),
+(1012, 'تحسين نظافة المرافق', 'تطبيق معايير جديدة لنظافة وتعقيم المرافق العامة', 'خدمات النظافة', 'medium', 'VERIFICATION', NOW() + INTERVAL '7 days', 1, NOW() - INTERVAL '18 days', 7),
+(1013, 'مراجعة صلاحيات الدخول', 'تحديث نظام صلاحيات الدخول للمناطق الحساسة', 'تقنية المعلومات', 'high', 'IMPLEMENTED', NOW() + INTERVAL '3 days', 1, NOW() - INTERVAL '25 days', 10),
 
 -- Verified CAPAs
-(1014, 'تحسين إدارة المخلفات الطبية', 'تطوير نظام متكامل لإدارة والتخلص من المخلفات الطبية الخطرة', 'إدارة المخلفات', 'medium', 'verified', NOW() + INTERVAL '10 days', 1, NOW() - INTERVAL '30 days', 8),
-(1015, 'تحديث أجهزة المراقبة', 'تحديث وصيانة أجهزة مراقبة العلامات الحيوية', 'الهندسة الطبية', 'medium', 'verified', NOW() + INTERVAL '15 days', 1, NOW() - INTERVAL '28 days', 6),
+(1014, 'تحسين إدارة المخلفات الطبية', 'تطوير نظام متكامل لإدارة والتخلص من المخلفات الطبية الخطرة', 'إدارة المخلفات', 'medium', 'VERIFIED', NOW() + INTERVAL '10 days', 1, NOW() - INTERVAL '30 days', 8),
+(1015, 'تحديث أجهزة المراقبة', 'تحديث وصيانة أجهزة مراقبة العلامات الحيوية', 'الهندسة الطبية', 'medium', 'VERIFIED', NOW() + INTERVAL '15 days', 1, NOW() - INTERVAL '28 days', 6),
 
 -- Closed CAPAs
-(1016, 'تحسين إجراءات التسجيل', 'تبسيط وتحسين إجراءات تسجيل المرضى الجدد', 'الاستقبال', 'low', 'closed', NOW() + INTERVAL '20 days', 1, NOW() - INTERVAL '35 days', 4),
-(1017, 'تحديث لوحات الإرشاد', 'استبدال وتحديث لوحات الإرشاد في جميع أنحاء المستشفى', 'المرافق العامة', 'low', 'closed', NOW() + INTERVAL '25 days', 1, NOW() - INTERVAL '40 days', 3),
+(1016, 'تحسين إجراءات التسجيل', 'تبسيط وتحسين إجراءات تسجيل المرضى الجدد', 'الاستقبال', 'low', 'CLOSED', NOW() + INTERVAL '20 days', 1, NOW() - INTERVAL '35 days', 4),
+(1017, 'تحديث لوحات الإرشاد', 'استبدال وتحديث لوحات الإرشاد في جميع أنحاء المستشفى', 'المرافق العامة', 'low', 'CLOSED', NOW() + INTERVAL '25 days', 1, NOW() - INTERVAL '40 days', 3),
 
 -- Additional Medium Priority CAPAs
-(1018, 'مراجعة سياسة الزيارات', 'تحديث سياسة زيارة المرضى بما يتوافق مع معايير السلامة', 'الإدارة', 'medium', 'in_progress', NOW() + INTERVAL '14 days', 1, NOW() - INTERVAL '7 days', 8),
-(1019, 'تحسين نظام الحجز', 'تطوير نظام إلكتروني محسّن لحجز المواعيد', 'تقنية المعلومات', 'medium', 'pending', NOW() + INTERVAL '30 days', 1, NOW() - INTERVAL '3 days', 7),
-(1020, 'تدريب على الإسعافات الأولية', 'برنامج تدريب متقدم للإسعافات الأولية للطاقم غير الطبي', 'التدريب', 'low', 'pending', NOW() + INTERVAL '45 days', 1, NOW() - INTERVAL '2 days', 5);
+(1018, 'مراجعة سياسة الزيارات', 'تحديث سياسة زيارة المرضى بما يتوافق مع معايير السلامة', 'الإدارة', 'medium', 'IN_PROGRESS', NOW() + INTERVAL '14 days', 1, NOW() - INTERVAL '7 days', 8),
+(1019, 'تحسين نظام الحجز', 'تطوير نظام إلكتروني محسّن لحجز المواعيد', 'تقنية المعلومات', 'medium', 'PENDING', NOW() + INTERVAL '30 days', 1, NOW() - INTERVAL '3 days', 7),
+(1020, 'تدريب على الإسعافات الأولية', 'برنامج تدريب متقدم للإسعافات الأولية للطاقم غير الطبي', 'التدريب', 'low', 'PENDING', NOW() + INTERVAL '45 days', 1, NOW() - INTERVAL '2 days', 5);
 
 -- =====================================================
 -- Insert Sample Actions
@@ -60,30 +60,30 @@ INSERT INTO capas (id, title, description, department, priority, status, target_
 -- Actions for CAPA 1001 (Overdue, In Progress)
 INSERT INTO capa_actions (capa_id, action_type, task, description, assigned_to, assigned_to_id, due_date, status, completion_percentage, created_at) VALUES
 (1001, 'corrective', 'تقييم الوضع الحالي لممارسات غسل اليدين', 'إجراء تقييم شامل للممارسات الحالية وتحديد نقاط الضعف', 'أحمد الفارسي', 1, NOW() - INTERVAL '10 days', 'completed', 100, NOW() - INTERVAL '15 days'),
-(1001, 'corrective', 'تطوير بروتوكول محسّن', 'إنشاء بروتوكول جديد بناءً على أفضل الممارسات العالمية', 'سارة أحمد', 1, NOW() - INTERVAL '3 days', 'in_progress', 70, NOW() - INTERVAL '12 days'),
-(1001, 'preventive', 'تدريب الطاقم على البروتوكول الجديد', 'عقد جلسات تدريبية لجميع العاملين', 'محمد السالم', 1, NOW() + INTERVAL '2 days', 'pending', 0, NOW() - INTERVAL '10 days'),
-(1001, 'verification', 'مراجعة الامتثال', 'مراجعة دورية للتأكد من الالتزام بالبروتوكول', 'فاطمة الزهراني', 1, NOW() + INTERVAL '7 days', 'pending', 0, NOW() - INTERVAL '10 days');
+(1001, 'corrective', 'تطوير بروتوكول محسّن', 'إنشاء بروتوكول جديد بناءً على أفضل الممارسات العالمية', 'سارة أحمد', 1, NOW() - INTERVAL '3 days', 'IN_PROGRESS', 70, NOW() - INTERVAL '12 days'),
+(1001, 'preventive', 'تدريب الطاقم على البروتوكول الجديد', 'عقد جلسات تدريبية لجميع العاملين', 'محمد السالم', 1, NOW() + INTERVAL '2 days', 'open', 0, NOW() - INTERVAL '10 days'),
+(1001, 'verification', 'مراجعة الامتثال', 'مراجعة دورية للتأكد من الالتزام بالبروتوكول', 'فاطمة الزهراني', 1, NOW() + INTERVAL '7 days', 'open', 0, NOW() - INTERVAL '10 days');
 
 -- Actions for CAPA 1002 (Overdue, Pending)
 INSERT INTO capa_actions (capa_id, action_type, task, description, assigned_to, assigned_to_id, due_date, status, completion_percentage, created_at) VALUES
-(1002, 'corrective', 'مراجعة البروتوكول الحالي', 'تحليل شامل للبروتوكول الحالي وتحديد المشاكل', 'خالد الدوسري', 1, NOW() - INTERVAL '2 days', 'pending', 0, NOW() - INTERVAL '10 days'),
-(1002, 'corrective', 'تحديث قائمة الأدوية عالية الخطورة', 'تحديث القائمة وفقاً لأحدث التوصيات', 'نورة الشمري', 1, NOW() + INTERVAL '1 day', 'pending', 0, NOW() - INTERVAL '8 days'),
-(1002, 'preventive', 'إنشاء نظام تنبيهات إلكتروني', 'تطوير نظام تنبيهات للأدوية عالية الخطورة', 'عبدالله التميمي', 1, NOW() + INTERVAL '5 days', 'pending', 0, NOW() - INTERVAL '8 days');
+(1002, 'corrective', 'مراجعة البروتوكول الحالي', 'تحليل شامل للبروتوكول الحالي وتحديد المشاكل', 'خالد الدوسري', 1, NOW() - INTERVAL '2 days', 'open', 0, NOW() - INTERVAL '10 days'),
+(1002, 'corrective', 'تحديث قائمة الأدوية عالية الخطورة', 'تحديث القائمة وفقاً لأحدث التوصيات', 'نورة الشمري', 1, NOW() + INTERVAL '1 day', 'open', 0, NOW() - INTERVAL '8 days'),
+(1002, 'preventive', 'إنشاء نظام تنبيهات إلكتروني', 'تطوير نظام تنبيهات للأدوية عالية الخطورة', 'عبدالله التميمي', 1, NOW() + INTERVAL '5 days', 'open', 0, NOW() - INTERVAL '8 days');
 
 -- Actions for CAPA 1003 (In Progress)
 INSERT INTO capa_actions (capa_id, action_type, task, description, assigned_to, assigned_to_id, due_date, status, completion_percentage, created_at) VALUES
 (1003, 'corrective', 'تطوير محتوى التدريب', 'إعداد مواد تدريبية شاملة', 'ريم القحطاني', 1, NOW() - INTERVAL '2 days', 'completed', 100, NOW() - INTERVAL '5 days'),
-(1003, 'corrective', 'جدولة جلسات التدريب', 'تنظيم جدول زمني لجميع الفئات', 'أحمد المالكي', 1, NOW() + INTERVAL '1 day', 'in_progress', 60, NOW() - INTERVAL '3 days'),
-(1003, 'preventive', 'إنشاء مواد مرجعية', 'تطوير دليل مرجعي سريع للموظفين', 'سعيد الغامدي', 1, NOW() + INTERVAL '4 days', 'in_progress', 40, NOW() - INTERVAL '2 days'),
-(1003, 'verification', 'اختبار ما بعد التدريب', 'إجراء اختبارات لتقييم فعالية التدريب', 'ليلى الحربي', 1, NOW() + INTERVAL '6 days', 'pending', 0, NOW() - INTERVAL '2 days');
+(1003, 'corrective', 'جدولة جلسات التدريب', 'تنظيم جدول زمني لجميع الفئات', 'أحمد المالكي', 1, NOW() + INTERVAL '1 day', 'IN_PROGRESS', 60, NOW() - INTERVAL '3 days'),
+(1003, 'preventive', 'إنشاء مواد مرجعية', 'تطوير دليل مرجعي سريع للموظفين', 'سعيد الغامدي', 1, NOW() + INTERVAL '4 days', 'IN_PROGRESS', 40, NOW() - INTERVAL '2 days'),
+(1003, 'verification', 'اختبار ما بعد التدريب', 'إجراء اختبارات لتقييم فعالية التدريب', 'ليلى الحربي', 1, NOW() + INTERVAL '6 days', 'open', 0, NOW() - INTERVAL '2 days');
 
 -- Actions for CAPA 1004-1010 (Various statuses)
 INSERT INTO capa_actions (capa_id, action_type, task, assigned_to, assigned_to_id, due_date, status, completion_percentage, created_at) VALUES
-(1004, 'corrective', 'تقييم نظام التخزين الحالي', 'مروان العتيبي', 1, NOW() + INTERVAL '3 days', 'in_progress', 50, NOW() - INTERVAL '8 days'),
+(1004, 'corrective', 'تقييم نظام التخزين الحالي', 'مروان العتيبي', 1, NOW() + INTERVAL '3 days', 'IN_PROGRESS', 50, NOW() - INTERVAL '8 days'),
 (1004, 'corrective', 'شراء وحدات تخزين جديدة', 'هند الراشد', 1, NOW() + INTERVAL '8 days', 'pending', 0, NOW() - INTERVAL '6 days'),
 (1004, 'preventive', 'تدريب الموظفين على النظام الجديد', 'عمر الشهري', 1, NOW() + INTERVAL '9 days', 'pending', 0, NOW() - INTERVAL '6 days'),
 
-(1005, 'corrective', 'مراجعة إجراءات التعقيم الحالية', 'منى البلوي', 1, NOW() + INTERVAL '4 days', 'in_progress', 65, NOW() - INTERVAL '6 days'),
+(1005, 'corrective', 'مراجعة إجراءات التعقيم الحالية', 'منى البلوي', 1, NOW() + INTERVAL '4 days', 'IN_PROGRESS', 65, NOW() - INTERVAL '6 days'),
 (1005, 'corrective', 'تحديث قوائم التحقق', 'طارق الزهراني', 1, NOW() + INTERVAL '10 days', 'in_progress', 30, NOW() - INTERVAL '4 days'),
 (1005, 'verification', 'اختبار فعالية التعقيم', 'رنا الخالدي', 1, NOW() + INTERVAL '11 days', 'pending', 0, NOW() - INTERVAL '4 days'),
 
@@ -120,21 +120,23 @@ INSERT INTO capa_actions (capa_id, action_type, task, assigned_to, assigned_to_i
 -- =====================================================
 
 -- Events for various CAPAs (showing progression)
+-- Ensure referenced action IDs exist before inserting events that reference them.
+-- For events that referenced action_id 1/2 etc., we rely on the sample actions inserted above. If sequences differ, update action_id values accordingly.
 INSERT INTO timeline_events (capa_id, event_type, title, description, user_id, user_name, action_id, new_status, created_at) VALUES
 -- CAPA 1001 Timeline
-(1001, 'capa_created', 'إنشاء خطة تصحيحية', 'تم إنشاء خطة تصحيحية جديدة لتحسين إجراءات غسل اليدين', 1, 'المدير العام', NULL, 'pending', NOW() - INTERVAL '15 days'),
-(1001, 'status_change', 'تغيير الحالة', 'تم تغيير الحالة من pending إلى in_progress', 1, 'المدير العام', NULL, 'in_progress', NOW() - INTERVAL '14 days'),
-(1001, 'action_completed', 'إنجاز إجراء', 'تم إنجاز تقييم الوضع الحالي', 1, 'أحمد الفارسي', 1, 'completed', NOW() - INTERVAL '10 days'),
-(1001, 'action_started', 'بدء إجراء', 'بدء تطوير بروتوكول محسّن', 1, 'سارة أحمد', 2, 'in_progress', NOW() - INTERVAL '8 days'),
+(1001, 'capa_created', 'إنشاء خطة تصحيحية', 'تم إنشاء خطة تصحيحية جديدة لتحسين إجراءات غسل اليدين', 1, 'المدير العام', NULL, 'PENDING', NOW() - INTERVAL '15 days'),
+(1001, 'status_change', 'تغيير الحالة', 'تم تغيير الحالة من pending إلى in_progress', 1, 'المدير العام', NULL, 'IN_PROGRESS', NOW() - INTERVAL '14 days'),
+(1001, 'action_completed', 'إنجاز إجراء', 'تم إنجاز تقييم الوضع الحالي', 1, 'أحمد الفارسي', 1, 'COMPLETED', NOW() - INTERVAL '10 days'),
+(1001, 'action_started', 'بدء إجراء', 'بدء تطوير بروتوكول محسّن', 1, 'سارة أحمد', 2, 'IN_PROGRESS', NOW() - INTERVAL '8 days'),
 
 -- CAPA 1002 Timeline
-(1002, 'capa_created', 'إنشاء خطة تصحيحية', 'خطة تصحيحية لتحديث بروتوكول الأدوية', 1, 'المدير العام', NULL, 'pending', NOW() - INTERVAL '10 days'),
+(1002, 'capa_created', 'إنشاء خطة تصحيحية', 'خطة تصحيحية لتحديث بروتوكول الأدوية', 1, 'المدير العام', NULL, 'PENDING', NOW() - INTERVAL '10 days'),
 (1002, 'comment_added', 'إضافة ملاحظة', 'تم تصنيف هذه الخطة كعاجلة بسبب المخاطر العالية', 1, 'مدير الجودة', NULL, NULL, NOW() - INTERVAL '9 days'),
 
 -- CAPA 1003 Timeline
-(1003, 'capa_created', 'إنشاء خطة تصحيحية', 'برنامج تدريبي شامل لمكافحة العدوى', 1, 'المدير العام', NULL, 'pending', NOW() - INTERVAL '5 days'),
-(1003, 'status_change', 'تغيير الحالة', 'بدء تنفيذ الخطة', 1, 'مدير التدريب', NULL, 'in_progress', NOW() - INTERVAL '4 days'),
-(1003, 'action_completed', 'إنجاز إجراء', 'تم إنجاز تطوير محتوى التدريب', 1, 'ريم القحطاني', NULL, 'completed', NOW() - INTERVAL '2 days'),
+(1003, 'capa_created', 'إنشاء خطة تصحيحية', 'برنامج تدريبي شامل لمكافحة العدوى', 1, 'المدير العام', NULL, 'PENDING', NOW() - INTERVAL '5 days'),
+(1003, 'status_change', 'تغيير الحالة', 'بدء تنفيذ الخطة', 1, 'مدير التدريب', NULL, 'IN_PROGRESS', NOW() - INTERVAL '4 days'),
+(1003, 'action_completed', 'إنجاز إجراء', 'تم إنجاز تطوير محتوى التدريب', 1, 'ريم القحطاني', NULL, 'COMPLETED', NOW() - INTERVAL '2 days'),
 
 -- CAPA 1011 Timeline (Verification)
 (1011, 'capa_created', 'إنشاء خطة تصحيحية', 'تحديث بروتوكول نقل الدم', 1, 'المدير العام', NULL, 'pending', NOW() - INTERVAL '20 days'),

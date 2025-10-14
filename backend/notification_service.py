@@ -4,8 +4,8 @@ from datetime import datetime
 import logging
 
 from crud import (
-    create_notification, 
-    get_user_notification_settings, 
+    create_notification,
+    get_user_notification_settings,
     get_users_with_notification_preference,
     update_notification_email_sent
 )
@@ -197,6 +197,57 @@ class NotificationService:
             entity_type="CAPA",
             entity_id=capa_id
         )
+    
+    def send_capa_created_notification(
+        self,
+        capa_id: int,
+        capa_title: str,
+        evaluation_item_title: str,
+        assigned_user_id: Optional[int] = None,
+        quality_manager_ids: Optional[List[int]] = None,
+        created_by_name: str = ""
+    ) -> int:
+        """
+        Send notification when a new CAPA is created
+        Notifies the assigned user and quality managers
+        """
+        success_count = 0
+        
+        # Notify assigned user
+        if assigned_user_id:
+            title = "خطة تصحيحية جديدة تم إنشاؤها"
+            message = f"تم إنشاء خطة تصحيحية جديدة '{capa_title}' للعنصر: {evaluation_item_title}"
+            if created_by_name:
+                message += f" من قبل {created_by_name}"
+            
+            if self.send_notification(
+                user_id=assigned_user_id,
+                title=title,
+                message=message,
+                notification_type=NotificationType.CAPA_CREATED,
+                entity_type="CAPA",
+                entity_id=capa_id
+            ):
+                success_count += 1
+        
+        # Notify quality managers
+        if quality_manager_ids:
+            title = "خطة تصحيحية جديدة"
+            message = f"تم إنشاء خطة تصحيحية '{capa_title}' لعنصر التقييم: {evaluation_item_title}"
+            
+            for qm_id in quality_manager_ids:
+                if self.send_notification(
+                    user_id=qm_id,
+                    title=title,
+                    message=message,
+                    notification_type=NotificationType.CAPA_CREATED,
+                    entity_type="CAPA",
+                    entity_id=capa_id,
+                    send_email=False  # Don't spam with emails
+                ):
+                    success_count += 1
+        
+        return success_count
     
     def send_system_update_notification(
         self,

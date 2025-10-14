@@ -1,579 +1,1276 @@
-INFO:     Will watch for changes in these directories: ['/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend']
+INFO:     Will watch for changes in these directories: ['/Users/salehalzaid/Documents/massdeigners/salamah_rounds']
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [61857] using WatchFiles
-INFO:     Started server process [61860]
+INFO:     Started reloader process [42598] using WatchFiles
+INFO:     Started server process [42612]
+INFO:     Waiting for application startup.
+WARNING:  WatchFiles detected changes in 'backend/schemas.py'. Reloading...
+INFO:     Application startup complete.
+INFO:     Started server process [42614]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 [DB] Using database: salamaty_db
-INFO:     127.0.0.1:54194 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54513 - "GET / HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54513 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54615 - "OPTIONS /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54616 - "OPTIONS /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54619 - "OPTIONS /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54620 - "OPTIONS /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54615 - "OPTIONS /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54623 - "OPTIONS /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54616 - "OPTIONS /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54624 - "OPTIONS /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54619 - "GET /rounds HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:54620 - "GET /capa HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:54615 - "GET /users HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:54623 - "GET /departments HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:54616 - "GET /capa HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:54624 - "GET /rounds HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:54620 - "GET /users HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:54619 - "GET /departments HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:54651 - "OPTIONS /auth/signin HTTP/1.1" 200 OK
-(trapped) error reading bcrypt version
-Traceback (most recent call last):
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
-    version = _bcrypt.__about__.__version__
-              ^^^^^^^^^^^^^^^^^
-AttributeError: module 'bcrypt' has no attribute '__about__'
-INFO:     127.0.0.1:54651 - "POST /auth/signin HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54651 - "GET /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54655 - "GET /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54657 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54656 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54651 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54662 - "GET /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54657 - "GET /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54656 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54656 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54657 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54656 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54657 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54664 - "OPTIONS /departments/5 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54664 - "PUT /departments/5 HTTP/1.1" 422 Unprocessable Content
-INFO:     127.0.0.1:54664 - "PUT /departments/5 HTTP/1.1" 422 Unprocessable Content
-INFO:     127.0.0.1:54664 - "DELETE /departments/5 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54664 - "GET /departments HTTP/1.1" 200 OK
-WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+[DB] Engine created successfully
+✅ CORS enabled for all localhost origins
+[WARN] Notifications router not loaded: No module named 'crud_notifications'
+INFO:     127.0.0.1:55541 - "GET /api/dashboard/stats/ HTTP/1.1" 403 Forbidden
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:55566 - "GET /api/dashboard/stats/ HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55670 - "GET /api/dashboard/stats/ HTTP/1.1" 403 Forbidden
+Error getting dashboard stats: (psycopg2.errors.UndefinedTable) relation "capa_dashboard_stats" does not exist
+LINE 1: SELECT * FROM capa_dashboard_stats
+                      ^
+
+[SQL: SELECT * FROM capa_dashboard_stats]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[DB] Unexpected database error: 500: خطأ في جلب إحصائيات الداشبورد: (psycopg2.errors.UndefinedTable) relation "capa_dashboard_stats" does not exist
+LINE 1: SELECT * FROM capa_dashboard_stats
+                      ^
+
+[SQL: SELECT * FROM capa_dashboard_stats]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:     127.0.0.1:56356 - "GET /api/dashboard/stats/ HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:56380 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56380 - "GET /api/notifications HTTP/1.1" 200 OK
+Error getting dashboard stats: (psycopg2.errors.UndefinedTable) relation "capa_dashboard_stats" does not exist
+LINE 1: SELECT * FROM capa_dashboard_stats
+                      ^
+
+[SQL: SELECT * FROM capa_dashboard_stats]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[DB] Unexpected database error: 500: خطأ في جلب إحصائيات الداشبورد: (psycopg2.errors.UndefinedTable) relation "capa_dashboard_stats" does not exist
+LINE 1: SELECT * FROM capa_dashboard_stats
+                      ^
+
+[SQL: SELECT * FROM capa_dashboard_stats]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:     127.0.0.1:56380 - "GET /api/dashboard/stats/ HTTP/1.1" 500 Internal Server Error
+Error getting dashboard stats: (psycopg2.errors.UndefinedTable) relation "capa_dashboard_stats" does not exist
+LINE 1: SELECT * FROM capa_dashboard_stats
+                      ^
+
+[SQL: SELECT * FROM capa_dashboard_stats]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[DB] Unexpected database error: 500: خطأ في جلب إحصائيات الداشبورد: (psycopg2.errors.UndefinedTable) relation "capa_dashboard_stats" does not exist
+LINE 1: SELECT * FROM capa_dashboard_stats
+                      ^
+
+[SQL: SELECT * FROM capa_dashboard_stats]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:     127.0.0.1:56380 - "GET /api/dashboard/stats/ HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:56645 - "GET /api/dashboard/stats/ HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:56658 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56658 - "OPTIONS /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56658 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56658 - "OPTIONS /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56661 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56666 - "GET /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56666 - "GET /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56670 - "OPTIONS /api/departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56672 - "OPTIONS /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56673 - "OPTIONS /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56675 - "OPTIONS /api/departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56676 - "OPTIONS /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56678 - "OPTIONS /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56670 - "GET /api/departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56672 - "GET /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56670 - "GET /api/departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56678 - "GET /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56670 - "GET /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56678 - "GET /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56678 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56670 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56678 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56670 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56678 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56678 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56834 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56834 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56834 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56834 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56834 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56834 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56834 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56834 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:56950 - "GET /api/reports/basic/?period=month HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:56950 - "GET /api/reports/basic/?period=month HTTP/1.1" 401 Unauthorized
+WARNING:  WatchFiles detected changes in 'node_modules/flatted/python/flatted.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [61860]
-INFO:     Started server process [71795]
+INFO:     Finished server process [42614]
+INFO:     Started server process [44277]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-[DB] Using database: salamaty_db
-INFO:     127.0.0.1:54711 - "PUT /departments/1 HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:54715 - "POST /auth/signin HTTP/1.1" 400 Bad Request
-INFO:     127.0.0.1:54717 - "PUT /departments/1 HTTP/1.1" 403 Forbidden
-INFO:     127.0.0.1:54722 - "POST /auth/signin HTTP/1.1" 400 Bad Request
-(trapped) error reading bcrypt version
-Traceback (most recent call last):
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
-    version = _bcrypt.__about__.__version__
-              ^^^^^^^^^^^^^^^^^
-AttributeError: module 'bcrypt' has no attribute '__about__'
-INFO:     127.0.0.1:54726 - "POST /auth/signin HTTP/1.1" 200 OK
-🔧 Updating department 1 with data: {'name': 'التمريض المحدث', 'name_en': 'Updated Nursing', 'code': 'NUR', 'floor': 'الطابق الأول', 'building': 'المبنى A', 'managers': []}
-✅ Department data validated: name='التمريض المحدث' name_en='Updated Nursing' code='NUR' floor='الطابق الأول' building='المبنى A' description=None managers=[]
-✅ Department 1 updated successfully
-INFO:     127.0.0.1:54728 - "PUT /departments/1 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54737 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54738 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54744 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54745 - "GET /users HTTP/1.1" 200 OK
-WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'node_modules/flatted/python/flatted.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [71795]
-INFO:     Started server process [75398]
+INFO:     Finished server process [44277]
+INFO:     Started server process [44344]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 [DB] Using database: salamaty_db
-INFO:     127.0.0.1:54751 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54752 - "GET /users HTTP/1.1" 200 OK
-WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [75398]
-INFO:     Started server process [75565]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-[DB] Using database: salamaty_db
-INFO:     127.0.0.1:54798 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54799 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54798 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54799 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54802 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54816 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54802 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54816 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54816 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54802 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54818 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54802 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54802 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54818 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54816 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54857 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54857 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54816 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54816 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54857 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54857 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54816 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54961 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54962 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54961 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54965 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54965 - "OPTIONS /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54961 - "OPTIONS /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54962 - "OPTIONS /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54966 - "OPTIONS /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54965 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54966 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54962 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54965 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55005 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55006 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55006 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55005 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55006 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55005 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55008 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55038 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55008 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55041 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55042 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55058 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55079 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55082 - "OPTIONS /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55079 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55082 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55079 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55087 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55088 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55087 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55088 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55088 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55087 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55088 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55087 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55090 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55088 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55088 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55088 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55090 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55087 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55090 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55093 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55093 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55093 - "OPTIONS /departments/4 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55103 - "OPTIONS /departments/4 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55103 - "GET /departments/4 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55093 - "GET /departments/4 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55106 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55107 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55106 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55107 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55124 - "GET /departments HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:55125 - "GET /users HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:55124 - "GET /users HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:55127 - "GET /departments HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:55202 - "OPTIONS /auth/signin HTTP/1.1" 200 OK
-(trapped) error reading bcrypt version
-Traceback (most recent call last):
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
-    version = _bcrypt.__about__.__version__
-              ^^^^^^^^^^^^^^^^^
-AttributeError: module 'bcrypt' has no attribute '__about__'
-INFO:     127.0.0.1:55202 - "POST /auth/signin HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55202 - "OPTIONS /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55205 - "OPTIONS /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55202 - "OPTIONS /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55207 - "OPTIONS /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55205 - "OPTIONS /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55210 - "OPTIONS /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55211 - "OPTIONS /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55212 - "OPTIONS /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55207 - "GET /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55202 - "GET /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55205 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55212 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55211 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55210 - "GET /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55212 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55205 - "GET /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55229 - "GET /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55232 - "GET /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55247 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55248 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55248 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55251 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55248 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55251 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55251 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55247 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55251 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55247 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55247 - "OPTIONS /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55251 - "OPTIONS /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55247 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55251 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55252 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55262 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55262 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55265 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55343 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55344 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55344 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55343 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55343 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55344 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55348 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55343 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55348 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55343 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55343 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55348 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55348 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55343 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55343 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55348 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55343 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55348 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55348 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55343 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56328 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56330 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56328 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56334 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56357 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56359 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56357 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56359 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56375 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56375 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56378 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56375 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56837 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56838 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56838 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56842 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56842 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56838 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56838 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56842 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56868 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56868 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56868 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56868 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56868 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56874 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56874 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56868 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56868 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56874 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56874 - "OPTIONS /departments/6 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56868 - "OPTIONS /departments/6 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56874 - "GET /departments/6 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56868 - "GET /departments/6 HTTP/1.1" 200 OK
-🔧 Updating department 6 with data: {'name': 'النساء والولادة', 'name_en': 'Obstetrics', 'code': 'OBS', 'floor': 'الارضي', 'building': 'الادارة', 'managers': [24, 19]}
-✅ Department data validated: name='النساء والولادة' name_en='Obstetrics' code='OBS' floor='الارضي' building='الادارة' description=None managers=[24, 19]
-✅ Department 6 updated successfully
-INFO:     127.0.0.1:56922 - "PUT /departments/6 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56922 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56924 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56922 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56924 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56989 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56991 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56991 - "GET /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56989 - "GET /departments/13 HTTP/1.1" 200 OK
-🔧 Updating department 13 with data: {'name': 'قسم الاختبار من React', 'name_en': 'Test Department from React', 'code': 'DEPT-001', 'floor': 'الاول', 'building': 'التنويم', 'managers': [24, 19, 20]}
-✅ Department data validated: name='قسم الاختبار من React' name_en='Test Department from React' code='DEPT-001' floor='الاول' building='التنويم' description=None managers=[24, 19, 20]
-✅ Department 13 updated successfully
-INFO:     127.0.0.1:56999 - "PUT /departments/13 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56999 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57001 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56999 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57004 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57006 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57006 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57006 - "OPTIONS /departments/2 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57008 - "OPTIONS /departments/2 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57006 - "GET /departments/2 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57008 - "GET /departments/2 HTTP/1.1" 200 OK
-🔧 Updating department 2 with data: {'name': 'الطوارئ', 'name_en': None, 'code': 'EMR', 'floor': 'الارضي', 'building': 'التنويم', 'managers': [22, 1]}
-✅ Department data validated: name='الطوارئ' name_en=None code='EMR' floor='الارضي' building='التنويم' description=None managers=[22, 1]
-✅ Department 2 updated successfully
-INFO:     127.0.0.1:57013 - "PUT /departments/2 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57013 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57015 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57013 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57018 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57020 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57020 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57026 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57027 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57029 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57026 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57026 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57029 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57465 - "OPTIONS /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57467 - "OPTIONS /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57468 - "OPTIONS /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57469 - "OPTIONS /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57465 - "GET /departments HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:57468 - "GET /users HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:57469 - "GET /departments HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:57467 - "GET /users HTTP/1.1" 401 Unauthorized
-INFO:     127.0.0.1:57467 - "OPTIONS /auth/signin HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57467 - "POST /auth/signin HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57467 - "OPTIONS /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57469 - "OPTIONS /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57481 - "OPTIONS /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57467 - "OPTIONS /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57469 - "GET /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57481 - "GET /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57465 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57468 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57469 - "GET /rounds HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57467 - "GET /capa HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57465 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57468 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57488 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57489 - "GET /users HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57488 - "GET /departments HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57489 - "GET /users HTTP/1.1" 200 OK
-WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [75565]
-INFO:     Started server process [6211]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-(trapped) error reading bcrypt version
-Traceback (most recent call last):
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
-    version = _bcrypt.__about__.__version__
-              ^^^^^^^^^^^^^^^^^
-AttributeError: module 'bcrypt' has no attribute '__about__'
-[DB] Using database: salamaty_db
-INFO:     127.0.0.1:57527 - "POST /auth/signin HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57530 - "POST /capa HTTP/1.1" 500 Internal Server Error
+[DB] Engine created successfully
+✅ CORS enabled for all localhost origins
+[WARN] Notifications router not loaded: No module named 'crud_notifications'
+INFO:     127.0.0.1:57389 - "OPTIONS /api/auth/signin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57389 - "POST /api/auth/signin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57389 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57391 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57399 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57395 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57397 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57400 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57389 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57391 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57397 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57395 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57400 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57399 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57412 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57412 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57415 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57415 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57412 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57415 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57419 - "GET /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57419 - "GET /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57427 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57427 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57429 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57429 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57427 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57427 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57690 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57686 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57688 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57684 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57693 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57694 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57688 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57690 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57686 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57694 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57693 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57684 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+🔍 [API] Fetching rounds from database for user 1
+🔍 [API] Database session: <sqlalchemy.orm.session.Session object at 0x106bab6b0>
+✅ [API] Database connection test successful
+✅ [API] Successfully fetched 19 rounds
+📋 [API] First round: ID=100, Title=جولة اختبار
+INFO:     127.0.0.1:57787 - "GET /api/rounds HTTP/1.1" 200 OK
+🔍 [API] Fetching rounds from database for user 1
+🔍 [API] Database session: <sqlalchemy.orm.session.Session object at 0x106babd40>
+✅ [API] Database connection test successful
+✅ [API] Successfully fetched 19 rounds
+📋 [API] First round: ID=100, Title=جولة اختبار
+INFO:     127.0.0.1:57787 - "GET /api/rounds HTTP/1.1" 200 OK
+🔍 API: Getting rounds for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+[DB] Unexpected database error: No module named 'utils'
+INFO:     127.0.0.1:57798 - "GET /api/rounds/my HTTP/1.1" 500 Internal Server Error
 ERROR:    Exception in ASGI application
 Traceback (most recent call last):
-  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 256, in create_capa
-    status = CapaStatus.ASSIGNED
-             ^^^^^^^^^^
-NameError: name 'CapaStatus' is not defined
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+  File "/opt/homebrew/lib/python3.13/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
     result = await app(  # type: ignore[func-returns-value]
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         self.scope, self.receive, self.send
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
     return await self.app(scope, receive, send)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/applications.py", line 1054, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/applications.py", line 1133, in __call__
     await super().__call__(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/applications.py", line 113, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/applications.py", line 113, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 186, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/errors.py", line 186, in __call__
     raise exc
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
     await self.app(scope, receive, _send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/cors.py", line 85, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/cors.py", line 144, in simple_response
     await self.app(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 716, in __call__
-    await self.middleware_stack(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 736, in app
-    await route.handle(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 290, in handle
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
     await self.app(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 78, in app
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 123, in app
     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 75, in app
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 109, in app
     response = await f(request)
                ^^^^^^^^^^^^^^^^
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/routing.py", line 302, in app
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 387, in app
     raw_response = await run_endpoint_function(
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     ...<3 lines>...
     )
     ^
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/routing.py", line 213, in run_endpoint_function
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 288, in run_endpoint_function
     return await dependant.call(**values)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 172, in create_new_capa
-    return create_capa(db, capa, current_user.id)
-  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 275, in create_capa
-    status = CapaStatus.PENDING
-             ^^^^^^^^^^
-NameError: name 'CapaStatus' is not defined
-INFO:     127.0.0.1:57534 - "OPTIONS /departments/13 HTTP/1.1" 200 OK
-🔧 Updating department 13 with data: {'name': 'قسم الاختبار من React', 'name_en': 'Test Department from React', 'code': 'DEPT-001', 'floor': 'الاول', 'building': 'التنويم', 'description': None, 'managers': '[24, 19, 20]', 'id': 13, 'is_active': True, 'created_at': '2025-09-09T18:02:27.236453+03:00', 'updated_at': None, 'isActive': True}
-❌ Department validation error: 1 validation error for DepartmentCreate
-managers
-  Input should be a valid list [type=list_type, input_value='[24, 19, 20]', input_type=str]
-    For further information visit https://errors.pydantic.dev/2.11/v/list_type
-INFO:     127.0.0.1:57534 - "PUT /departments/13 HTTP/1.1" 400 Bad Request
-INFO:     127.0.0.1:57540 - "POST /capa HTTP/1.1" 500 Internal Server Error
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 917, in get_my_rounds
+    rounds = get_rounds_by_user(db, current_user.id, skip=skip, limit=limit)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 929, in get_my_rounds_stats
+    rounds = get_rounds_by_user(db, current_user.id, skip=0, limit=1000)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+❌ Error calculating stats: No module named 'utils'
+[DB] Unexpected database error: 500: خطأ في حساب الإحصائيات: No module named 'utils'
+INFO:     127.0.0.1:57800 - "GET /api/rounds/my/stats HTTP/1.1" 500 Internal Server Error
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 929, in get_my_rounds_stats
+    rounds = get_rounds_by_user(db, current_user.id, skip=0, limit=1000)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+🔍 API: Getting rounds for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+❌ Error calculating stats: No module named 'utils'
+[DB] Unexpected database error: No module named 'utils'
+[DB] Unexpected database error: 500: خطأ في حساب الإحصائيات: No module named 'utils'
+INFO:     127.0.0.1:57804 - "GET /api/rounds/my HTTP/1.1" 500 Internal Server Error
 ERROR:    Exception in ASGI application
 Traceback (most recent call last):
-  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 256, in create_capa
-    status = CapaStatus.ASSIGNED
-             ^^^^^^^^^^
-NameError: name 'CapaStatus' is not defined
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+  File "/opt/homebrew/lib/python3.13/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
     result = await app(  # type: ignore[func-returns-value]
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         self.scope, self.receive, self.send
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
     return await self.app(scope, receive, send)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/applications.py", line 1054, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/applications.py", line 1133, in __call__
     await super().__call__(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/applications.py", line 113, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/applications.py", line 113, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 186, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/errors.py", line 186, in __call__
     raise exc
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
     await self.app(scope, receive, _send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/cors.py", line 85, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/cors.py", line 144, in simple_response
     await self.app(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 716, in __call__
-    await self.middleware_stack(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 736, in app
-    await route.handle(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 290, in handle
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
     await self.app(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 78, in app
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 123, in app
     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/starlette/routing.py", line 75, in app
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 109, in app
     response = await f(request)
                ^^^^^^^^^^^^^^^^
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/routing.py", line 302, in app
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 387, in app
     raw_response = await run_endpoint_function(
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     ...<3 lines>...
     )
     ^
-  File "/Users/salehalzaid/Documents/massdeigners/salamaty-system/backend/venv/lib/python3.13/site-packages/fastapi/routing.py", line 213, in run_endpoint_function
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 288, in run_endpoint_function
     return await dependant.call(**values)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 172, in create_new_capa
-    return create_capa(db, capa, current_user.id)
-  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 275, in create_capa
-    status = CapaStatus.PENDING
-             ^^^^^^^^^^
-NameError: name 'CapaStatus' is not defined
-WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 917, in get_my_rounds
+    rounds = get_rounds_by_user(db, current_user.id, skip=skip, limit=limit)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+INFO:     127.0.0.1:57800 - "GET /api/rounds/my/stats HTTP/1.1" 500 Internal Server Error
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 929, in get_my_rounds_stats
+    rounds = get_rounds_by_user(db, current_user.id, skip=0, limit=1000)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+❌ Error calculating stats: No module named 'utils'
+[DB] Unexpected database error: 500: خطأ في حساب الإحصائيات: No module named 'utils'
+INFO:     127.0.0.1:57800 - "GET /api/rounds/my/stats HTTP/1.1" 500 Internal Server Error
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 929, in get_my_rounds_stats
+    rounds = get_rounds_by_user(db, current_user.id, skip=0, limit=1000)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+❌ Error calculating stats: No module named 'utils'
+[DB] Unexpected database error: 500: خطأ في حساب الإحصائيات: No module named 'utils'
+INFO:     127.0.0.1:57800 - "GET /api/rounds/my/stats HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:57806 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57806 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57809 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57809 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57806 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57806 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57814 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57817 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57821 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57819 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57823 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57824 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57814 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57819 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57817 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57824 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57821 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57823 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'backend/crud_notifications.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [6211]
-INFO:     Started server process [8025]
+INFO:     Finished server process [44344]
+INFO:     Started server process [47058]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
+[DB] Using database: salamaty_db
+[DB] Engine created successfully
+✅ CORS enabled for all localhost origins
+[WARN] Notifications router not loaded: No module named 'crud_notifications'
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:58612 - "GET /api/actions/ HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:58628 - "GET /api/actions/ HTTP/1.1" 401 Unauthorized
+WARNING:  WatchFiles detected changes in 'backend/crud_notifications.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [8025]
-INFO:     Started server process [8098]
+INFO:     Finished server process [47058]
+INFO:     Started server process [47314]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
+[DB] Using database: salamaty_db
+[DB] Engine created successfully
+✅ CORS enabled for all localhost origins
+[WARN] Notifications router not loaded: No module named 'crud_notifications'
+INFO:     127.0.0.1:59090 - "GET /api/capa/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59092 - "GET /api/actions/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59093 - "GET /api/alerts/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59094 - "GET /api/timeline/events/?start_date=2025-10-01T00%3a00%3a00Z&end_date=2025-10-31T23%3a59%3a59Z HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59095 - "GET /api/rounds/100/items-needing-capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59147 - "GET /api/rounds/100/items-needing-capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59150 - "POST /api/evaluation-results/307/mark-needs-capa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59166 - "POST /api/capa/ HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:59186 - "OPTIONS /api/capa/ HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:60039 - "OPTIONS /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60041 - "OPTIONS /api/notifications HTTP/1.1" 200 OK
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:60039 - "GET /api/notifications HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:60041 - "GET /api/notifications HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60041 - "OPTIONS /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60039 - "OPTIONS /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60043 - "OPTIONS /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60041 - "OPTIONS /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60047 - "OPTIONS /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60043 - "OPTIONS /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60039 - "OPTIONS /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60049 - "OPTIONS /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60047 - "OPTIONS /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60041 - "OPTIONS /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60050 - "OPTIONS /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60039 - "OPTIONS /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:60049 - "GET /api/reports/dashboard/stats HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:60049 - "GET /api/reports/dashboard/stats HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:60050 - "GET /api/reports/rounds-by-type HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+[DB] Unexpected database error: 401: Could not validate credentials
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:60041 - "GET /api/reports/capa-status-distribution HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60039 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60047 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60043 - "GET /api/reports/department-performance HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:60049 - "GET /api/reports/rounds-by-type HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:60050 - "GET /api/reports/capa-status-distribution HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:60047 - "GET /api/reports/department-performance HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60039 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60041 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 401 Unauthorized
+WARNING:  WatchFiles detected changes in 'backend/crud_notifications.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [8098]
-Fatal Python error: init_sys_streams: can't initialize sys standard streams
-Python runtime state: core initialized
-OSError: [Errno 9] Bad file descriptor
-
-Current thread 0x0000000203f720c0 (most recent call first):
-  <no Python frame>
-WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
-Fatal Python error: init_sys_streams: can't initialize sys standard streams
-Python runtime state: core initialized
-OSError: [Errno 9] Bad file descriptor
-
-Current thread 0x0000000203f720c0 (most recent call first):
-  <no Python frame>
-WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
-Fatal Python error: init_sys_streams: can't initialize sys standard streams
-Python runtime state: core initialized
-OSError: [Errno 9] Bad file descriptor
-
-Current thread 0x0000000203f720c0 (most recent call first):
-  <no Python frame>
-WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
-Fatal Python error: init_sys_streams: can't initialize sys standard streams
-Python runtime state: core initialized
-OSError: [Errno 9] Bad file descriptor
-
-Current thread 0x0000000203f720c0 (most recent call first):
-  <no Python frame>
-WARNING:  WatchFiles detected changes in 'crud.py'. Reloading...
-Fatal Python error: init_sys_streams: can't initialize sys standard streams
-Python runtime state: core initialized
-OSError: [Errno 9] Bad file descriptor
-
-Current thread 0x0000000203f720c0 (most recent call first):
-  <no Python frame>
-WARNING:  WatchFiles detected changes in 'models_updated.py'. Reloading...
-Fatal Python error: init_sys_streams: can't initialize sys standard streams
-Python runtime state: core initialized
-OSError: [Errno 9] Bad file descriptor
-
-Current thread 0x0000000203f720c0 (most recent call first):
-  <no Python frame>
-WARNING:  WatchFiles detected changes in 'models_updated.py'. Reloading...
-Fatal Python error: init_sys_streams: can't initialize sys standard streams
-Python runtime state: core initialized
-OSError: [Errno 9] Bad file descriptor
-
-Current thread 0x0000000203f720c0 (most recent call first):
-  <no Python frame>
-WARNING:  WatchFiles detected changes in 'models_updated.py', 'crud.py'. Reloading...
-Fatal Python error: init_sys_streams: can't initialize sys standard streams
-Python runtime state: core initialized
-OSError: [Errno 9] Bad file descriptor
-
-Current thread 0x0000000203f720c0 (most recent call first):
-  <no Python frame>
-INFO:     Stopping reloader process [61857]
+INFO:     Finished server process [47314]
+INFO:     Started server process [52854]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'scripts/create_capa_via_db.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [52854]
+INFO:     Started server process [52938]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'scripts/create_capa_via_db.py', 'backend/crud_notifications.py', 'backend/crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [52938]
+INFO:     Started server process [52975]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'backend/crud_notifications.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [52975]
+INFO:     Started server process [54016]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'scripts/api_smoke_tests.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [54016]
+WARNING:  WatchFiles detected changes in 'scripts/api_smoke_tests.py'. Reloading...
+INFO:     Started server process [54408]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Started server process [54411]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'scripts/api_smoke_tests.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [54411]
+INFO:     Started server process [54466]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'scripts/api_smoke_tests.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [54466]
+INFO:     Started server process [55241]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'backend/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [55241]
+INFO:     Started server process [55504]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'backend/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [55504]
+INFO:     Started server process [55558]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'backend/crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [55558]
+INFO:     Started server process [55651]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'backend/main.py', 'backend/crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [55651]
+INFO:     Started server process [55684]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'backend/crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [55684]
+INFO:     Started server process [55808]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[DB] Using database: salamaty_db
+[DB] Engine created successfully
+✅ CORS enabled for all localhost origins
+[WARN] Notifications router not loaded: No module named 'crud_notifications'
+[WARN] CAPA router not loaded: No module named 'capa_router'
+INFO:     127.0.0.1:63619 - "OPTIONS /api/auth/signin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63619 - "POST /api/auth/signin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63619 - "OPTIONS /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63621 - "OPTIONS /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63623 - "OPTIONS /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63627 - "OPTIONS /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63628 - "OPTIONS /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63629 - "OPTIONS /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63621 - "OPTIONS /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63619 - "OPTIONS /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63623 - "OPTIONS /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63627 - "OPTIONS /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63628 - "OPTIONS /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63629 - "OPTIONS /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63621 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63623 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63628 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63619 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63627 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63629 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63621 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63623 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63619 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63627 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63629 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63628 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63643 - "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63644 - "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63643 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63644 - "OPTIONS /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63643 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63646 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63643 - "OPTIONS /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63646 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63644 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63644 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63660 - "OPTIONS /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63661 - "OPTIONS /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63660 - "GET /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63660 - "GET /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63660 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63660 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63661 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63661 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63660 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63660 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63672 - "OPTIONS /api/capas HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63674 - "OPTIONS /api/capa/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63672 - "GET /api/capas HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63676 - "OPTIONS /api/capa/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63678 - "GET /api/capa/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63674 - "GET /api/capas HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63672 - "GET /api/capa/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63678 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63672 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63674 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63676 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63684 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63685 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63678 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63674 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63676 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63672 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63684 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63685 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63700 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63692 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63694 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63699 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63695 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63697 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63752 - "OPTIONS /api/rounds HTTP/1.1" 200 OK
+🔍 [API] Fetching rounds from database for user 1
+🔍 [API] Database session: <sqlalchemy.orm.session.Session object at 0x106827f20>
+✅ [API] Database connection test successful
+✅ [API] Successfully fetched 19 rounds
+📋 [API] First round: ID=100, Title=جولة اختبار
+INFO:     127.0.0.1:63752 - "GET /api/rounds HTTP/1.1" 200 OK
+🔍 [API] Fetching rounds from database for user 1
+🔍 [API] Database session: <sqlalchemy.orm.session.Session object at 0x106826a80>
+✅ [API] Database connection test successful
+✅ [API] Successfully fetched 19 rounds
+📋 [API] First round: ID=100, Title=جولة اختبار
+INFO:     127.0.0.1:63754 - "GET /api/rounds HTTP/1.1" 200 OK
+🔍 [API] Fetching rounds from database for user 1
+🔍 [API] Database session: <sqlalchemy.orm.session.Session object at 0x106826e40>
+✅ [API] Database connection test successful
+✅ [API] Successfully fetched 19 rounds
+📋 [API] First round: ID=100, Title=جولة اختبار
+INFO:     127.0.0.1:63766 - "GET /api/rounds HTTP/1.1" 200 OK
+🔍 [API] Fetching rounds from database for user 1
+🔍 [API] Database session: <sqlalchemy.orm.session.Session object at 0x1068272f0>
+✅ [API] Database connection test successful
+✅ [API] Successfully fetched 19 rounds
+📋 [API] First round: ID=100, Title=جولة اختبار
+INFO:     127.0.0.1:63770 - "GET /api/rounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63779 - "OPTIONS /api/rounds/my HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63783 - "OPTIONS /api/rounds/my/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63784 - "OPTIONS /api/rounds/my HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63785 - "OPTIONS /api/rounds/my/stats HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 929, in get_my_rounds_stats
+    rounds = get_rounds_by_user(db, current_user.id, skip=0, limit=1000)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+🔍 API: Getting rounds for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+❌ Error calculating stats: No module named 'utils'
+[DB] Unexpected database error: No module named 'utils'
+[DB] Unexpected database error: 500: خطأ في حساب الإحصائيات: No module named 'utils'
+INFO:     127.0.0.1:63779 - "GET /api/rounds/my HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.13/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/applications.py", line 1133, in __call__
+    await super().__call__(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 123, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 109, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 387, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 288, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 917, in get_my_rounds
+    rounds = get_rounds_by_user(db, current_user.id, skip=skip, limit=limit)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+INFO:     127.0.0.1:63788 - "GET /api/rounds/my/stats HTTP/1.1" 500 Internal Server Error
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 929, in get_my_rounds_stats
+    rounds = get_rounds_by_user(db, current_user.id, skip=0, limit=1000)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+🔍 API: Getting rounds for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+❌ Error calculating stats: No module named 'utils'
+[DB] Unexpected database error: No module named 'utils'
+[DB] Unexpected database error: 500: خطأ في حساب الإحصائيات: No module named 'utils'
+INFO:     127.0.0.1:63785 - "GET /api/rounds/my HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.13/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/applications.py", line 1133, in __call__
+    await super().__call__(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 123, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/opt/homebrew/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 109, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 387, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/opt/homebrew/lib/python3.13/site-packages/fastapi/routing.py", line 288, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 917, in get_my_rounds
+    rounds = get_rounds_by_user(db, current_user.id, skip=skip, limit=limit)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+INFO:     127.0.0.1:63788 - "GET /api/rounds/my/stats HTTP/1.1" 500 Internal Server Error
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 929, in get_my_rounds_stats
+    rounds = get_rounds_by_user(db, current_user.id, skip=0, limit=1000)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+❌ Error calculating stats: No module named 'utils'
+[DB] Unexpected database error: 500: خطأ في حساب الإحصائيات: No module named 'utils'
+INFO:     127.0.0.1:63788 - "GET /api/rounds/my/stats HTTP/1.1" 500 Internal Server Error
+Traceback (most recent call last):
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/main.py", line 929, in get_my_rounds_stats
+    rounds = get_rounds_by_user(db, current_user.id, skip=0, limit=1000)
+  File "/Users/salehalzaid/Documents/massdeigners/salamah_rounds/backend/crud.py", line 401, in get_rounds_by_user
+    from utils.status_calculator import calculate_round_status
+ModuleNotFoundError: No module named 'utils'
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+❌ Error calculating stats: No module named 'utils'
+[DB] Unexpected database error: 500: خطأ في حساب الإحصائيات: No module named 'utils'
+INFO:     127.0.0.1:63788 - "GET /api/rounds/my/stats HTTP/1.1" 500 Internal Server Error
+WARNING:  WatchFiles detected changes in 'backend/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [55808]
+INFO:     Started server process [56019]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'backend/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56019]
+INFO:     Started server process [56090]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'backend/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56090]
+INFO:     Started server process [56325]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[DB] Using database: salamaty_db
+[DB] Engine created successfully
+✅ CORS enabled for all localhost origins
+[WARN] Notifications router not loaded: No module named 'crud_notifications'
+[WARN] CAPA router not loaded: No module named 'capa_router'
+INFO:     127.0.0.1:50485 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50485 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50489 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50489 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50485 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50485 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50485 - "GET /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50485 - "GET /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50485 - "OPTIONS /api/evaluation-categories HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50489 - "OPTIONS /api/evaluation-items HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50495 - "OPTIONS /objective-options?active_only=false HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50497 - "OPTIONS /api/evaluation-categories HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50499 - "OPTIONS /api/evaluation-items HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50500 - "OPTIONS /objective-options?active_only=false HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50489 - "GET /api/evaluation-items HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50485 - "GET /api/evaluation-categories HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50500 - "GET /api/evaluation-items HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50485 - "GET /api/evaluation-categories HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50500 - "GET /api/evaluation-categories HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50485 - "GET /api/evaluation-items HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50500 - "GET /api/evaluation-categories HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50489 - "GET /api/evaluation-items HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50503 - "OPTIONS /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50505 - "OPTIONS /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50503 - "GET /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50505 - "GET /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50505 - "OPTIONS /api/departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50503 - "GET /api/departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50505 - "GET /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50503 - "GET /api/departments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50507 - "GET /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50503 - "GET /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50507 - "GET /api/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50507 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50507 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50503 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50503 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50507 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50507 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'backend/crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56325]
+INFO:     Started server process [56516]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[DB] Using database: salamaty_db
+[DB] Engine created successfully
+✅ CORS enabled for all localhost origins
+[WARN] Notifications router not loaded: No module named 'crud_notifications'
+[WARN] CAPA router not loaded: No module named 'capa_router'
+INFO:     127.0.0.1:50523 - "GET /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50523 - "GET /api/reports/basic/?period=month HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50539 - "OPTIONS /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50540 - "OPTIONS /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50537 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50539 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50537 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50540 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50539 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50540 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50537 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50537 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50548 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50548 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50548 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50551 - "GET /api/capas HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50553 - "GET /api/capa/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50556 - "GET /api/capas HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50551 - "GET /api/capa/all HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'backend/crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56516]
+INFO:     Started server process [56541]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[DB] Using database: salamaty_db
+[DB] Engine created successfully
+✅ CORS enabled for all localhost origins
+[WARN] Notifications router not loaded: No module named 'crud_notifications'
+[WARN] CAPA router not loaded: No module named 'capa_router'
+INFO:     127.0.0.1:50572 - "GET /api/capas HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50574 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50573 - "GET /api/capa/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50572 - "GET /api/capas HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50574 - "GET /api/capa/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50580 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50592 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50598 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50596 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50601 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50599 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50602 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50592 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50596 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50601 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50599 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50598 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50602 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'backend/crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56541]
+INFO:     Started server process [56592]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[DB] Using database: salamaty_db
+[DB] Engine created successfully
+✅ CORS enabled for all localhost origins
+[WARN] Notifications router not loaded: No module named 'crud_notifications'
+[WARN] CAPA router not loaded: No module named 'capa_router'
+🔍 API: Getting rounds for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+📊 API: Returning 9 rounds
+INFO:     127.0.0.1:50625 - "GET /api/rounds/my HTTP/1.1" 200 OK
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+✅ Stats calculated: {'total': 9, 'completed': 2, 'in_progress': 2, 'overdue': 0, 'scheduled': 5, 'avg_completion': 40, 'avg_compliance': 72, 'high_priority': 7, 'needs_capa_count': 0, 'open_capa_count': 0}
+INFO:     127.0.0.1:50626 - "GET /api/rounds/my/stats HTTP/1.1" 200 OK
+🔍 API: Getting rounds for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+📊 API: Returning 9 rounds
+INFO:     127.0.0.1:50625 - "GET /api/rounds/my HTTP/1.1" 200 OK
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+✅ Stats calculated: {'total': 9, 'completed': 2, 'in_progress': 2, 'overdue': 0, 'scheduled': 5, 'avg_completion': 40, 'avg_compliance': 72, 'high_priority': 7, 'needs_capa_count': 0, 'open_capa_count': 0}
+INFO:     127.0.0.1:50626 - "GET /api/rounds/my/stats HTTP/1.1" 200 OK
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+✅ Stats calculated: {'total': 9, 'completed': 2, 'in_progress': 2, 'overdue': 0, 'scheduled': 5, 'avg_completion': 40, 'avg_compliance': 72, 'high_priority': 7, 'needs_capa_count': 0, 'open_capa_count': 0}
+INFO:     127.0.0.1:50626 - "GET /api/rounds/my/stats HTTP/1.1" 200 OK
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+✅ Stats calculated: {'total': 9, 'completed': 2, 'in_progress': 2, 'overdue': 0, 'scheduled': 5, 'avg_completion': 40, 'avg_compliance': 72, 'high_priority': 7, 'needs_capa_count': 0, 'open_capa_count': 0}
+INFO:     127.0.0.1:50626 - "GET /api/rounds/my/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50632 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50632 - "GET /api/dashboard/stats/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50632 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50632 - "GET /api/dashboard/overdue/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50635 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50635 - "GET /api/dashboard/upcoming/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50637 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50639 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50644 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50637 - "GET /api/reports/dashboard/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50642 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50646 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50647 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50639 - "GET /api/reports/compliance-trends?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50644 - "GET /api/reports/rounds-by-type HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50646 - "GET /api/reports/capa-status-distribution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50647 - "GET /api/reports/monthly-rounds?months=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50642 - "GET /api/reports/department-performance HTTP/1.1" 200 OK
+🔍 API: Getting rounds for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+📊 API: Returning 9 rounds
+INFO:     127.0.0.1:50647 - "GET /api/rounds/my HTTP/1.1" 200 OK
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+✅ Stats calculated: {'total': 9, 'completed': 2, 'in_progress': 2, 'overdue': 0, 'scheduled': 5, 'avg_completion': 40, 'avg_compliance': 72, 'high_priority': 7, 'needs_capa_count': 0, 'open_capa_count': 0}
+INFO:     127.0.0.1:50646 - "GET /api/rounds/my/stats HTTP/1.1" 200 OK
+🔍 API: Getting rounds for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+📊 API: Returning 9 rounds
+INFO:     127.0.0.1:50642 - "GET /api/rounds/my HTTP/1.1" 200 OK
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+✅ Stats calculated: {'total': 9, 'completed': 2, 'in_progress': 2, 'overdue': 0, 'scheduled': 5, 'avg_completion': 40, 'avg_compliance': 72, 'high_priority': 7, 'needs_capa_count': 0, 'open_capa_count': 0}
+INFO:     127.0.0.1:50646 - "GET /api/rounds/my/stats HTTP/1.1" 200 OK
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+✅ Stats calculated: {'total': 9, 'completed': 2, 'in_progress': 2, 'overdue': 0, 'scheduled': 5, 'avg_completion': 40, 'avg_compliance': 72, 'high_priority': 7, 'needs_capa_count': 0, 'open_capa_count': 0}
+INFO:     127.0.0.1:50646 - "GET /api/rounds/my/stats HTTP/1.1" 200 OK
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+✅ Stats calculated: {'total': 9, 'completed': 2, 'in_progress': 2, 'overdue': 0, 'scheduled': 5, 'avg_completion': 40, 'avg_compliance': 72, 'high_priority': 7, 'needs_capa_count': 0, 'open_capa_count': 0}
+INFO:     127.0.0.1:50646 - "GET /api/rounds/my/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50725 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50725 - "GET /api/notifications HTTP/1.1" 200 OK
+🔍 API: Getting rounds for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+📊 API: Returning 9 rounds
+INFO:     127.0.0.1:50725 - "GET /api/rounds/my HTTP/1.1" 200 OK
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+✅ Stats calculated: {'total': 9, 'completed': 2, 'in_progress': 2, 'overdue': 0, 'scheduled': 5, 'avg_completion': 40, 'avg_compliance': 72, 'high_priority': 7, 'needs_capa_count': 0, 'open_capa_count': 0}
+INFO:     127.0.0.1:50728 - "GET /api/rounds/my/stats HTTP/1.1" 200 OK
+🔍 API: Getting rounds for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+📊 API: Returning 9 rounds
+INFO:     127.0.0.1:50725 - "GET /api/rounds/my HTTP/1.1" 200 OK
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+✅ Stats calculated: {'total': 9, 'completed': 2, 'in_progress': 2, 'overdue': 0, 'scheduled': 5, 'avg_completion': 40, 'avg_compliance': 72, 'high_priority': 7, 'needs_capa_count': 0, 'open_capa_count': 0}
+INFO:     127.0.0.1:50728 - "GET /api/rounds/my/stats HTTP/1.1" 200 OK
+📊 API: Getting stats for user ID: 1
+🔍 Getting rounds for user ID: 1
+👤 User: مدير محدث النظام (ID: 1)
+🎯 Found 9 rounds assigned to user ID 1
+  ✓ Round 78: العناية - Status: RoundStatus.COMPLETED - assigned_to_ids: [39, 38, 1]
+  ✓ Round 87: فحص مكافحة العدوى - العناية المركزة - Status: RoundStatus.COMPLETED - assigned_to_ids: [35, 1]
+  ✓ Round 83: جولة equipment safety - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 52, 1]
+  ✓ Round 85: جولة general - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 1]
+  ✓ Round 77: جولة ١ - Status: RoundStatus.SCHEDULED - assigned_to_ids: [39, 38, 50, 1]
+  ✓ Round 95: فحص سلامة المعدات - الطوارئ - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1]
+  ✓ Round 93: مراجعة مكافحة العدوى - المختبر - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1]
+  ✓ Round 96: اختبار سلامة البيانات - Status: RoundStatus.SCHEDULED - assigned_to_ids: [1, 37]
+  ✓ Round 90: فحص سلامة المعدات - الأشعة - Status: RoundStatus.IN_PROGRESS - assigned_to_ids: [1, 40]
+✅ Stats calculated: {'total': 9, 'completed': 2, 'in_progress': 2, 'overdue': 0, 'scheduled': 5, 'avg_completion': 40, 'avg_compliance': 72, 'high_priority': 7, 'needs_capa_count': 0, 'open_capa_count': 0}
+INFO:     127.0.0.1:50728 - "GET /api/rounds/my/stats HTTP/1.1" 200 OK
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:50864 - "GET /api/notifications HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:50864 - "GET /api/notifications HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:50867 - "GET /api/rounds/my/stats HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:50867 - "GET /api/rounds/my/stats HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50864 - "GET /api/rounds/my HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:50873 - "GET /api/rounds/my HTTP/1.1" 401 Unauthorized
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:51008 - "GET /api/rounds/my/stats HTTP/1.1" 401 Unauthorized

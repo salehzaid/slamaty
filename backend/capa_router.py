@@ -13,8 +13,10 @@ from schemas import (
 from auth import get_current_user
 from crud import (
     create_capa, get_capas, get_capa_by_id, update_capa, delete_capa,
-    create_audit_log, get_department_manager_ids
+    create_audit_log, get_department_manager_ids,
+    get_non_compliant_evaluation_items, create_capas_for_round_non_compliance
 )
+from notification_service import get_notification_service
 
 router = APIRouter(prefix="/api/capas", tags=["CAPA"])
 
@@ -114,6 +116,43 @@ async def create_capa_endpoint(
         "new_values": json.dumps({"title": db_capa.title, "department": db_capa.department})
     })
 
+    # Send notifications
+    try:
+        notification_service = get_notification_service(db)
+        creator_name = f"{current_user.first_name} {current_user.last_name}"
+        
+        # Get evaluation item title if available
+        evaluation_item_title = "عنصر التقييم"
+        if db_capa.evaluation_item_id:
+            try:
+                from models import EvaluationItem
+                eval_item = db.query(EvaluationItem).filter(EvaluationItem.id == db_capa.evaluation_item_id).first()
+                if eval_item:
+                    evaluation_item_title = eval_item.title or eval_item.code
+            except:
+                pass
+        
+        # Get quality managers
+        quality_manager_ids = []
+        try:
+            quality_managers = db.query(User).filter(User.role == "quality_manager").all()
+            quality_manager_ids = [qm.id for qm in quality_managers if qm.id != current_user.id]
+        except:
+            pass
+        
+        # Send notifications
+        notification_service.send_capa_created_notification(
+            capa_id=db_capa.id,
+            capa_title=db_capa.title,
+            evaluation_item_title=evaluation_item_title,
+            assigned_user_id=db_capa.assigned_to_id,
+            quality_manager_ids=quality_manager_ids,
+            created_by_name=creator_name
+        )
+    except Exception as e:
+        # Log error but don't fail CAPA creation
+        print(f"Failed to send CAPA creation notifications: {e}")
+
     return {
         "status": "success",
         "message": "CAPA plan created successfully",
@@ -178,6 +217,90 @@ async def get_capas_endpoint(
         "skip": skip,
         "limit": limit
     }
+
+
+@router.get("/rounds/{round_id}/non-compliant", response_model=dict)
+async def get_round_non_compliant_items(
+    round_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Return non-compliant evaluation items for a round (used to create CAPAs)"""
+    try:
+        items = get_non_compliant_evaluation_items(db, round_id)
+        return {"status": "success", "items": items}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/rounds/{round_id}/create-capas", response_model=dict)
+async def create_capas_for_round_endpoint(
+    round_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Create CAPAs for all non-compliant items in a round (permission enforced)"""
+    if current_user.role not in ["super_admin", "quality_manager", "department_head"]:
+        raise HTTPException(status_code=403, detail="You don't have permission to create CAPAs for a round")
+
+    result = create_capas_for_round_non_compliance(db, round_id, current_user.id)
+    if not result.get('success'):
+        raise HTTPException(status_code=500, detail=result.get('message') or 'Failed to create CAPAs')
+    return result
+
+
+@router.post("/{capa_id}/progress", response_model=dict)
+async def update_capa_progress_endpoint(
+    capa_id: int,
+    payload: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update CAPA status/progress and create an audit log.
+
+    Expected payload: { "status": "IN_PROGRESS" } or { "status": "VERIFIED", "verification_status": "verified" }
+    """
+    # Allowed roles to change CAPA status
+    allowed_roles = ["super_admin", "quality_manager", "department_head"]
+
+    # Fetch existing CAPA
+    existing = get_capa_by_id(db, capa_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="CAPA plan not found")
+
+    # Permission: allow if user in allowed roles OR assigned_to_id matches
+    if current_user.role not in allowed_roles and existing.assigned_to_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You don't have permission to update this CAPA plan")
+
+    # Validate payload
+    status_value = payload.get('status')
+    verification_status = payload.get('verification_status')
+    if not status_value:
+        raise HTTPException(status_code=400, detail="status field is required")
+
+    update_data = {}
+    update_data['status'] = status_value
+    if verification_status is not None:
+        update_data['verification_status'] = verification_status
+
+    # apply update
+    # Pass current_user.id so an audit log will be created inside update_capa
+    updated = update_capa(db, capa_id, update_data, performed_by_id=current_user.id)
+
+    # audit
+    try:
+        create_audit_log(db, {
+            "user_id": current_user.id,
+            "action": "update_capa",
+            "entity_type": "capa",
+            "entity_id": capa_id,
+            "old_values": json.dumps({"status": existing.status, "verification_status": existing.verification_status}, ensure_ascii=False),
+            "new_values": json.dumps({"status": updated.status, "verification_status": updated.verification_status}, ensure_ascii=False)
+        })
+    except Exception as e:
+        print(f"⚠️ Warning: failed to create audit log for progress update: {e}")
+
+    return {"status": "success", "message": "CAPA progress updated", "capa": serialize_json_fields(updated)}
 
 @router.patch("/{capa_id}", response_model=dict)
 async def update_capa_endpoint(

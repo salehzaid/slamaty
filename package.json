@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "postinstall": "echo postinstall hook - ensure optional native deps installed || true",
     "build": "vite build",
     "lint": "eslint .",
     "test:e2e": "playwright test",

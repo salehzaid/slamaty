@@ -1,4 +1,81 @@
 """
+Stub helpers for notification-related CRUD used during development.
+This prevents import errors when the full module isn't implemented yet.
+"""
+from typing import List
+
+def get_users_with_notification_preference(db, preference_type: str) -> List[int]:
+    """Return user IDs for users who would receive a given notification preference.
+
+    This is a stub: it returns an empty list if database access is not available.
+    Replace with actual implementation when user settings storage is finalized.
+    """
+    try:
+        from models_updated import UserNotificationSettings, User
+        users = db.query(UserNotificationSettings).filter(getattr(UserNotificationSettings, preference_type) == True).all()
+        return [u.user_id for u in users]
+    except Exception:
+        return []
+
+def update_notification_email_sent(db, notification_id: int):
+    """Mark notification email as sent (stub).
+    """
+    try:
+        from models_updated import Notification
+        notif = db.query(Notification).filter(Notification.id == notification_id).first()
+        if notif:
+            notif.is_email_sent = True
+            db.commit()
+            return True
+    except Exception:
+        pass
+    return False
+
+"""
+Stubbed notification CRUD helpers.
+
+This module provides minimal implementations so the application can import
+`crud_notifications` in environments where the full notification backend
+is not required. The real implementations live elsewhere in production.
+"""
+from typing import Any, Dict, List, Optional
+
+def create_notification(db, notification_data: Dict[str, Any]):
+    """Create a notification record (stub).
+
+    Returns a simple dict-like object with an `id` for compatibility.
+    """
+    # Minimal stub: return a simple object
+    class _N:
+        def __init__(self):
+            self.id = -1
+    return _N()
+
+def get_notifications_by_user(db, user_id: int, limit: int = 50):
+    return []
+
+def get_unread_notifications_count(db, user_id: int) -> int:
+    return 0
+
+def mark_notification_as_read(db, notification_id: int) -> bool:
+    return True
+
+def mark_all_notifications_as_read(db, user_id: int) -> int:
+    return 0
+
+def delete_notification(db, notification_id: int) -> bool:
+    return True
+
+def get_user_notification_settings(db, user_id: int) -> Dict[str, Any]:
+    return {}
+
+def create_user_notification_settings(db, user_id: int, settings: Dict[str, Any]):
+    return {}
+
+def update_notification_email_sent(db, notification_id: int):
+    return True
+
+"""
 Notifications CRUD operations
 """
 

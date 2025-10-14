@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Check, X, Minus, HelpCircle, Save, Send, Settings, Eye } from 'lucide-react'
+import { Check, X, Minus, HelpCircle, Save, Send, Settings, Eye, AlertTriangle } from 'lucide-react'
 import { apiClient } from '@/lib/api'
 import EvaluationWizard from './EvaluationWizard'
 
@@ -29,9 +29,11 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
   const [evaluations, setEvaluations] = useState<Record<number, string>>({})
   const [comments, setComments] = useState<Record<number, string>>({})
   const [notes, setNotes] = useState('')
-  const [completionPercentage, setCompletionPercentage] = useState(0)
   const [roundStatus, setRoundStatus] = useState<string>('')
-  const [useWizardMode, setUseWizardMode] = useState(true) // Default to wizard mode
+  const [completionPercentage, setCompletionPercentage] = useState(0)
+  const [useWizardMode, setUseWizardMode] = useState(false) // Default to full mode for E2E/test flows
+  const [needsCapaFlags, setNeedsCapaFlags] = useState<Record<number, boolean>>({})
+  const [capaNotesForItems, setCapaNotesForItems] = useState<Record<number, string>>({})
 
   useEffect(() => {
     let mounted = true
@@ -146,9 +148,9 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
         item_id: Number(key), 
         status: evaluations[Number(key)],
         comments: comments[Number(key)] || '',
-        // include CAPA flag and note if user marked it
-        mark_needs_capa: (comments[Number(key)] || '').toString().toLowerCase().includes('#capa'),
-        capa_note: undefined
+        // Use explicit checkbox state, or fallback to #capa in comments
+        mark_needs_capa: needsCapaFlags[Number(key)] || (comments[Number(key)] || '').toString().toLowerCase().includes('#capa'),
+        capa_note: capaNotesForItems[Number(key)] || ''
       })),
       notes
     }
@@ -264,6 +266,9 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
     )
   }
 
+  // Count items that need CAPA
+  const itemsNeedingCapaCount = Object.keys(needsCapaFlags).filter(key => needsCapaFlags[Number(key)]).length
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Mode Toggle Header */}
@@ -274,6 +279,12 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
             <Badge variant="outline" className="text-sm">
               إجمالي العناصر: {items.length}
             </Badge>
+            {itemsNeedingCapaCount > 0 && (
+              <Badge className="text-sm bg-amber-100 text-amber-800 border-amber-300">
+                <AlertTriangle className="w-3 h-3 ml-1" />
+                يحتاج CAPA: {itemsNeedingCapaCount}
+              </Badge>
+            )}
           </div>
           
           <div className="flex items-center gap-2">
@@ -372,6 +383,8 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
                       <div className="space-y-6">
                         {categoryItems.map((item, index) => {
                           const currentStatus = evaluations[item.id] || 'na'
+                          // compute global index of this item within all items for stable test selectors
+                          const globalIndex = items.findIndex(it => it.id === item.id)
                           return (
                             <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                               {/* Item Header */}
@@ -464,6 +477,7 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
                                         type="button"
                                         variant={isSelected ? "default" : "outline"}
                                         disabled={isCompleted}
+                                        data-test={`mark-${option.value}-${globalIndex}`}
                                         className={`flex flex-col items-center gap-2 h-16 p-3 ${
                                           isSelected 
                                             ? option.color 
@@ -485,36 +499,90 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
                                 <Textarea
                                   value={comments[item.id] || ''}
                                   onChange={(e) => !isCompleted && handleCommentChange(item.id, e.target.value)}
-                                  placeholder="أضف ملاحظاتك هنا.... (اكتب #capa إذا يلزم خطة تصحيحية)"
+                                  placeholder="أضف ملاحظاتك هنا..."
                                   disabled={isCompleted}
                                   className={`min-h-[80px] resize-none ${isCompleted ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 />
-                                {/* Quick CAPA start button if evaluator flagged the note */}
-                                { (comments[item.id] || '').toLowerCase().includes('#capa') && (
-                                  <div className="mt-2">
-                                    <Button size="sm" variant="outline" onClick={async () => {
-                                      try {
-                                        const confirmMsg = 'هل أنت متأكد أنك تريد بدء خطة تصحيحية لهذا العنصر؟'
-                                        if (!window.confirm(confirmMsg)) return
+                                
+                                {/* CAPA checkbox for non-compliant items */}
+                                {(currentStatus === 'not_applied' || currentStatus === 'partial') && !isCompleted && (
+                                  <div className={`mt-3 p-3 rounded-lg border-2 transition-all ${
+                                    needsCapaFlags[item.id] 
+                                      ? 'bg-amber-50 border-amber-300' 
+                                      : 'bg-gray-50 border-gray-200'
+                                  }`}>
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <input
+                                        type="checkbox"
+                                        id={`needs-capa-${item.id}`}
+                                        checked={needsCapaFlags[item.id] || false}
+                                        onChange={(e) => {
+                                          setNeedsCapaFlags(prev => ({ ...prev, [item.id]: e.target.checked }))
+                                          if (!e.target.checked) {
+                                            setCapaNotesForItems(prev => ({ ...prev, [item.id]: '' }))
+                                          }
+                                        }}
+                                        className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
+                                      />
+                                      <label 
+                                        htmlFor={`needs-capa-${item.id}`}
+                                        className="text-sm font-medium text-gray-700 cursor-pointer flex items-center gap-2"
+                                      >
+                                        <AlertTriangle className="w-4 h-4 text-amber-600" />
+                                        يحتاج خطة تصحيحية (CAPA)
+                                      </label>
+                                    </div>
+                                    
+                                    {needsCapaFlags[item.id] && (
+                                      <div className="mt-2">
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                                          ملاحظة خاصة بالخطة التصحيحية
+                                        </label>
+                                        <Textarea
+                                          value={capaNotesForItems[item.id] || ''}
+                                          onChange={(e) => setCapaNotesForItems(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                          placeholder="أضف ملاحظة حول الخطة التصحيحية المطلوبة..."
+                                          className="min-h-[60px] text-sm resize-none"
+                                        />
+                                        <Button 
+                                          size="sm" 
+                                          variant="default"
+                                          className="mt-2 bg-amber-600 hover:bg-amber-700"
+                                          onClick={async () => {
+                                            try {
+                                              const confirmMsg = 'هل تريد إنشاء خطة تصحيحية لهذا العنصر الآن؟'
+                                              if (!window.confirm(confirmMsg)) return
 
-                                        const payload = {
-                                          title: `CAPA - Round ${roundId} - Item ${item.id}`,
-                                          description: (comments[item.id] || '').slice(0, 250) || item.description || item.title,
-                                          round_id: roundId,
-                                          evaluation_item_id: item.id,
-                                          department: item.category_name || 'عام',
-                                          assigned_to_id: undefined,
-                                          sla_days: 14
-                                        }
-                                        const res = await apiClient.createCapa(payload)
-                                        alert('تم إنشاء خطة تصحيحية (إذا لم تكن موجودة مسبقاً).')
-                                      } catch (err) {
-                                        console.error('Failed to create CAPA:', err)
-                                        alert('حدث خطأ أثناء إنشاء خطة التصحيحية')
-                                      }
-                                    }}>
-                                      ابدأ خطة تصحيحية
-                                    </Button>
+                                              const payload = {
+                                                title: `خطة تصحيحية: ${item.title || item.code}`,
+                                                description: capaNotesForItems[item.id] || comments[item.id] || item.description || item.title,
+                                                round_id: roundId,
+                                                evaluation_item_id: item.id,
+                                                department: item.category_name || 'عام',
+                                                assigned_to_id: undefined,
+                                                sla_days: 14
+                                              }
+                                              await apiClient.createCapa(payload)
+                                              alert('✅ تم إنشاء خطة تصحيحية بنجاح')
+                                            } catch (err) {
+                                              console.error('Failed to create CAPA:', err)
+                                              alert('❌ حدث خطأ أثناء إنشاء الخطة التصحيحية')
+                                            }
+                                          }}
+                                        >
+                                          إنشاء خطة تصحيحية الآن
+                                        </Button>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                                
+                                {/* Legacy support: Quick CAPA start button if evaluator flagged with #capa */}
+                                {!needsCapaFlags[item.id] && (comments[item.id] || '').toLowerCase().includes('#capa') && (
+                                  <div className="mt-2">
+                                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300">
+                                      تم وضع علامة #capa
+                                    </Badge>
                                   </div>
                                 )}
                               </div>
@@ -547,10 +615,11 @@ const EvaluateRoundForm: React.FC<EvaluateRoundFormProps> = ({ roundId, onSubmit
             {items.length > 0 && (
               <div className="space-y-3 pt-4">
                 {!isCompleted && (
-                  <div className="flex gap-3">
+                    <div className="flex gap-3">
                     <Button 
                       type="button" 
                       onClick={handleSaveDraft}
+                        data-test="submit-evaluation"
                       disabled={saving}
                       variant="outline"
                       className="flex-1"

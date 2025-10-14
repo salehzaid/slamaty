@@ -299,7 +299,9 @@ class NotificationType(str, enum.Enum):
     ROUND_REMINDER = "round_reminder"
     ROUND_DEADLINE = "round_deadline"
     CAPA_ASSIGNED = "capa_assigned"
+    CAPA_CREATED = "capa_created"
     CAPA_DEADLINE = "capa_deadline"
+    EVALUATION_NEEDS_CAPA = "evaluation_needs_capa"
     SYSTEM_UPDATE = "system_update"
     GENERAL = "general"
 

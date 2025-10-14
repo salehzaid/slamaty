@@ -219,10 +219,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = (): AuthContextType | null => {
   const context = useContext(AuthContext);
+  // If used outside provider, return null instead of throwing so callers can handle gracefully
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    console.warn('useAuth called outside of AuthProvider - returning null');
+    return null;
   }
   return context;
 };

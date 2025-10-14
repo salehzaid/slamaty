@@ -224,3 +224,335 @@ Browserslist: caniuse-lite is outdated. Please run:
 6:40:53 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
 6:41:12 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
 6:42:10 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+11:31:54 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+12:13:01 PM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+12:23:45 PM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/SimpleDashboard.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestRoundsData.tsx, /src/components/TestDataDisplay.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+12:23:45 PM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+12:23:45 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/LoginPage.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx, /src/components/pages/CapaManagement.tsx
+12:23:45 PM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+12:23:45 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/UserDropdown.tsx, /src/components/NotificationDropdown.tsx
+12:34:42 PM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/SimpleDashboard.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestRoundsData.tsx, /src/components/TestDataDisplay.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+12:34:42 PM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+12:34:42 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/LoginPage.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx, /src/components/pages/CapaManagement.tsx
+12:34:42 PM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+12:34:42 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/UserDropdown.tsx, /src/components/NotificationDropdown.tsx
+1:29:13 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+1:29:22 PM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/SimpleDashboard.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestRoundsData.tsx, /src/components/TestDataDisplay.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+1:29:22 PM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+1:29:22 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/LoginPage.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx, /src/components/pages/CapaManagement.tsx
+1:29:22 PM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+1:29:22 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/UserDropdown.tsx, /src/components/NotificationDropdown.tsx
+1:29:42 PM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/SimpleDashboard.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestRoundsData.tsx, /src/components/TestDataDisplay.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+1:29:42 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+1:29:42 PM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+1:29:42 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/LoginPage.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx, /src/components/pages/CapaManagement.tsx
+1:29:42 PM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+1:29:42 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/UserDropdown.tsx, /src/components/NotificationDropdown.tsx
+1:34:29 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+2:14:02 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+2:15:08 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+2:17:40 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+5:04:42 PM [vite] hmr update /src/components/dashboard/EnhancedCapaDashboardMain.tsx, /src/index.css
+5:07:42 PM [vite] hmr update /src/components/pages/CapaManagement.tsx, /src/index.css
+5:07:42 PM [vite] Internal server error: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/CapaManagement.tsx: Identifier 'React' has already been declared. (13:7)
+
+  11 | import { useAuth } from '@/context/AuthContext'
+  12 | import EnhancedCapaManagement from '@/components/pages/EnhancedCapaManagement'
+> 13 | import React, { useEffect, useState } from 'react'
+     |        ^
+  14 |
+  15 | const CapaManagement: React.FC = () => {
+  16 |   console.log('🔄 CapaManagement component is rendering...')
+  Plugin: vite:react-babel
+  File: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/CapaManagement.tsx:13:7
+  11 |  import { useAuth } from '@/context/AuthContext'
+  12 |  import EnhancedCapaManagement from '@/components/pages/EnhancedCapaManagement'
+  13 |  import React, { useEffect, useState } from 'react'
+     |         ^
+  14 |  
+  15 |  const CapaManagement: React.FC = () => {
+      at constructor (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:362:19)
+      at TypeScriptParserMixin.raise (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:3259:19)
+      at TypeScriptScopeHandler.checkRedeclarationInScope (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:1507:19)
+      at TypeScriptScopeHandler.declareName (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:1473:12)
+      at TypeScriptScopeHandler.declareName (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6927:11)
+      at TypeScriptParserMixin.declareNameFromIdentifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7350:16)
+      at TypeScriptParserMixin.checkIdentifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7346:12)
+      at TypeScriptParserMixin.checkLVal (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7287:12)
+      at TypeScriptParserMixin.finishImportSpecifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13734:10)
+      at TypeScriptParserMixin.parseImportSpecifierLocal (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13731:31)
+      at TypeScriptParserMixin.maybeParseDefaultImportSpecifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13846:12)
+      at TypeScriptParserMixin.parseImportSpecifiersAndAfter (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13708:29)
+      at TypeScriptParserMixin.parseImport (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13704:17)
+      at TypeScriptParserMixin.parseImport (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9073:26)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12351:27)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9157:18)
+      at TypeScriptParserMixin.parseStatementLike (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12243:17)
+      at TypeScriptParserMixin.parseModuleItem (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12220:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12796:36)
+      at TypeScriptParserMixin.parseBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12789:10)
+      at TypeScriptParserMixin.parseProgram (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12117:10)
+      at TypeScriptParserMixin.parseTopLevel (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12107:25)
+      at TypeScriptParserMixin.parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13923:10)
+      at TypeScriptParserMixin.parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9771:18)
+      at parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13957:38)
+      at parser (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/parser/index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transformation/index.js:21:50)
+      at run.next (<anonymous>)
+      at transform (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:261:32)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:223:11)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:189:28
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/gensync-utils/async.js:67:7
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:113:33
+      at step (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:287:14)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:223:11)
+5:09:51 PM [vite] hmr update /src/components/dashboard/EnhancedCapaDashboardMain.tsx, /src/index.css
+5:10:22 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+5:11:13 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+5:13:06 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+5:13:22 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+5:13:39 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+5:15:27 PM [vite] hmr update /src/components/dashboard/EnhancedCapaDashboardMain.tsx, /src/index.css
+5:15:27 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+5:36:34 PM [vite] Pre-transform error: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/CapaManagement.tsx: Identifier 'React' has already been declared. (13:7)
+
+  11 | import { useAuth } from '@/context/AuthContext'
+  12 | import EnhancedCapaManagement from '@/components/pages/EnhancedCapaManagement'
+> 13 | import React, { useEffect, useState } from 'react'
+     |        ^
+  14 |
+  15 | const CapaManagement: React.FC = () => {
+  16 |   console.log('🔄 CapaManagement component is rendering...')
+5:36:35 PM [vite] Internal server error: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/CapaManagement.tsx: Identifier 'React' has already been declared. (13:7)
+
+  11 | import { useAuth } from '@/context/AuthContext'
+  12 | import EnhancedCapaManagement from '@/components/pages/EnhancedCapaManagement'
+> 13 | import React, { useEffect, useState } from 'react'
+     |        ^
+  14 |
+  15 | const CapaManagement: React.FC = () => {
+  16 |   console.log('🔄 CapaManagement component is rendering...')
+  Plugin: vite:react-babel
+  File: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/CapaManagement.tsx:13:7
+  11 |  import { useAuth } from '@/context/AuthContext'
+  12 |  import EnhancedCapaManagement from '@/components/pages/EnhancedCapaManagement'
+  13 |  import React, { useEffect, useState } from 'react'
+     |         ^
+  14 |  
+  15 |  const CapaManagement: React.FC = () => {
+      at constructor (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:362:19)
+      at TypeScriptParserMixin.raise (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:3259:19)
+      at TypeScriptScopeHandler.checkRedeclarationInScope (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:1507:19)
+      at TypeScriptScopeHandler.declareName (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:1473:12)
+      at TypeScriptScopeHandler.declareName (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6927:11)
+      at TypeScriptParserMixin.declareNameFromIdentifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7350:16)
+      at TypeScriptParserMixin.checkIdentifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7346:12)
+      at TypeScriptParserMixin.checkLVal (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7287:12)
+      at TypeScriptParserMixin.finishImportSpecifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13734:10)
+      at TypeScriptParserMixin.parseImportSpecifierLocal (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13731:31)
+      at TypeScriptParserMixin.maybeParseDefaultImportSpecifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13846:12)
+      at TypeScriptParserMixin.parseImportSpecifiersAndAfter (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13708:29)
+      at TypeScriptParserMixin.parseImport (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13704:17)
+      at TypeScriptParserMixin.parseImport (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9073:26)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12351:27)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9157:18)
+      at TypeScriptParserMixin.parseStatementLike (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12243:17)
+      at TypeScriptParserMixin.parseModuleItem (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12220:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12796:36)
+      at TypeScriptParserMixin.parseBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12789:10)
+      at TypeScriptParserMixin.parseProgram (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12117:10)
+      at TypeScriptParserMixin.parseTopLevel (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12107:25)
+      at TypeScriptParserMixin.parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13923:10)
+      at TypeScriptParserMixin.parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9771:18)
+      at parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13957:38)
+      at parser (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/parser/index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transformation/index.js:21:50)
+      at run.next (<anonymous>)
+      at transform (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:261:32)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:223:11)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:189:28
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/gensync-utils/async.js:67:7
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:113:33
+      at step (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:287:14)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:223:11)
+9:06:30 PM [vite] Internal server error: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/CapaManagement.tsx: Identifier 'React' has already been declared. (13:7)
+
+  11 | import { useAuth } from '@/context/AuthContext'
+  12 | import EnhancedCapaManagement from '@/components/pages/EnhancedCapaManagement'
+> 13 | import React, { useEffect, useState } from 'react'
+     |        ^
+  14 |
+  15 | const CapaManagement: React.FC = () => {
+  16 |   console.log('🔄 CapaManagement component is rendering...')
+  Plugin: vite:react-babel
+  File: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/CapaManagement.tsx:13:7
+  11 |  import { useAuth } from '@/context/AuthContext'
+  12 |  import EnhancedCapaManagement from '@/components/pages/EnhancedCapaManagement'
+  13 |  import React, { useEffect, useState } from 'react'
+     |         ^
+  14 |  
+  15 |  const CapaManagement: React.FC = () => {
+      at constructor (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:362:19)
+      at TypeScriptParserMixin.raise (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:3259:19)
+      at TypeScriptScopeHandler.checkRedeclarationInScope (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:1507:19)
+      at TypeScriptScopeHandler.declareName (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:1473:12)
+      at TypeScriptScopeHandler.declareName (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6927:11)
+      at TypeScriptParserMixin.declareNameFromIdentifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7350:16)
+      at TypeScriptParserMixin.checkIdentifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7346:12)
+      at TypeScriptParserMixin.checkLVal (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7287:12)
+      at TypeScriptParserMixin.finishImportSpecifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13734:10)
+      at TypeScriptParserMixin.parseImportSpecifierLocal (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13731:31)
+      at TypeScriptParserMixin.maybeParseDefaultImportSpecifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13846:12)
+      at TypeScriptParserMixin.parseImportSpecifiersAndAfter (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13708:29)
+      at TypeScriptParserMixin.parseImport (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13704:17)
+      at TypeScriptParserMixin.parseImport (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9073:26)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12351:27)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9157:18)
+      at TypeScriptParserMixin.parseStatementLike (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12243:17)
+      at TypeScriptParserMixin.parseModuleItem (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12220:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12796:36)
+      at TypeScriptParserMixin.parseBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12789:10)
+      at TypeScriptParserMixin.parseProgram (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12117:10)
+      at TypeScriptParserMixin.parseTopLevel (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12107:25)
+      at TypeScriptParserMixin.parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13923:10)
+      at TypeScriptParserMixin.parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9771:18)
+      at parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13957:38)
+      at parser (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/parser/index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transformation/index.js:21:50)
+      at run.next (<anonymous>)
+      at transform (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:261:32)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:223:11)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:189:28
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/gensync-utils/async.js:67:7
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:113:33
+      at step (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:287:14)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:223:11)
+9:43:23 PM [vite] Internal server error: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/CapaManagement.tsx: Identifier 'React' has already been declared. (13:7)
+
+  11 | import { useAuth } from '@/context/AuthContext'
+  12 | import EnhancedCapaManagement from '@/components/pages/EnhancedCapaManagement'
+> 13 | import React, { useEffect, useState } from 'react'
+     |        ^
+  14 |
+  15 | const CapaManagement: React.FC = () => {
+  16 |   console.log('🔄 CapaManagement component is rendering...')
+  Plugin: vite:react-babel
+  File: /Users/salehalzaid/Documents/massdeigners/salamah_rounds/src/components/pages/CapaManagement.tsx:13:7
+  11 |  import { useAuth } from '@/context/AuthContext'
+  12 |  import EnhancedCapaManagement from '@/components/pages/EnhancedCapaManagement'
+  13 |  import React, { useEffect, useState } from 'react'
+     |         ^
+  14 |  
+  15 |  const CapaManagement: React.FC = () => {
+      at constructor (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:362:19)
+      at TypeScriptParserMixin.raise (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:3259:19)
+      at TypeScriptScopeHandler.checkRedeclarationInScope (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:1507:19)
+      at TypeScriptScopeHandler.declareName (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:1473:12)
+      at TypeScriptScopeHandler.declareName (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:6927:11)
+      at TypeScriptParserMixin.declareNameFromIdentifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7350:16)
+      at TypeScriptParserMixin.checkIdentifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7346:12)
+      at TypeScriptParserMixin.checkLVal (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:7287:12)
+      at TypeScriptParserMixin.finishImportSpecifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13734:10)
+      at TypeScriptParserMixin.parseImportSpecifierLocal (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13731:31)
+      at TypeScriptParserMixin.maybeParseDefaultImportSpecifier (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13846:12)
+      at TypeScriptParserMixin.parseImportSpecifiersAndAfter (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13708:29)
+      at TypeScriptParserMixin.parseImport (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13704:17)
+      at TypeScriptParserMixin.parseImport (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9073:26)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12351:27)
+      at TypeScriptParserMixin.parseStatementContent (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9157:18)
+      at TypeScriptParserMixin.parseStatementLike (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12243:17)
+      at TypeScriptParserMixin.parseModuleItem (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12220:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12796:36)
+      at TypeScriptParserMixin.parseBlockBody (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12789:10)
+      at TypeScriptParserMixin.parseProgram (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12117:10)
+      at TypeScriptParserMixin.parseTopLevel (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:12107:25)
+      at TypeScriptParserMixin.parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13923:10)
+      at TypeScriptParserMixin.parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:9771:18)
+      at parse (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/parser/lib/index.js:13957:38)
+      at parser (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/parser/index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transformation/index.js:21:50)
+      at run.next (<anonymous>)
+      at transform (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:261:32)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:223:11)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:189:28
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/@babel/core/lib/gensync-utils/async.js:67:7
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:113:33
+      at step (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:287:14)
+      at /Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/salehalzaid/Documents/massdeigners/salamah_rounds/node_modules/gensync/index.js:223:11)
+9:45:00 PM [vite] hmr update /src/components/pages/CapaManagement.tsx, /src/index.css
+9:45:06 PM [vite] hmr update /src/components/pages/CapaManagement.tsx, /src/index.css
+9:53:23 PM [vite] hmr update /src/components/dashboard/EnhancedCapaDashboardMain.tsx, /src/index.css
+9:53:32 PM [vite] hmr update /src/components/dashboard/EnhancedCapaDashboardMain.tsx, /src/index.css
+9:53:51 PM [vite] hmr update /src/components/dashboard/EnhancedCapaDashboardMain.tsx, /src/index.css
+8:23:34 AM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+10:59:35 AM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+12:43:07 PM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/SimpleDashboard.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestRoundsData.tsx, /src/components/TestDataDisplay.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+12:43:08 PM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+12:43:08 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/LoginPage.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/EnhancedCapaManagement.tsx
+12:43:08 PM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+12:43:08 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/UserDropdown.tsx, /src/components/NotificationDropdown.tsx
+12:43:56 PM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+12:44:07 PM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+12:44:40 PM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+12:44:48 PM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+12:45:13 PM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+12:45:38 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+12:46:45 PM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+12:47:13 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+12:48:14 PM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/SimpleDashboard.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestRoundsData.tsx, /src/components/TestDataDisplay.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+12:48:14 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+12:48:14 PM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+12:48:14 PM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+12:48:14 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/LoginPage.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/EnhancedCapaManagement.tsx
+12:48:14 PM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+12:48:14 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/UserDropdown.tsx, /src/components/NotificationDropdown.tsx
+1:56:53 PM [vite] hmr update /src/components/pages/EnhancedCapaManagement.tsx, /src/index.css
+5:22:38 PM [vite] hmr update /src/components/dashboard/EnhancedCapaDashboardMain.tsx, /src/index.css
+5:23:55 PM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+5:26:07 PM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/SimpleDashboard.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestRoundsData.tsx, /src/components/TestDataDisplay.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+5:26:08 PM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+5:26:08 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/LoginPage.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/EnhancedCapaManagement.tsx
+5:26:08 PM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+5:26:08 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/UserDropdown.tsx, /src/components/NotificationDropdown.tsx
+5:27:09 PM [vite] hmr update /src/components/dashboard/EnhancedCapaDashboardMain.tsx, /src/index.css
+5:27:09 PM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/SimpleDashboard.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestRoundsData.tsx, /src/components/TestDataDisplay.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+5:27:09 PM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+5:27:10 PM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+5:27:10 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/LoginPage.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/EnhancedCapaManagement.tsx
+5:27:10 PM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+5:27:10 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/UserDropdown.tsx, /src/components/NotificationDropdown.tsx
+6:39:52 AM [vite] hmr update /src/components/forms/EvaluateRoundForm.tsx, /src/index.css
+6:39:52 AM [vite] hmr update /src/context/AuthContext.tsx, /src/index.css, /src/context/NotificationsContext.tsx, /src/components/SimpleDashboard.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/DepartmentFormPage.tsx, /src/components/pages/DepartmentsManagement.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/ReportsPage.tsx, /src/components/pages/EnhancedCapaManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsCalendarView.tsx, /src/components/pages/RoundsListView.tsx, /src/components/TestApi.tsx, /src/components/TestDepartments.tsx, /src/components/forms/CompleteRoundForm.tsx, /src/components/TestRoundsData.tsx, /src/components/TestDataDisplay.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/CapaIntegrationRoundSelector.tsx, /src/components/pages/EvaluationCategoriesPage.tsx, /src/components/pages/EvaluationItemsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/SettingsPage.tsx, /src/components/forms/EvaluateRoundForm.tsx, /src/components/dashboard/ActionProgressTracker.tsx, /src/components/dashboard/CapaTimelineView.tsx, /src/components/dashboard/EnhancedCapaDashboard.tsx, /src/components/dashboard/AlertSystem.tsx, /src/components/dashboard/BasicReports.tsx, /src/components/pages/RoundTypesSettingsPage.tsx, /src/components/forms/EvaluationWizard.tsx
+6:39:52 AM [vite] hmr update /src/components/dashboard/EnhancedCapaDashboardMain.tsx, /src/index.css
+6:39:54 AM [vite] hmr invalidate /src/context/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+6:39:54 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/LoginPage.tsx, /src/components/RegisterPage.tsx, /src/components/TestRoundCreation.tsx, /src/components/TestMyRounds.tsx, /src/components/TestCreateRound.tsx, /src/components/pages/MyRoundsPage.tsx, /src/components/pages/SettingsPage.tsx, /src/components/pages/UsersManagement.tsx, /src/components/pages/EvaluateRoundPage.tsx, /src/components/pages/RoundsManagement.tsx, /src/components/pages/RoundsListView.tsx, /src/components/UserDropdown.tsx, /src/components/pages/CapaManagement.tsx, /src/components/pages/EnhancedCapaManagement.tsx
+6:39:54 AM [vite] hmr invalidate /src/context/NotificationsContext.tsx Could not Fast Refresh ("useNotifications" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+6:39:54 AM [vite] hmr update /src/App.tsx, /src/index.css, /src/components/UserDropdown.tsx, /src/components/NotificationDropdown.tsx

@@ -398,7 +398,12 @@ def get_rounds_by_user(db: Session, user_id: int, skip: int = 0, limit: int = 10
     print(f"🎯 Found {len(user_rounds)} rounds assigned to user ID {user_id}")
     
     # تحديث الحالة تلقائياً لكل جولة
-    from utils.status_calculator import calculate_round_status
+    # Use package-relative import to avoid "No module named 'utils'" when running from backend package
+    try:
+        from backend.utils.status_calculator import calculate_round_status
+    except Exception:
+        # Fallback to relative import for tests or different launch contexts
+        from utils.status_calculator import calculate_round_status
     
     updated_count = 0
     for round in user_rounds:
@@ -817,12 +822,17 @@ def get_capas_by_department(db: Session, department: str):
 def get_capas_by_status(db: Session, status: str):
     return db.query(Capa).filter(Capa.status == status).all()
 
-def update_capa(db: Session, capa_id: int, capa_data: dict):
+def update_capa(db: Session, capa_id: int, capa_data: dict, performed_by_id: Optional[int] = None):
     """Update a CAPA by ID"""
     db_capa = db.query(Capa).filter(Capa.id == capa_id).first()
     if not db_capa:
         return None
-    
+    # Capture old values for auditing
+    old_values = {
+        'status': db_capa.status,
+        'verification_status': getattr(db_capa, 'verification_status', None)
+    }
+
     # Update basic fields if provided
     if 'title' in capa_data and capa_data['title'] is not None:
         db_capa.title = capa_data['title']
@@ -945,6 +955,67 @@ def update_capa(db: Session, capa_id: int, capa_data: dict):
         print(f"⚠️ Failed to update actions in capa_actions table: {e}")
     
     db.refresh(db_capa)
+
+    # Create audit log entry if caller provided a user id
+    try:
+        if performed_by_id is not None:
+            create_audit_log(db, {
+                'user_id': performed_by_id,
+                'action': 'update_capa',
+                'entity_type': 'capa',
+                'entity_id': capa_id,
+                'old_values': json.dumps(old_values, ensure_ascii=False),
+                'new_values': json.dumps({'status': db_capa.status, 'verification_status': getattr(db_capa, 'verification_status', None)}, ensure_ascii=False)
+            })
+    except Exception as e:
+        print(f"⚠️ Warning: failed to create audit log in update_capa: {e}")
+
+    # Send notifications to department managers on key status changes
+    try:
+        # Only notify when status transitioned to IMPLEMENTED or VERIFIED
+        new_status = getattr(db_capa, 'status', '')
+        notify_on = ['IMPLEMENTED', 'VERIFIED']
+        if new_status in notify_on:
+            try:
+                from notification_service import get_notification_service
+                # Creator name
+                creator = get_user_by_id(db, performed_by_id) if performed_by_id else None
+                created_by_name = f"{creator.first_name} {creator.last_name}" if creator else 'نظام'
+                manager_ids = get_department_manager_ids(db, db_capa.department)
+                if manager_ids:
+                    notification_service = get_notification_service(db)
+                    # Try the service helper first
+                    try:
+                        sent_count = notification_service.send_capa_assignment_notification(
+                            capa_id=db_capa.id,
+                            capa_title=db_capa.title,
+                            capa_department=db_capa.department,
+                            assigned_user_id=manager_ids[0],
+                            created_by_name=created_by_name
+                        )
+                    except Exception as ne:
+                        print(f"⚠️ Warning: notification service failed: {ne}")
+                        sent_count = 0
+
+                    # If service didn't create notifications (or returned 0), fallback to direct creation
+                    if not sent_count:
+                        for manager_id in manager_ids:
+                            try:
+                                create_notification(db, {
+                                    'user_id': manager_id,
+                                    'title': f'خطة تصحيحية محدثة: {db_capa.title}',
+                                    'message': f'حالة الخطة التصحيحية "{db_capa.title}" تغيرت إلى {db_capa.status} من قبل {created_by_name}',
+                                    'notification_type': 'capa_assigned',
+                                    'entity_type': 'CAPA',
+                                    'entity_id': db_capa.id
+                                })
+                            except Exception as ne:
+                                print(f"⚠️ Warning: failed to create fallback notification for {manager_id}: {ne}")
+            except Exception as ne:
+                print(f"⚠️ Warning: notification flow failed: {ne}")
+    except Exception:
+        pass
+
     return db_capa
 
 def delete_capa(db: Session, capa_id: int):
@@ -1500,6 +1571,33 @@ def create_notification(db: Session, notification_data: dict):
         db.add(db_notification)
         db.commit()
         db.refresh(db_notification)
+
+        # Attempt to send email immediately if the recipient has email notifications enabled
+        try:
+            # Local imports to avoid circular import issues at module import time
+            from crud import get_user_by_id as _get_user_by_id
+            from notification_service import get_notification_service as _get_notification_service
+
+            user = _get_user_by_id(db, db_notification.user_id)
+            settings = get_user_notification_settings(db, db_notification.user_id)
+
+            # Only attempt sending if user has an email and email notifications enabled (or no settings => default true)
+            if user and getattr(user, 'email', None):
+                email_enabled = True
+                if settings and hasattr(settings, 'email_notifications'):
+                    email_enabled = bool(settings.email_notifications)
+
+                if email_enabled:
+                    try:
+                        svc = _get_notification_service(db)
+                        svc._send_email_notification(db_notification)
+                    except Exception as e:
+                        print(f"⚠️ Warning: failed to send email for notification {db_notification.id}: {e}")
+
+        except Exception as e:
+            # Don't fail the DB operation on email errors
+            print(f"⚠️ Warning in post-create notification email flow: {e}")
+
         return db_notification
     except Exception:
         # Rollback to clear the failed transaction so subsequent operations can proceed
@@ -1726,6 +1824,57 @@ def get_non_compliant_evaluation_items(db: Session, round_id: int, threshold: in
         return []
 
 
+def get_evaluation_items_needing_capa(db: Session, round_id: int):
+    """
+    Get evaluation items from a round that are marked as needing CAPA.
+    Returns items where needs_capa = True.
+    
+    Args:
+        round_id: The round ID to analyze
+    
+    Returns:
+        List of evaluation items that need CAPA plans
+    """
+    if not EVALUATION_MODELS_AVAILABLE:
+        return []
+    
+    try:
+        from models_updated import EvaluationResult, EvaluationItem
+        
+        # Get evaluation results for this round where needs_capa is True
+        results = db.query(EvaluationResult).join(EvaluationItem).filter(
+            EvaluationResult.round_id == round_id,
+            EvaluationResult.needs_capa == True
+        ).all()
+        
+        items_needing_capa = []
+        for result in results:
+            # Get the evaluation item details
+            item = db.query(EvaluationItem).filter(EvaluationItem.id == result.item_id).first()
+            if item:
+                items_needing_capa.append({
+                    'evaluation_result_id': result.id,
+                    'item_id': item.id,
+                    'item_code': item.code,
+                    'item_title': item.title,
+                    'item_description': item.description,
+                    'category_name': item.category_name,
+                    'category_color': item.category_color,
+                    'risk_level': getattr(item, 'risk_level', 'MINOR'),
+                    'score': result.score,
+                    'comments': result.comments,
+                    'capa_note': result.capa_note,
+                    'evaluated_at': result.evaluated_at,
+                    'status': 'needs_capa'
+                })
+        
+        return items_needing_capa
+        
+    except Exception as e:
+        print(f"Error getting evaluation items needing CAPA: {e}")
+        return []
+
+
 def create_capa_from_evaluation_item(db: Session, round_id: int, evaluation_item_data: dict, creator_id: int):
     """
     Create a CAPA plan for a specific evaluation item that failed compliance.
@@ -1810,6 +1959,50 @@ def create_capa_from_evaluation_item(db: Session, round_id: int, evaluation_item
         db.add(db_capa)
         db.commit()
         db.refresh(db_capa)
+
+        # Send notifications (best-effort) to assigned user and quality managers
+        try:
+            try:
+                from notification_service import get_notification_service
+                notification_service = get_notification_service(db)
+            except Exception:
+                notification_service = None
+
+            creator = get_user_by_id(db, creator_id) if creator_id else None
+            creator_name = f"{creator.first_name} {creator.last_name}" if creator else "نظام"
+
+            evaluation_item_title = item_title
+
+            # Get quality manager ids
+            try:
+                quality_manager_ids = [qm.id for qm in db.query(User).filter(User.role == 'quality_manager').all() if qm.id != creator_id]
+            except Exception:
+                quality_manager_ids = []
+
+            if notification_service:
+                notification_service.send_capa_created_notification(
+                    capa_id=db_capa.id,
+                    capa_title=db_capa.title,
+                    evaluation_item_title=evaluation_item_title,
+                    assigned_user_id=db_capa.assigned_to_id,
+                    quality_manager_ids=quality_manager_ids,
+                    created_by_name=creator_name
+                )
+        except Exception as e:
+            print(f"Warning: failed to send notifications for created CAPA {getattr(db_capa, 'id', None)}: {e}")
+
+        # Audit log
+        try:
+            create_audit_log(db, {
+                "user_id": creator_id,
+                "action": "create_capa",
+                "entity_type": "capa",
+                "entity_id": db_capa.id,
+                "new_values": json.dumps({"title": db_capa.title, "department": db_capa.department}, ensure_ascii=False)
+            })
+        except Exception as e:
+            print(f"Warning: failed to create audit log for CAPA {getattr(db_capa, 'id', None)}: {e}")
+
         return db_capa
         
     except Exception as e:

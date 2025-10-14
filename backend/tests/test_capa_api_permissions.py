@@ -28,7 +28,7 @@ def test_create_capa_forbidden_for_assessor():
         "sla_days": 14
     }
 
-    resp = client.post("/api/capas/", json=payload)
+    resp = client.post("/api/capas", json=payload)
     assert resp.status_code == 403
     assert "permission" in resp.json().get("detail", "").lower()
 
@@ -52,7 +52,7 @@ def test_create_capa_allowed_for_quality_manager():
         "sla_days": 14
     }
 
-    resp = client.post("/api/capas/", json=payload)
+    resp = client.post("/api/capas", json=payload)
     # Should be success (200 or 201 depending on implementation)
     assert resp.status_code in (200, 201)
     data = resp.json()
