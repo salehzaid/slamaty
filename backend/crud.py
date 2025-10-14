@@ -390,7 +390,6 @@ def get_rounds_by_user(db: Session, user_id: int, skip: int = 0, limit: int = 10
     
     # Query rounds where assigned_to_ids JSONB array contains the user_id
     # Using PostgreSQL JSONB operators: @> checks if left JSONB contains right JSONB
-    # We use text() to pass raw SQL for the JSONB comparison
     user_rounds = db.query(Round).filter(
         text(f"assigned_to_ids @> '[{user_id}]'::jsonb")
     ).offset(skip).limit(limit).all()
