@@ -2,8 +2,13 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from models_updated import Base, Capa, EvaluationResult, CapaStatus
+try:
+    from models_updated import Base, Capa, EvaluationResult, CapaStatus
+except ImportError:
+    from backend.models_updated import Base, Capa, EvaluationResult, CapaStatus
 
 # Use test DB URL from env or fallback
 DB_URL = os.getenv('TEST_DATABASE_URL', 'postgresql://postgres@localhost/salamaty_db')

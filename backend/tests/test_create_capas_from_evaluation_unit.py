@@ -1,7 +1,16 @@
 import pytest
-from backend.database import get_db
-from backend import crud
-from backend.auth import get_password_hash
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+try:
+    from backend.database import get_db
+    from backend import crud
+    from backend.auth import get_password_hash
+except ImportError:
+    from database import get_db
+    import crud
+    from auth import get_password_hash
 
 
 def get_db_session():

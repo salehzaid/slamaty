@@ -1,8 +1,16 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
-from models_updated import Base, Round, EvaluationItem, EvaluationResult, Capa
-from crud import create_capas_for_round_non_compliance
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+try:
+    from models_updated import Base, Round, EvaluationItem, EvaluationResult, Capa
+    from crud import create_capas_for_round_non_compliance
+except ImportError:
+    from backend.models_updated import Base, Round, EvaluationItem, EvaluationResult, Capa
+    from backend.crud import create_capas_for_round_non_compliance
+
 from datetime import datetime
 
 DB_URL = os.getenv('TEST_DATABASE_URL', 'postgresql://postgres@localhost/salamaty_db')

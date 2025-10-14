@@ -1,6 +1,14 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from fastapi.testclient import TestClient
-from backend.main import app
-from backend.auth import get_current_user
+try:
+    from backend.main import app
+    from backend.auth import get_current_user
+except ImportError:
+    from main import app
+    from auth import get_current_user
 
 
 class FakeUser:

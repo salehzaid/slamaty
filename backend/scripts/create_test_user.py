@@ -1,10 +1,19 @@
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from backend.models_updated import User, UserRole
-from auth import get_password_hash
-from database import engine
 from sqlalchemy import text
+
+try:
+    from backend.models_updated import User, UserRole
+    from auth import get_password_hash
+    from database import engine
+except ImportError:
+    from models_updated import User, UserRole
+    from auth import get_password_hash
+    from database import engine
 
 DB_URL = os.getenv('TEST_DATABASE_URL', os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/salamaty_db'))
 

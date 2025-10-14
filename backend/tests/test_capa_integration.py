@@ -1,9 +1,15 @@
 import pytest
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from crud import create_evaluation_results, create_capa, get_capas
+try:
+    from crud import create_evaluation_results, create_capa, get_capas
+except ImportError:
+    from backend.crud import create_evaluation_results, create_capa, get_capas
 
 DB_URL = os.getenv('TEST_DATABASE_URL', 'postgresql://postgres@localhost/salamaty_db')
 engine = create_engine(DB_URL)

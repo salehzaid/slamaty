@@ -1274,3 +1274,108 @@ INFO:     127.0.0.1:50864 - "GET /api/rounds/my HTTP/1.1" 401 Unauthorized
 INFO:     127.0.0.1:50873 - "GET /api/rounds/my HTTP/1.1" 401 Unauthorized
 [DB] Unexpected database error: 401: Could not validate credentials
 INFO:     127.0.0.1:51008 - "GET /api/rounds/my/stats HTTP/1.1" 401 Unauthorized
+WARNING:  WatchFiles detected changes in 'update_railway_db.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56592]
+INFO:     Started server process [57498]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'railway_db_init.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [57498]
+INFO:     Started server process [57558]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'create_new_admin.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [57558]
+WARNING:  WatchFiles detected changes in 'create_new_admin.py'. Reloading...
+INFO:     Started server process [57659]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Started server process [57667]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'update_railway_db.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [57667]
+INFO:     Started server process [57757]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'railway_db_init.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [57757]
+WARNING:  WatchFiles detected changes in 'railway_db_init.py'. Reloading...
+INFO:     Started server process [57762]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'create_new_admin.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [57762]
+WARNING:  WatchFiles detected changes in 'create_new_admin.py'. Reloading...
+INFO:     Started server process [57771]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Started server process [57777]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'create_new_admin.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [57777]
+INFO:     Started server process [57787]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'backend/crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [57787]
+INFO:     Started server process [59055]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'backend/crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [59055]
+INFO:     Started server process [59066]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[DB] Using database: salamaty_db
+[DB] Engine created successfully
+✅ CORS enabled for all localhost origins
+[WARN] Notifications router not loaded: No module named 'crud_notifications'
+[WARN] CAPA router not loaded: No module named 'capa_router'
+[DB] Unexpected database error: 401: Could not validate credentials
+INFO:     127.0.0.1:53405 - "GET /api/rounds/my HTTP/1.1" 401 Unauthorized
+WARNING:  WatchFiles detected changes in 'test_fix.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [59066]
+WARNING:  WatchFiles detected changes in 'test_fix.py'. Reloading...
+INFO:     Started server process [59172]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Started server process [59176]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [59176]
+INFO:     Stopping reloader process [42598]

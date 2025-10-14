@@ -39,7 +39,12 @@ except Exception as e:
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
+try:
+    from sqlalchemy.orm import declarative_base
+    Base = declarative_base()
+except ImportError:
+    from sqlalchemy.ext.declarative import declarative_base
+    Base = declarative_base()
 
 def get_db():
     db = SessionLocal()

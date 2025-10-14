@@ -9,6 +9,8 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     services:
       postgres:
         image: postgres:15
@@ -60,6 +62,8 @@ jobs:
   e2e:
     needs: tests
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
 
@@ -82,7 +86,7 @@ jobs:
           nohup python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 &
           # wait for backend
           for i in {1..30}; do
-            curl -sS http://localhost:8000/ || sleep 2 && break
+            curl -sS http://localhost:8000/health && break || sleep 2
           done
 
       - name: Setup Node
@@ -102,7 +106,7 @@ jobs:
           nohup npm run dev &
           # wait for frontend
           for i in {1..30}; do
-            curl -sS http://127.0.0.1:5173/ || sleep 2 && break
+            curl -sS http://127.0.0.1:5173/ && break || sleep 2
           done
 
       - name: Run Playwright tests
