@@ -380,21 +380,30 @@ def get_rounds_by_user(db: Session, user_id: int, skip: int = 0, limit: int = 10
     
     print(f"🔍 Getting rounds for user ID: {user_id}")
     
-    # Check if user exists
-    user = get_user_by_id(db, user_id)
-    if not user:
-        print(f"❌ User with ID {user_id} not found")
+    try:
+        # Check if user exists
+        user = get_user_by_id(db, user_id)
+        if not user:
+            print(f"❌ User with ID {user_id} not found")
+            return []
+        
+        print(f"👤 User: {user.first_name} {user.last_name} (ID: {user_id})")
+        
+        # Query rounds where assigned_to_ids JSONB array contains the user_id
+        # Using PostgreSQL JSONB operators: @> checks if left JSONB contains right JSONB
+        user_rounds = db.query(Round).filter(
+            text(f"assigned_to_ids @> '[{user_id}]'::jsonb")
+        ).offset(skip).limit(limit).all()
+        
+        print(f"🎯 Found {len(user_rounds)} rounds assigned to user ID {user_id}")
+        
+        return user_rounds
+        
+    except Exception as e:
+        print(f"❌ Error in get_rounds_by_user: {e}")
+        import traceback
+        traceback.print_exc()
         return []
-    
-    print(f"👤 User: {user.first_name} {user.last_name} (ID: {user_id})")
-    
-    # Query rounds where assigned_to_ids JSONB array contains the user_id
-    # Using PostgreSQL JSONB operators: @> checks if left JSONB contains right JSONB
-    user_rounds = db.query(Round).filter(
-        text(f"assigned_to_ids @> '[{user_id}]'::jsonb")
-    ).offset(skip).limit(limit).all()
-    
-    print(f"🎯 Found {len(user_rounds)} rounds assigned to user ID {user_id}")
     
     # تحديث الحالة تلقائياً لكل جولة
     # Use package-relative import to avoid "No module named 'utils'" when running from backend package
