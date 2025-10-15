@@ -3284,7 +3284,7 @@ async def create_capa_compat(capa: CapaCreate, current_user: User = Depends(get_
             evaluation_item_title = 'عنصر التقييم'
             if getattr(db_capa, 'evaluation_item_id', None):
                 try:
-                    from models import EvaluationItem
+                    from models_updated import EvaluationItem
                     ev = db.query(EvaluationItem).filter(EvaluationItem.id == db_capa.evaluation_item_id).first()
                     if ev:
                         evaluation_item_title = ev.title or ev.code

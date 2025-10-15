@@ -5,7 +5,7 @@ from datetime import datetime
 import json
 
 from database import get_db
-from models import User, Capa, VerificationStatus, CapaStatus
+from models_updated import User, Capa, VerificationStatus, CapaStatus
 from schemas import (
     CapaCreate, CapaUpdate, CapaResponse, CapaVerify, 
     ActionItem, VerificationStep, StatusHistoryItem
@@ -125,7 +125,7 @@ async def create_capa_endpoint(
         evaluation_item_title = "عنصر التقييم"
         if db_capa.evaluation_item_id:
             try:
-                from models import EvaluationItem
+                from models_updated import EvaluationItem
                 eval_item = db.query(EvaluationItem).filter(EvaluationItem.id == db_capa.evaluation_item_id).first()
                 if eval_item:
                     evaluation_item_title = eval_item.title or eval_item.code
