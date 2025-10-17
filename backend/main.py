@@ -913,10 +913,16 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
 @app.get("/api/rounds/my", response_model=List[RoundResponse])
 async def get_my_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Get rounds assigned to the current user"""
-    print(f"🔍 API: Getting rounds for user ID: {current_user.id}")
-    rounds = get_rounds_by_user(db, current_user.id, skip=skip, limit=limit)
-    print(f"📊 API: Returning {len(rounds)} rounds")
-    return rounds
+    try:
+        print(f"🔍 API: Getting rounds for user ID: {current_user.id}")
+        rounds = get_rounds_by_user(db, current_user.id, skip=skip, limit=limit)
+        print(f"📊 API: Returning {len(rounds)} rounds")
+        return rounds
+    except Exception as e:
+        print(f"❌ Error in get_my_rounds: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"خطأ في جلب الجولات: {str(e)}")
 
 
 @app.get("/api/rounds/my/stats")
