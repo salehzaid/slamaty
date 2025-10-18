@@ -910,14 +910,27 @@ async def get_all_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"خطأ في تحميل الجولات من قاعدة البيانات: {str(e)}")
 
-@app.get("/api/rounds/my", response_model=List[RoundResponse])
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+
+
+@app.get("/api/rounds/my")
 async def get_my_rounds(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    """Get rounds assigned to the current user"""
+    """Get rounds assigned to the current user.
+
+    NOTE: return a serialized JSON response rather than relying on FastAPI
+    response_model validation. Some production rows contain values that
+    fail pydantic validation during serialization; returning a pre-encoded
+    JSON payload avoids runtime 500s while we investigate/align schemas.
+    """
     try:
         print(f"🔍 API: Getting rounds for user ID: {current_user.id}")
         rounds = get_rounds_by_user(db, current_user.id, skip=skip, limit=limit)
         print(f"📊 API: Returning {len(rounds)} rounds")
-        return rounds
+
+        # Safely encode SQLAlchemy models to primitives (datetimes -> iso, lists, etc.)
+        payload = jsonable_encoder(rounds)
+        return JSONResponse(content=payload)
     except Exception as e:
         print(f"❌ Error in get_my_rounds: {e}")
         import traceback
