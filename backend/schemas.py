@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, field_validator
+import json
 from typing import Optional, List, Union
 from datetime import datetime
 from models_updated import UserRole, RoundStatus, RoundType, CapaStatus, VerificationStatus, NotificationType, NotificationStatus
@@ -76,6 +77,59 @@ class RoundResponse(RoundBase):
 
     class Config:
         from_attributes = True
+
+    # Accept string-encoded JSON lists from DB (some rows store JSON as TEXT)
+    @field_validator("selected_categories", mode="before")
+    def _parse_selected_categories(cls, v):
+        if v is None:
+            return []
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except Exception:
+                # fallback: parse bracketed numbers like "[1,2]"
+                s = v.strip()
+                if s.startswith("[") and s.endswith("]"):
+                    inner = s[1:-1].strip()
+                    if not inner:
+                        return []
+                    return [int(x.strip()) for x in inner.split(",") if x.strip()]
+                return []
+        return v
+
+    @field_validator("evaluation_items", mode="before")
+    def _parse_evaluation_items(cls, v):
+        if v is None:
+            return []
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except Exception:
+                s = v.strip()
+                if s.startswith("[") and s.endswith("]"):
+                    inner = s[1:-1].strip()
+                    if not inner:
+                        return []
+                    return [int(x.strip()) for x in inner.split(",") if x.strip()]
+                return []
+        return v
+
+    @field_validator("assigned_to_ids", mode="before")
+    def _parse_assigned_to_ids(cls, v):
+        if v is None:
+            return []
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except Exception:
+                s = v.strip()
+                if s.startswith("[") and s.endswith("]"):
+                    inner = s[1:-1].strip()
+                    if not inner:
+                        return []
+                    return [int(x.strip()) for x in inner.split(",") if x.strip()]
+                return []
+        return v
 
 # CAPA schemas
 class ActionItem(BaseModel):
