@@ -26,8 +26,8 @@ const RoundsPage: React.FC = () => {
   const { data: rounds, loading, error, refetch } = useRounds();
 
   const filteredRounds = (rounds || []).filter(round => {
-    const matchesSearch = round.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         round.department.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (round.department || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (round.roundCode || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || round.status === statusFilter;
     const matchesDepartment = departmentFilter === 'all' || round.department === departmentFilter;
     
@@ -151,13 +151,27 @@ const RoundsPage: React.FC = () => {
           <p className="text-gray-600">إدارة وتتبع جولات التقييم والجودة</p>
         </div>
         {hasPermission(['super_admin', 'quality_manager']) && (
-          <button
-            onClick={() => setShowCreateForm(true)}
-            className="btn-primary flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            جولة جديدة
-          </button>
+          <>
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-4 py-2 text-sm font-bold rounded-full shadow-2xl flex items-center gap-2 hover:scale-105 transform transition"
+              aria-label="إنشاء جولة جديدة"
+            >
+              <Plus className="w-5 h-5" />
+              جولة جديدة
+            </button>
+
+            {/* Floating CTA for small screens */}
+            <div className="sm:hidden fixed bottom-6 right-6 z-40">
+              <button
+                onClick={() => setShowCreateForm(true)}
+                className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-4 rounded-full shadow-2xl flex items-center justify-center"
+                aria-label="إنشاء جولة جديدة - متحرك"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            </div>
+          </>
         )}
       </div>
 
@@ -240,12 +254,7 @@ const RoundsPage: React.FC = () => {
             
             {/* Ticket Content */}
             <div className="p-4">
-              <div className="mb-3">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">{round.title}</h4>
-                {round.description && (
-                  <p className="text-gray-600 text-xs line-clamp-1">{round.description}</p>
-                )}
-              </div>
+              {/* Removed title/description per requirements */}
               
               {/* Flight Details Style */}
               <div className="grid grid-cols-2 gap-3 mb-4">

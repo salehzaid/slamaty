@@ -257,7 +257,7 @@ const RoundsListView: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="p-6 space-y-8">
         {/* Enhanced Header */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 sticky top-6 z-30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <div className="p-3 bg-gray-100 rounded-lg">
@@ -271,13 +271,25 @@ const RoundsListView: React.FC = () => {
             <div className="flex items-center gap-4">
               <Button 
                 onClick={handleCreateRound}
-                className="bg-blue-600 text-white flex items-center gap-2 px-4 py-2 h-10 text-sm font-semibold rounded-md shadow-sm hover:shadow-md transition"
+                className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white flex items-center gap-3 px-5 py-3 text-base font-bold rounded-full shadow-2xl hover:shadow-2xl transform hover:scale-105 transition"
+                aria-label="إنشاء جولة جديدة"
               >
                 <Plus className="w-5 h-5" />
                 إنشاء جولة جديدة
               </Button>
             </div>
           </div>
+        </div>
+
+        {/* Floating CTA for small screens */}
+        <div className="sm:hidden fixed bottom-6 right-6 z-40">
+          <Button
+            onClick={handleCreateRound}
+            className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-4 rounded-full shadow-2xl flex items-center justify-center"
+            aria-label="إنشاء جولة جديدة - متحرك"
+          >
+            <Plus className="w-5 h-5" />
+          </Button>
         </div>
 
         {/* Enhanced Stats Cards */}
