@@ -127,14 +127,20 @@ const MyRoundsPage: React.FC = () => {
   }
 
   const getStatusText = (status: string) => {
-    const texts = {
-      'completed': 'مكتملة',
-      'in_progress': 'قيد التنفيذ',
-      'scheduled': 'مجدولة',
-      'overdue': 'متأخرة',
-      'cancelled': 'ملغية',
+    const texts: Record<string, { ar: string; en: string }> = {
+      completed: { ar: 'مكتملة', en: 'COMPLETED' },
+      in_progress: { ar: 'قيد التنفيذ', en: 'IN_PROGRESS' },
+      scheduled: { ar: 'مجدولة', en: 'SCHEDULED' },
+      overdue: { ar: 'متأخرة', en: 'OVERDUE' },
+      cancelled: { ar: 'ملغية', en: 'CANCELLED' },
     }
-    return texts[status as keyof typeof texts] || status
+    const t = texts[(status || '').toLowerCase()] || { ar: status || '', en: '' }
+    return (
+      <span className="inline-flex items-center gap-2">
+        <span>{t.ar}</span>
+        {t.en && <span className="text-xs text-gray-400 font-mono">{t.en}</span>}
+      </span>
+    )
   }
 
   const getPriorityText = (priority: string) => {
@@ -161,8 +167,8 @@ const MyRoundsPage: React.FC = () => {
   }
 
   const filteredRounds = myRounds?.filter(round => {
-    const matchesSearch = round.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         round.department.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = (round.department || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (round.roundCode || '').toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = filterStatus === 'all' || round.status === filterStatus
     const matchesPriority = filterPriority === 'all' || round.priority === filterPriority
     return matchesSearch && matchesStatus && matchesPriority
@@ -433,11 +439,11 @@ const MyRoundsPage: React.FC = () => {
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 h-14 text-lg"
               >
-                <option value="all">جميع الحالات</option>
-                <option value="scheduled">مجدولة</option>
-                <option value="in_progress">قيد التنفيذ</option>
-                <option value="completed">مكتملة</option>
-                <option value="overdue">متأخرة</option>
+              <option value="all">جميع الحالات</option>
+              <option value="scheduled">مجدولة — SCHEDULED</option>
+              <option value="in_progress">قيد التنفيذ — IN_PROGRESS</option>
+              <option value="completed">مكتملة — COMPLETED</option>
+              <option value="overdue">متأخرة — OVERDUE</option>
               </select>
               <select
                 value={filterPriority}
@@ -488,12 +494,7 @@ const MyRoundsPage: React.FC = () => {
               
               {/* Ticket Content */}
               <div className="p-4">
-                <div className="mb-3">
-                  <h4 className="text-base font-semibold text-gray-900 mb-1">{round.title}</h4>
-                  {round.description && (
-                    <p className="text-gray-600 text-xs line-clamp-1">{round.description}</p>
-                  )}
-                </div>
+                {/* Removed title/description per requirements */}
                 
                 {/* Flight Details Style */}
                 <div className="grid grid-cols-2 gap-3 mb-4">

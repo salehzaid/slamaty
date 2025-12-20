@@ -165,13 +165,20 @@ const RoundsListView: React.FC = () => {
 
   // Get status text
   const getStatusText = (status: string) => {
-    const texts = {
-      'scheduled': 'مجدولة',
-      'in_progress': 'قيد التنفيذ',
-      'completed': 'مكتملة',
-      'cancelled': 'ملغاة',
+    const texts: Record<string, { ar: string; en: string }> = {
+      scheduled: { ar: 'مجدولة', en: 'SCHEDULED' },
+      in_progress: { ar: 'قيد التنفيذ', en: 'IN_PROGRESS' },
+      completed: { ar: 'مكتملة', en: 'COMPLETED' },
+      cancelled: { ar: 'ملغاة', en: 'CANCELLED' },
+      overdue: { ar: 'متأخرة', en: 'OVERDUE' },
     }
-    return texts[status as keyof typeof texts] || status
+    const t = texts[(status || '').toLowerCase()] || { ar: status || '', en: '' }
+    return (
+      <span className="inline-flex items-center gap-2" aria-hidden={false}>
+        <span>{t.ar}</span>
+        {t.en && <span className="text-xs text-gray-400 font-mono">{t.en}</span>}
+      </span>
+    )
   }
 
   // Get priority color

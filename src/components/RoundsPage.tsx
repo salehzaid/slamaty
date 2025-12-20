@@ -109,17 +109,23 @@ const RoundsPage: React.FC = () => {
   }
 
   const getStatusText = (status: RoundStatus) => {
-    const texts = {
-      'scheduled': 'مجدولة',
-      'in_progress': 'قيد التنفيذ',
-      'pending_review': 'بانتظار المراجعة',
-      'under_review': 'تحت المراجعة',
-      'completed': 'مكتملة',
-      'cancelled': 'ملغاة',
-      'on_hold': 'معلقة',
-      'overdue': 'متأخرة'
+    const texts: Record<string, { ar: string; en: string }> = {
+      scheduled: { ar: 'مجدولة', en: 'SCHEDULED' },
+      in_progress: { ar: 'قيد التنفيذ', en: 'IN_PROGRESS' },
+      pending_review: { ar: 'بانتظار المراجعة', en: 'PENDING_REVIEW' },
+      under_review: { ar: 'تحت المراجعة', en: 'UNDER_REVIEW' },
+      completed: { ar: 'مكتملة', en: 'COMPLETED' },
+      cancelled: { ar: 'ملغاة', en: 'CANCELLED' },
+      on_hold: { ar: 'معلقة', en: 'ON_HOLD' },
+      overdue: { ar: 'متأخرة', en: 'OVERDUE' }
     };
-    return texts[status] || status;
+    const t = texts[(status || '')] || { ar: status || '', en: '' }
+    return (
+      <span className="inline-flex items-center gap-2">
+        <span>{t.ar}</span>
+        {t.en && <span className="text-xs text-gray-100/80 font-mono">{t.en}</span>}
+      </span>
+    );
   };
 
   const getPriorityColor = (priority: string) => {
@@ -195,11 +201,11 @@ const RoundsPage: React.FC = () => {
             className="input-field"
           >
             <option value="all">جميع الحالات</option>
-            <option value="scheduled">مجدولة</option>
-            <option value="in_progress">قيد التنفيذ</option>
-            <option value="pending_review">بانتظار المراجعة</option>
-            <option value="completed">مكتملة</option>
-            <option value="overdue">متأخرة</option>
+            <option value="scheduled">مجدولة — SCHEDULED</option>
+            <option value="in_progress">قيد التنفيذ — IN_PROGRESS</option>
+            <option value="pending_review">بانتظار المراجعة — PENDING_REVIEW</option>
+            <option value="completed">مكتملة — COMPLETED</option>
+            <option value="overdue">متأخرة — OVERDUE</option>
           </select>
           
           <select
