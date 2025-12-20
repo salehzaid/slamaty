@@ -54,8 +54,6 @@ const RoundsListView: React.FC = () => {
       
       // Prepare data for backend
       const roundData = {
-        title: data.title,
-        description: data.description,
         round_type: data.round_type,
         department: data.department || 'عام', // Use department from form or default
         assigned_to: data.assigned_to || data.assigned_users, // Array of user IDs
@@ -99,8 +97,6 @@ const RoundsListView: React.FC = () => {
       
       // Prepare data for backend
       const updateData = {
-        title: data.title,
-        description: data.description,
         round_type: data.round_type,
         department: data.department || 'عام',
         assigned_to: data.assigned_to || data.assigned_users,
@@ -202,8 +198,11 @@ const RoundsListView: React.FC = () => {
 
   // Filter rounds based on search and status
   const filteredRounds = Array.isArray(rounds) ? rounds.filter((round: any) => {
-    const matchesSearch = round.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         round.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    const q = searchTerm.toLowerCase()
+    const matchesSearch =
+      (round.department?.toLowerCase().includes(q)) ||
+      (round.roundCode?.toLowerCase().includes(q)) ||
+      (round.roundType?.toLowerCase().includes(q))
     const matchesStatus = filterStatus === 'all' || round.status === filterStatus
     return matchesSearch && matchesStatus
   }) : []
@@ -301,7 +300,10 @@ const RoundsListView: React.FC = () => {
                 <div>
                   <p className="text-green-100 text-sm font-medium">مكتملة</p>
                   <p className="text-3xl font-bold">
-                    {filteredRounds.filter((r: any) => r.status === 'completed').length}
+                    {filteredRounds.filter((r: any) => {
+                      const status = (r.status || '').toLowerCase();
+                      return status === 'completed';
+                    }).length}
                   </p>
                 </div>
                 <CheckCircle2 className="w-12 h-12 text-green-200" />
@@ -315,7 +317,10 @@ const RoundsListView: React.FC = () => {
                 <div>
                   <p className="text-yellow-100 text-sm font-medium">قيد التنفيذ</p>
                   <p className="text-3xl font-bold">
-                    {filteredRounds.filter((r: any) => r.status === 'in_progress').length}
+                    {filteredRounds.filter((r: any) => {
+                      const status = (r.status || '').toLowerCase();
+                      return status === 'in_progress';
+                    }).length}
                   </p>
                 </div>
                 <Play className="w-12 h-12 text-yellow-200" />
@@ -329,7 +334,19 @@ const RoundsListView: React.FC = () => {
                 <div>
                   <p className="text-red-100 text-sm font-medium">متأخرة</p>
                   <p className="text-3xl font-bold">
-                    {filteredRounds.filter((r: any) => r.status === 'overdue').length}
+                    {filteredRounds.filter((r: any) => {
+                      const status = (r.status || '').toLowerCase();
+                      // Check if round is overdue based on deadline
+                      if (status === 'overdue') return true;
+                      // Also check if deadline has passed but status is not completed
+                      if (r.deadline) {
+                        const deadline = new Date(r.deadline);
+                        const now = new Date();
+                        const isCompleted = status === 'completed';
+                        return deadline < now && !isCompleted;
+                      }
+                      return false;
+                    }).length}
                   </p>
                 </div>
                 <AlertTriangle className="w-12 h-12 text-red-200" />
@@ -342,7 +359,15 @@ const RoundsListView: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsChart
             title="معدل الإنجاز"
-            value={filteredRounds.length > 0 ? Math.round((filteredRounds.filter((r: any) => r.status === 'completed').length / filteredRounds.length) * 100) : 0}
+            value={(() => {
+              if (filteredRounds.length === 0) return 0;
+              // Calculate average completion percentage from individual rounds
+              const totalCompletion = filteredRounds.reduce((acc: number, round: any) => {
+                const completion = round.compliancePercentage || round.completionPercentage || 0;
+                return acc + (typeof completion === 'number' ? completion : 0);
+              }, 0);
+              return Math.round(totalCompletion / filteredRounds.length);
+            })()}
             previousValue={85}
             icon={<CheckCircle2 className="w-6 h-6 text-green-600" />}
             color="text-green-600"
@@ -353,7 +378,10 @@ const RoundsListView: React.FC = () => {
           
           <StatsChart
             title="الجولات النشطة"
-            value={filteredRounds.filter((r: any) => r.status === 'in_progress').length}
+            value={filteredRounds.filter((r: any) => {
+              const status = (r.status || '').toLowerCase();
+              return status === 'in_progress';
+            }).length}
             previousValue={3}
             icon={<Play className="w-6 h-6 text-blue-600" />}
             color="text-blue-600"
@@ -364,10 +392,15 @@ const RoundsListView: React.FC = () => {
           
           <StatsChart
             title="متوسط الأولوية"
-            value={filteredRounds.length > 0 ? Math.round(filteredRounds.reduce((acc: number, round: any) => {
-              const priorityValues = { low: 1, medium: 2, high: 3, urgent: 4 };
-              return acc + (priorityValues[round.priority as keyof typeof priorityValues] || 2);
-            }, 0) / filteredRounds.length) : 0}
+            value={(() => {
+              if (filteredRounds.length === 0) return 0;
+              const priorityValues: { [key: string]: number } = { low: 1, medium: 2, high: 3, urgent: 4 };
+              const totalPriority = filteredRounds.reduce((acc: number, round: any) => {
+                const priority = (round.priority || 'medium').toLowerCase();
+                return acc + (priorityValues[priority] || 2);
+              }, 0);
+              return Math.round(totalPriority / filteredRounds.length);
+            })()}
             previousValue={2}
             icon={<Target className="w-6 h-6 text-orange-600" />}
             color="text-orange-600"
@@ -378,7 +411,25 @@ const RoundsListView: React.FC = () => {
           
           <StatsChart
             title="كفاءة الفريق"
-            value={92}
+            value={(() => {
+              if (filteredRounds.length === 0) return 0;
+              // Calculate team efficiency based on completion rate and on-time performance
+              const completedRounds = filteredRounds.filter((r: any) => {
+                const status = (r.status || '').toLowerCase();
+                return status === 'completed';
+              }).length;
+              const completionRate = (completedRounds / filteredRounds.length) * 100;
+              
+              // Factor in average completion percentage for more accurate efficiency
+              const avgCompletion = filteredRounds.reduce((acc: number, round: any) => {
+                const completion = round.compliancePercentage || round.completionPercentage || 0;
+                return acc + (typeof completion === 'number' ? completion : 0);
+              }, 0) / filteredRounds.length;
+              
+              // Weighted efficiency calculation
+              const efficiency = (completionRate * 0.6 + avgCompletion * 0.4);
+              return Math.round(efficiency);
+            })()}
             previousValue={88}
             icon={<User className="w-6 h-6 text-purple-600" />}
             color="text-purple-600"
@@ -388,42 +439,49 @@ const RoundsListView: React.FC = () => {
           />
         </div>
 
-        {/* Filters - simple and formal */}
+        {/* Filters - compact row: Search — Status — Apply — Export */}
         <div className="bg-white border border-gray-200 rounded-md p-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <Filter className="w-5 h-5 text-gray-600" />
               <h3 className="text-lg font-medium text-gray-800">فلاتر البحث</h3>
             </div>
-            <div>
-              <Button variant="outline" className="text-sm px-3 py-1">تطبيق</Button>
-            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="relative flex-1 w-full sm:w-auto">
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
                 placeholder="بحث..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10 h-10 text-sm border border-gray-200 rounded-md"
+                className="pr-10 h-10 text-sm border border-gray-200 rounded-md w-full"
+                aria-label="بحث في الجولات"
               />
             </div>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-md text-sm"
-            >
-              <option value="all">جميع الحالات</option>
-              <option value="scheduled">مجدولة</option>
-              <option value="in_progress">قيد التنفيذ</option>
-              <option value="completed">مكتملة</option>
-              <option value="cancelled">ملغاة</option>
-            </select>
-            <div className="flex gap-2">
-              <Button variant="outline" className="text-sm px-3 py-2">تصدير</Button>
-              <Button variant="outline" className="text-sm px-3 py-2"><MoreHorizontal className="w-4 h-4" /></Button>
+
+            <div className="w-full sm:w-56">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-3 py-2 border border-gray-200 rounded-md text-sm w-full"
+                aria-label="حالة الجولة"
+              >
+                <option value="all">جميع الحالات</option>
+                <option value="scheduled">مجدولة</option>
+                <option value="in_progress">قيد التنفيذ</option>
+                <option value="completed">مكتملة</option>
+                <option value="cancelled">ملغاة</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2 ml-auto">
+              <Button onClick={() => refetch()} variant="outline" className="text-sm px-3 py-2" aria-label="تطبيق الفلاتر">
+                تطبيق
+              </Button>
+              <Button onClick={() => { console.log('Export rounds') }} variant="outline" className="text-sm px-3 py-2" aria-label="تصدير الجولات">
+                تصدير
+              </Button>
             </div>
           </div>
         </div>
@@ -440,8 +498,8 @@ const RoundsListView: React.FC = () => {
                         <Target className="w-6 h-6 text-gray-600" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{round.title || 'جولة بدون عنوان'}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{round.description ? (round.description.length > 120 ? round.description.slice(0, 117) + '...' : round.description) : '—'}</p>
+                        <h3 className="text-lg font-semibold text-gray-900">{round.department || '—'}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{round.roundCode || '—'}</p>
                         <div className="flex items-center gap-2 mt-3">
                           <Badge className={`${getStatusColor(round.status)} text-xs px-2 py-1 rounded-full`}>{getStatusText(round.status)}</Badge>
                           <Badge className={`${getPriorityColor(round.priority)} text-xs px-2 py-1 rounded-full`}>{getPriorityText(round.priority)}</Badge>
@@ -459,7 +517,7 @@ const RoundsListView: React.FC = () => {
                         </Button>
                       )}
                       {hasPermission(['super_admin']) && (
-                        <Button variant="ghost" className="text-sm px-3 py-1 text-red-600" onClick={() => handleDeleteRound(round.id, round.title)} disabled={deleteRoundMutation.loading}>
+                        <Button variant="ghost" className="text-sm px-3 py-1 text-red-600" onClick={() => handleDeleteRound(round.id, round.roundCode || String(round.id))} disabled={deleteRoundMutation.loading}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       )}
