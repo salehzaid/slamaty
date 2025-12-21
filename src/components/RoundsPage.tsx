@@ -14,6 +14,7 @@ import { RoundStatus } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useRounds } from '../hooks/useRounds';
 import RoundForm from './forms/RoundForm';
+import AssignedUsers from '@/components/ui/AssignedUsers';
 
 const RoundsPage: React.FC = () => {
   const { hasPermission } = useAuth();
@@ -313,7 +314,7 @@ const RoundsPage: React.FC = () => {
                   <User className="w-4 h-4 text-gray-600" />
                   <div>
                     <div className="text-xs font-medium text-gray-900">المكلف</div>
-                    <div className="text-xs text-gray-600 truncate">{round.assignedTo.join(', ')}</div>
+                    <div className="text-xs text-gray-600 truncate">{/* @ts-ignore */}<AssignedUsers users={round.assignedTo} /></div>
                   </div>
                 </div>
               </div>

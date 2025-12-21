@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import AssignedUsers from '@/components/ui/AssignedUsers'
 import { useRounds, useDeleteRound } from '@/hooks/useRounds'
 import CompleteRoundForm from '@/components/forms/CompleteRoundForm'
 import StatsChart from '@/components/ui/StatsChart'
@@ -550,7 +551,12 @@ const RoundsListView: React.FC = () => {
                     </div>
                     <div>
                       <div className="text-xs text-gray-500">المسؤول</div>
-                      <div className="font-medium text-gray-800">{round.assignedTo && round.assignedTo.length > 0 ? round.assignedTo.join(', ') : 'غير محدد'}</div>
+                      <div className="font-medium text-gray-800">
+                        {/* AssignedUsers component hides numeric IDs and shows +N */}
+                        { /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */ }
+                        {/* @ts-ignore */}
+                        <AssignedUsers users={round.assignedTo} />
+                      </div>
                     </div>
                     <div>
                       <div className="text-xs text-gray-500">القسم</div>
