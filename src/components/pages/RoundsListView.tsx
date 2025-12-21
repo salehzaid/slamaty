@@ -651,6 +651,7 @@ const RoundsListView: React.FC = () => {
         </div>
       </div>
     </div>
+    </div>
   )
 }
 
