@@ -3,16 +3,22 @@ const API_BASE_URL = (() => {
   // Prefer explicit env var at build time
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL
   // At runtime (dev server) if the frontend is served from vite (ports 5173/5174)
-  // default backend to localhost:8000 so API calls reach the running backend container
+  // default backend to 127.0.0.1:8000 (preferred) or localhost:8000 (fallback)
   if (typeof window !== 'undefined') {
     const port = window.location.port
     if (port === '5173' || port === '5174') {
+      // Always use 127.0.0.1 for consistency and to avoid CORS issues
       return 'http://127.0.0.1:8000'
     }
     return window.location.origin
   }
-  return 'http://localhost:8000'
+  return 'http://127.0.0.1:8000'
 })()
+
+// Log the API base URL on initialization to help debug
+if (typeof window !== 'undefined') {
+  console.log('🌐 API Base URL:', API_BASE_URL)
+}
 
 interface ApiResponse<T> {
   data: T
@@ -69,7 +75,14 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<any> {
-    const url = `${this.baseURL}${endpoint}`
+    // Ensure we use 127.0.0.1 instead of localhost to avoid CORS issues
+    let baseURL = this.baseURL
+    if (baseURL.includes('localhost:8000')) {
+      baseURL = baseURL.replace('localhost:8000', '127.0.0.1:8000')
+      console.log('🔄 Switched from localhost to 127.0.0.1')
+    }
+    
+    const url = `${baseURL}${endpoint}`
     
     // تم إزالة فحص التوكن القديم لاستخدام البيانات الحقيقية من قاعدة البيانات
     // الآن سيتم استخدام البيانات الحقيقية دائماً من قاعدة البيانات salamaty_db
@@ -84,13 +97,12 @@ class ApiClient {
     }
 
     try {
-      console.log('🔗 API Request - URL:', url)
-      console.log('🔗 API Request - Config:', config)
-      console.log('🔗 API Request - Body:', options.body)
-      
-      const response = await fetch(url, config)
-      console.log('📥 API Response - Status:', response.status)
-      console.log('📥 API Response - Headers:', response.headers)
+      // Use AbortController to enforce a request timeout to avoid hanging requests
+      const controller = new AbortController()
+      const timeoutMs = 8000 // 8s timeout for dev responsiveness
+      const timeout = setTimeout(() => controller.abort(), timeoutMs)
+      const response = await fetch(url, { signal: controller.signal, ...config })
+      clearTimeout(timeout)
       
       // التعامل مع 401 و 403 (غير مصادق أو غير مصرح)
       if (response.status === 401 || response.status === 403) {
@@ -110,12 +122,11 @@ class ApiClient {
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.log('❌ API Response - Error Text:', errorText)
+        console.error('❌ API Response - Error:', response.status, errorText)
         throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
       }
 
       const data = await response.json()
-      console.log('✅ API Response - Data:', data)
 
       // Normalize payloads so frontend always receives the underlying data:
       // - If API returns an array -> return the array
@@ -134,41 +145,101 @@ class ApiClient {
       }
 
       return data
-    } catch (error) {
-      console.error('❌ API request failed:', error)
-      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        throw new Error('Network error: Unable to connect to server. Please check if the server is running.')
+    } catch (error: any) {
+      // Clear potential fetch abort reason
+      const isAbort = error?.name === 'AbortError'
+      console.error('❌ API request failed:', isAbort ? 'timeout/abort' : error)
+      if (isAbort) {
+        throw new Error('انتهى وقت الاتصال بالخادم. تأكد من أن الخادم يعمل أو أن إعدادات VITE_API_URL صحيحة.')
       }
+
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        throw new Error('خطأ في الاتصال بالخادم. تأكد من أن الخادم يعمل')
+      }
+
+      if (error?.message) {
+        if (error.message.includes('خطأ') || error.message.includes('فشل') || error.message.includes('error')) {
+          throw error
+        }
+      }
+
       throw error
     }
   }
 
   // Authentication endpoints
   async login(email: string, password: string) {
-    const response = await fetch(`${this.baseURL}/api/auth/signin`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password })
-    })
+    try {
+      const url = `${this.baseURL}/api/auth/signin`
+      const requestBody = { email, password }
 
-    if (!response.ok) {
-      let detail = ''
-      try {
-        const text = await response.text()
-        detail = text
-      } catch (_) {}
-      throw new Error(`HTTP error! status: ${response.status}${detail ? `, message: ${detail}` : ''}`)
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      })
+
+      if (!response.ok) {
+        let errorMessage = 'فشل في تسجيل الدخول. تحقق من بياناتك.'
+        try {
+          const errorData = await response.json()
+          console.error('📥 Login error response:', errorData)
+          if (errorData.detail) {
+            errorMessage = errorData.detail
+          } else if (typeof errorData === 'string') {
+            errorMessage = errorData
+          } else if (errorData.message) {
+            errorMessage = errorData.message
+          }
+        } catch (parseError) {
+          // If JSON parsing fails, try text
+          try {
+            const text = await response.text()
+            console.error('📥 Login error text:', text)
+            if (text) {
+              errorMessage = text
+            }
+          } catch (textError) {
+            console.error('📥 Failed to parse error text:', textError)
+          }
+        }
+        
+        console.error('❌ Login failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorMessage
+        })
+        
+        throw new Error(errorMessage)
+      }
+
+      const data = await response.json()
+      console.log('📥 Login response data:', {
+        hasAccessToken: !!data.access_token,
+        hasUser: !!data.user,
+        userEmail: data.user?.email,
+        userId: data.user?.id
+      })
+
+      if (data.access_token) {
+        this.setToken(data.access_token)
+        console.log('✅ Login successful, token saved')
+      } else {
+        console.error('❌ Login response missing access_token. Full response:', data)
+        throw new Error('فشل في تسجيل الدخول: لا يوجد رمز الوصول')
+      }
+
+      return data
+    } catch (error) {
+      console.error('❌ Login error:', error)
+      // Re-throw with user-friendly message
+      if (error instanceof Error) {
+        throw error
+      }
+      throw new Error('حدث خطأ أثناء تسجيل الدخول. حاول مرة أخرى.')
     }
-
-    const data = await response.json()
-
-    if (data.access_token) {
-      this.setToken(data.access_token)
-    }
-
-    return data
   }
 
   async register(userData: any) {
@@ -232,6 +303,10 @@ class ApiClient {
   // Departments endpoints - استخدام البيانات الحقيقية من قاعدة البيانات
   async getDepartments() {
     return this.request('/api/departments')
+  }
+
+  async getDepartment(departmentId: number) {
+    return this.request(`/api/departments/${departmentId}`)
   }
 
   async createDepartment(departmentData: any) {
@@ -309,21 +384,24 @@ class ApiClient {
     return this.request('/api/capas')
   }
 
-  async createCapa(capaData: any) {
-    return this.request('/api/capas', {
-      method: 'POST',
-      body: JSON.stringify(capaData),
+  async deleteAllCapas() {
+    return this.request('/api/capa/all', {
+      method: 'DELETE',
     })
+  }
+
+  async getCapa(capaId: number) {
+    return this.request(`/api/capas/${capaId}`)
   }
 
   async getItemsNeedingCapa(roundId: number) {
     return this.request(`/api/rounds/${roundId}/items-needing-capa`)
   }
 
-  async createCapa(payload: any) {
-    return this.request(`/api/capa/`, {
+  async createCapa(capaData: any) {
+    return this.request('/api/capas', {
       method: 'POST',
-      body: JSON.stringify(payload)
+      body: JSON.stringify(capaData),
     })
   }
 
@@ -408,28 +486,56 @@ class ApiClient {
   }
 
   // Reports endpoints - استخدام البيانات الحقيقية من قاعدة البيانات
-  async getReportsDashboardStats() {
-    return this.request('/api/reports/dashboard/stats')
+  async getReportsDashboardStats(months: number = 6, department?: string) {
+    const params = new URLSearchParams({ months: months.toString() })
+    if (department && department !== 'all') {
+      params.append('department', department)
+    }
+    return this.request(`/api/reports/dashboard/stats?${params.toString()}`)
   }
 
-  async getComplianceTrends(months: number = 6) {
-    return this.request(`/api/reports/compliance-trends?months=${months}`)
+  async getDashboardStats() {
+    return this.request('/api/reports/dashboard/stats?months=6')
   }
 
-  async getDepartmentPerformance() {
-    return this.request('/api/reports/department-performance')
+  async getComplianceTrends(months: number = 6, department?: string) {
+    const params = new URLSearchParams({ months: months.toString() })
+    if (department && department !== 'all') {
+      params.append('department', department)
+    }
+    return this.request(`/api/reports/compliance-trends?${params.toString()}`)
   }
 
-  async getRoundsByType() {
-    return this.request('/api/reports/rounds-by-type')
+  async getDepartmentPerformance(months: number = 6, department?: string) {
+    const params = new URLSearchParams({ months: months.toString() })
+    if (department && department !== 'all') {
+      params.append('department', department)
+    }
+    return this.request(`/api/reports/department-performance?${params.toString()}`)
   }
 
-  async getCapaStatusDistribution() {
-    return this.request('/api/reports/capa-status-distribution')
+  async getRoundsByType(months: number = 6, department?: string) {
+    const params = new URLSearchParams({ months: months.toString() })
+    if (department && department !== 'all') {
+      params.append('department', department)
+    }
+    return this.request(`/api/reports/rounds-by-type?${params.toString()}`)
   }
 
-  async getMonthlyRounds(months: number = 6) {
-    return this.request(`/api/reports/monthly-rounds?months=${months}`)
+  async getCapaStatusDistribution(months: number = 6, department?: string) {
+    const params = new URLSearchParams({ months: months.toString() })
+    if (department && department !== 'all') {
+      params.append('department', department)
+    }
+    return this.request(`/api/reports/capa-status-distribution?${params.toString()}`)
+  }
+
+  async getMonthlyRounds(months: number = 6, department?: string) {
+    const params = new URLSearchParams({ months: months.toString() })
+    if (department && department !== 'all') {
+      params.append('department', department)
+    }
+    return this.request(`/api/reports/monthly-rounds?${params.toString()}`)
   }
 
   // Evaluation Results endpoints
