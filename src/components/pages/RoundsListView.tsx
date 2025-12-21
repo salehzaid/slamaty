@@ -267,7 +267,9 @@ const RoundsListView: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="p-6 space-y-8">
+      {/* Skip link for keyboard users */}
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4 bg-white p-2 rounded shadow">تخطي إلى المحتوى</a>
+      <div id="main-content" className="p-6 space-y-8">
         {/* Enhanced Header */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 sticky top-6 z-30">
           <div className="flex items-center justify-between">
@@ -283,7 +285,7 @@ const RoundsListView: React.FC = () => {
             <div className="flex items-center gap-4">
               <Button 
                 onClick={handleCreateRound}
-                className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white flex items-center gap-3 px-5 py-3 text-base font-bold rounded-full shadow-2xl hover:shadow-2xl transform hover:scale-105 transition"
+                className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white flex items-center gap-3 px-5 py-3 text-base font-bold rounded-full shadow-2xl hover:shadow-2xl transform hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 aria-label="إنشاء جولة جديدة"
               >
                 <Plus className="w-5 h-5" />

@@ -238,7 +238,8 @@ const MyRoundsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
-      <div className="p-6 space-y-8">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4 bg-white p-2 rounded shadow">تخطي إلى المحتوى</a>
+      <div id="main-content" className="p-6 space-y-8">
         
         {/* Success Message Banner */}
         {successMessage && (

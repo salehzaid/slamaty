@@ -151,8 +151,9 @@ const RoundsPage: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white p-2 rounded shadow">تخطي إلى المحتوى</a>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div id="main-content" className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">إدارة الجولات</h1>
           <p className="text-gray-600">إدارة وتتبع جولات التقييم والجودة</p>
@@ -161,7 +162,7 @@ const RoundsPage: React.FC = () => {
           <>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-4 py-2 text-sm font-bold rounded-full shadow-2xl flex items-center gap-2 hover:scale-105 transform transition"
+              className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-4 py-2 text-sm font-bold rounded-full shadow-2xl flex items-center gap-2 hover:scale-105 transform transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               aria-label="إنشاء جولة جديدة"
             >
               <Plus className="w-5 h-5" />
