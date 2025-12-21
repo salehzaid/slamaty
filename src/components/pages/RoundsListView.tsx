@@ -32,7 +32,7 @@ import RoundsTable from '@/components/ui/RoundsTable'
 const RoundsListView: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
-  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
+  const [viewMode, setViewMode] = useState('cards' as 'cards' | 'table')
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [showEditForm, setShowEditForm] = useState(false)
   const [selectedRound, setSelectedRound] = useState<any>(null)
