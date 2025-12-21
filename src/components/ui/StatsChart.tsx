@@ -46,11 +46,19 @@ const StatsChart: React.FC<StatsChartProps> = ({
   };
 
   const calculatePercentage = () => {
-    if (!previousValue || previousValue === 0) return 0;
+    if (previousValue === undefined || previousValue === null || previousValue === 0) return 0;
     return ((value - previousValue) / previousValue) * 100;
   };
 
   const percentage = calculatePercentage();
+  // If trend not explicitly provided, infer from previousValue
+  const inferredTrend: 'up' | 'down' | 'stable' | undefined = (() => {
+    if (previousValue === undefined || previousValue === null) return undefined
+    if (value > previousValue) return 'up'
+    if (value < previousValue) return 'down'
+    return 'stable'
+  })()
+  const effectiveTrend = trend || inferredTrend
 
   return (
     <Card className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
@@ -59,10 +67,15 @@ const StatsChart: React.FC<StatsChartProps> = ({
           <div className={`p-3 ${bgColor} rounded-xl`}>
             {icon}
           </div>
-          {trend && trendValue && (
-            <div className={`flex items-center gap-1 text-sm font-medium ${getTrendColor()}`}>
+          {(effectiveTrend && previousValue !== undefined) && (
+            <div
+              className={`flex items-center gap-1 text-sm font-medium ${getTrendColor()}`}
+              role="img"
+              aria-label={effectiveTrend === 'up' ? 'اتجاه تصاعدي' : effectiveTrend === 'down' ? 'اتجاه هبوطي' : 'مستقر'}
+              title={`الحالي: ${value} — السابق: ${previousValue} (${Math.abs(percentage).toFixed(1)}%)`}
+            >
               {getTrendIcon()}
-              <span>{Math.abs(percentage).toFixed(1)}%</span>
+              <span>{effectiveTrend === 'stable' ? `${Math.abs(percentage).toFixed(1)}%` : `${Math.abs(percentage).toFixed(1)}%`}</span>
             </div>
           )}
         </div>
@@ -72,19 +85,20 @@ const StatsChart: React.FC<StatsChartProps> = ({
           <p className={`text-3xl font-bold ${color}`}>{value}</p>
         </div>
         
-        {previousValue && (
-          <div className="text-xs text-gray-500">
-            مقارنة بالفترة السابقة: {previousValue}
+        {previousValue !== undefined && (
+          <div className="text-xs text-gray-500" title={`الحالي: ${value} — السابق: ${previousValue}`}>
+            مقارنة بالفترة السابقة: <span className="font-medium">{previousValue}</span>
           </div>
         )}
         
         {/* Simple progress bar */}
         <div className="mt-4">
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className={`h-2 rounded-full transition-all duration-500 ${bgColor.replace('bg-', 'bg-').replace('-100', '-500')}`}
+            <div
+              className={`h-2 rounded-full transition-all duration-500 ${bgColor.includes('bg-') ? bgColor.replace('-100', '-500') : bgColor}`}
               style={{ width: `${Math.min((value / 100) * 100, 100)}%` }}
-            ></div>
+              aria-hidden
+            />
           </div>
         </div>
       </CardContent>
