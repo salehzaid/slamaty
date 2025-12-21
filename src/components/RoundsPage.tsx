@@ -259,6 +259,19 @@ const RoundsPage: React.FC = () => {
               </div>
             </div>
             
+            {/* Unified header strip under the title: status + priority + date */}
+            <div className="px-4 py-2 border-b border-gray-100 bg-white flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(round.status)}`}>
+                  {getStatusText(round.status)}
+                </div>
+                <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(round.priority)}`}>
+                  {getPriorityText(round.priority)}
+                </div>
+              </div>
+              <div className="text-sm text-gray-600">{round.scheduledDate ? new Date(round.scheduledDate).toLocaleDateString() : 'غير محدد'}</div>
+            </div>
+            
             {/* Ticket Content */}
             <div className="p-4">
               {/* Removed title/description per requirements */}

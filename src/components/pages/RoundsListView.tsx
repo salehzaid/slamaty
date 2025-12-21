@@ -513,19 +513,28 @@ const RoundsListView: React.FC = () => {
               <Card key={round.id} className="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden h-full">
                 <CardContent className="p-4 flex flex-col justify-between h-full">
                   <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4">
-                      <div className="p-2 bg-gray-100 rounded-md">
-                        <Target className="w-6 h-6 text-gray-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{round.department || '—'}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{round.roundCode || '—'}</p>
-                        <div className="flex items-center gap-2 mt-3">
-                          <Badge className={`${getStatusColor(round.status)} text-xs px-2 py-1 rounded-full`}>{getStatusText(round.status)}</Badge>
-                          <Badge className={`${getPriorityColor(round.priority)} text-xs px-2 py-1 rounded-full`}>{getPriorityText(round.priority)}</Badge>
+                      <div className="flex items-start gap-4">
+                        <div className="p-2 bg-gray-100 rounded-md">
+                          <Target className="w-6 h-6 text-gray-600" />
+                        </div>
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-3">
+                            <h3 className="text-lg font-semibold text-gray-900">{round.department || '—'}</h3>
+                            <p className="text-sm text-gray-600 mt-1">{round.roundCode || '—'}</p>
+                          </div>
+
+                          {/* Unified header strip: status, priority, scheduled date */}
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(round.status)}`}>
+                              {getStatusText(round.status)}
+                            </span>
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(round.priority)}`}>
+                              {getPriorityText(round.priority)}
+                            </span>
+                            <span className="text-xs text-gray-500 ml-2"> {round.scheduledDate ? new Date(round.scheduledDate).toLocaleDateString() : 'غير محدد'}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
                     <div className="flex items-center gap-2">
                       <Button variant="ghost" className="text-sm px-3 py-1" onClick={() => navigate(`/rounds/evaluate/${round.id}`, { state: { from: '/rounds/list' } })}>
