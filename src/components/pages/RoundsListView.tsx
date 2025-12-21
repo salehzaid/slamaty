@@ -23,12 +23,16 @@ import {
   Edit,
   Play,
   MoreHorizontal,
-  Trash2
+  Trash2,
+  List,
+  Grid
 } from 'lucide-react'
+import RoundsTable from '@/components/ui/RoundsTable'
 
 const RoundsListView: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [showEditForm, setShowEditForm] = useState(false)
   const [selectedRound, setSelectedRound] = useState<any>(null)
@@ -459,6 +463,26 @@ const RoundsListView: React.FC = () => {
           />
         </div>
 
+        {/* View toggle: Cards / Table */}
+        <div className="flex items-center justify-end gap-2">
+          <button
+            className={`p-2 rounded-md ${viewMode === 'table' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+            aria-pressed={viewMode === 'table'}
+            title="عرض كجدول"
+            onClick={() => setViewMode('table')}
+          >
+            <List className="w-5 h-5" />
+          </button>
+          <button
+            className={`p-2 rounded-md ${viewMode === 'cards' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+            aria-pressed={viewMode === 'cards'}
+            title="عرض كبطاقات"
+            onClick={() => setViewMode('cards')}
+          >
+            <Grid className="w-5 h-5" />
+          </button>
+        </div>
+
         {/* Filters - compact row: Search — Status — Apply — Export */}
         <div className="bg-white border border-gray-200 rounded-md p-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
@@ -507,7 +531,19 @@ const RoundsListView: React.FC = () => {
         </div>
 
         {/* Enhanced Rounds List - two cards per row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          {/* Table view */}
+          <div className={viewMode === 'table' ? '' : 'hidden'}>
+            <RoundsTable
+              rounds={filteredRounds}
+              onView={(id) => navigate(`/rounds/evaluate/${id}`, { state: { from: '/rounds/list' } })}
+              onEdit={(r) => handleEditRound(r)}
+              onDelete={(id, code) => handleDeleteRound(id, code || String(id))}
+            />
+          </div>
+
+          {/* Cards view */}
+          <div className={viewMode === 'cards' ? 'grid grid-cols-1 sm:grid-cols-2 gap-6' : 'hidden'}>
           {filteredRounds.length > 0 ? (
             filteredRounds.map((round: any) => (
               <Card key={round.id} className="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden h-full">
