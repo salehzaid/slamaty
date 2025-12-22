@@ -42,10 +42,15 @@ const RoundsListView: React.FC = () => {
   const navigate = useNavigate()
   const deleteRoundMutation = useDeleteRound()
 
-  // Debug logging
-  console.log('RoundsListView - rounds data:', rounds)
-  console.log('RoundsListView - loading:', loading)
-  console.log('RoundsListView - error:', error)
+  // Debug logging (dev only)
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.debug('RoundsListView - rounds data:', rounds)
+    // eslint-disable-next-line no-console
+    console.debug('RoundsListView - loading:', loading)
+    // eslint-disable-next-line no-console
+    console.debug('RoundsListView - error:', error)
+  }
 
   // Handle create round
   const handleCreateRound = () => {
@@ -208,16 +213,19 @@ const RoundsListView: React.FC = () => {
     return texts[priority as keyof typeof texts] || priority
   }
 
-  // Filter rounds based on search and status
-  const filteredRounds = Array.isArray(rounds) ? rounds.filter((round: any) => {
+  // Filter rounds based on search and status (memoized)
+  const filteredRounds = React.useMemo(() => {
+    if (!Array.isArray(rounds)) return []
     const q = searchTerm.toLowerCase()
-    const matchesSearch =
-      (round.department?.toLowerCase().includes(q)) ||
-      (round.roundCode?.toLowerCase().includes(q)) ||
-      (round.roundType?.toLowerCase().includes(q))
-    const matchesStatus = filterStatus === 'all' || round.status === filterStatus
-    return matchesSearch && matchesStatus
-  }) : []
+    return rounds.filter((round: any) => {
+      const matchesSearch =
+        (round.department?.toLowerCase().includes(q)) ||
+        (round.roundCode?.toLowerCase().includes(q)) ||
+        (round.roundType?.toLowerCase().includes(q))
+      const matchesStatus = filterStatus === 'all' || round.status === filterStatus
+      return matchesSearch && matchesStatus
+    })
+  }, [rounds, searchTerm, filterStatus])
 
   // Show create form
   if (showCreateForm) {

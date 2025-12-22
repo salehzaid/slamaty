@@ -94,13 +94,17 @@ export function useRounds(params?: { skip?: number; limit?: number }) {
         }
       }) : []
       
-      console.log('Rounds data loaded:', transformedData.length, 'rounds')
-      console.log('📅 Rounds with dates:', transformedData.map(r => ({
-        title: r.title,
-        scheduledDate: r.scheduledDate,
-        deadline: r.deadline,
-        endDate: r.endDate
-      })))
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug('Rounds data loaded:', transformedData.length, 'rounds')
+        // eslint-disable-next-line no-console
+        console.debug('📅 Rounds with dates:', transformedData.map(r => ({
+          title: r.title,
+          scheduledDate: r.scheduledDate,
+          deadline: r.deadline,
+          endDate: r.endDate
+        })))
+      }
       setState(prev => ({ ...prev, data: transformedData, loading: false, error: null }))
     } catch (error) {
       console.error('API call failed:', error)
@@ -147,12 +151,21 @@ export function useMyRounds(params?: { skip?: number; limit?: number }) {
   const refetch = async () => {
     setState(prev => ({ ...prev, loading: true }))
     try {
-      console.log('🔍 Fetching my rounds...')
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug('🔍 Fetching my rounds...')
+      }
       const response = await apiClient.getMyRounds(params)
-      console.log('📥 My rounds response:', response)
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug('📥 My rounds response:', response)
+      }
       
       const data = Array.isArray(response) ? response : (response.data || [])
-      console.log('📊 My rounds data:', data)
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug('📊 My rounds data:', data)
+      }
       
       // Transform API data to match frontend interface
       const transformedData = Array.isArray(data) ? data.map((round: any) => {
@@ -224,7 +237,10 @@ export function useMyRounds(params?: { skip?: number; limit?: number }) {
         }
       }) : []
       
-      console.log('✅ Transformed my rounds data:', transformedData)
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug('✅ Transformed my rounds data:', transformedData)
+      }
       setState(prev => ({ ...prev, data: transformedData, loading: false, error: null }))
     } catch (error) {
       console.error('❌ My rounds API call failed:', error)

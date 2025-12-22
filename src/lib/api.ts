@@ -15,9 +15,10 @@ const API_BASE_URL = (() => {
   return 'http://127.0.0.1:8000'
 })()
 
-// Log the API base URL on initialization to help debug
-if (typeof window !== 'undefined') {
-  console.log('🌐 API Base URL:', API_BASE_URL)
+// Log the API base URL on initialization to help debug (dev only)
+if (typeof window !== 'undefined' && import.meta.env.DEV) {
+  // eslint-disable-next-line no-console
+  console.debug('🌐 API Base URL:', API_BASE_URL)
 }
 
 interface ApiResponse<T> {
