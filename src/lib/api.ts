@@ -107,17 +107,14 @@ class ApiClient {
       
       // التعامل مع 401 و 403 (غير مصادق أو غير مصرح)
       if (response.status === 401 || response.status === 403) {
+        // Authentication failure - clear local token and surface error to caller
+        // Do NOT redirect here; let the UI decide how to handle authentication flows.
+        // eslint-disable-next-line no-console
         console.error('🔒 Authentication Error:', response.status)
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('sallamaty_user')
-        
-        // عرض رسالة للمستخدم قبل إعادة التوجيه
-        const message = response.status === 401 
-          ? 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.'
-          : 'غير مصرح بالوصول. يرجى تسجيل الدخول.'
-        
-        alert(message)
-        window.location.href = '/login'
+        try {
+          localStorage.removeItem('access_token')
+          localStorage.removeItem('sallamaty_user')
+        } catch {}
         throw new Error('Authentication required')
       }
 

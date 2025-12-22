@@ -111,14 +111,13 @@ export function useRounds(params?: { skip?: number; limit?: number }) {
       const msg = error instanceof Error ? error.message : String(error)
       // If authentication error - redirect to login or show login message
       if (msg.includes('Authentication required') || /status:\s*401|status:\s*403|401/.test(msg)) {
-        console.warn('Authentication error detected while fetching rounds, redirecting to login...')
-        // Clear local auth and redirect
+        console.warn('Authentication error detected while fetching rounds; setting unauthenticated state')
         try {
           localStorage.removeItem('access_token')
           localStorage.removeItem('sallamaty_user')
         } catch {}
-        window.location.href = '/login'
-        setState(prev => ({ ...prev, data: [], loading: false, error: 'يرجى تسجيل الدخول' }))
+        // Surface a clear error to the UI so it can show login prompt instead of forcing redirect
+        setState(prev => ({ ...prev, data: [], loading: false, error: 'غير مسموح — يرجى تسجيل الدخول' }))
         return
       }
 
