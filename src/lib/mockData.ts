@@ -43,3 +43,9 @@ export const MOCK_DEPARTMENTS = [
   { id: 3, name: 'المختبر' }
 ]
 
+export const MOCK_USERS = [
+  { id: 1, first_name: 'أحمد', last_name: 'الزائد', email: 'ahmed@example.com', role: 'quality_manager' },
+  { id: 2, first_name: 'سارة', last_name: 'الهاشمي', email: 'sara@example.com', role: 'department_head' },
+  { id: 3, first_name: 'ليلى', last_name: 'المرزوقي', email: 'leila@example.com', role: 'inspector' }
+]
+

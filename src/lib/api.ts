@@ -155,12 +155,15 @@ class ApiClient {
           // eslint-disable-next-line no-console
           console.warn('🔁 API timeout — returning mock data in DEV mode (if endpoint supported).')
           try {
-            const { MOCK_ROUNDS, MOCK_REPORTS, MOCK_CAPAS, MOCK_DEPARTMENTS } = await import('./mockData')
+            const { MOCK_ROUNDS, MOCK_REPORTS, MOCK_CAPAS, MOCK_DEPARTMENTS, MOCK_USERS } = await import('./mockData')
             // Simple endpoint matching
             if (endpoint.startsWith('/api/rounds/my/stats')) return MOCK_REPORTS
             if (endpoint.startsWith('/api/rounds/my') || endpoint.startsWith('/api/rounds')) return MOCK_ROUNDS
             if (endpoint.startsWith('/api/capas')) return MOCK_CAPAS
             if (endpoint.startsWith('/api/departments')) return MOCK_DEPARTMENTS
+            if (endpoint.startsWith('/api/users')) return MOCK_USERS
+            // Reports endpoints
+            if (endpoint.startsWith('/api/reports')) return MOCK_REPORTS
           } catch (mErr) {
             // ignore mock import errors
           }
