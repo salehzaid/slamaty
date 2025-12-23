@@ -147,7 +147,24 @@ class ApiClient {
       // Clear potential fetch abort reason
       const isAbort = error?.name === 'AbortError'
       console.error('❌ API request failed:', isAbort ? 'timeout/abort' : error)
+      // Mark global flag to indicate backend unavailable
+      try { (window as any).__API_UNAVAILABLE__ = true } catch {}
       if (isAbort) {
+        // In development, offer fallback to mock data to keep UI usable
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.warn('🔁 API timeout — returning mock data in DEV mode (if endpoint supported).')
+          try {
+            const { MOCK_ROUNDS, MOCK_REPORTS, MOCK_CAPAS, MOCK_DEPARTMENTS } = await import('./mockData')
+            // Simple endpoint matching
+            if (endpoint.startsWith('/api/rounds/my/stats')) return MOCK_REPORTS
+            if (endpoint.startsWith('/api/rounds/my') || endpoint.startsWith('/api/rounds')) return MOCK_ROUNDS
+            if (endpoint.startsWith('/api/capas')) return MOCK_CAPAS
+            if (endpoint.startsWith('/api/departments')) return MOCK_DEPARTMENTS
+          } catch (mErr) {
+            // ignore mock import errors
+          }
+        }
         throw new Error('انتهى وقت الاتصال بالخادم. تأكد من أن الخادم يعمل أو أن إعدادات VITE_API_URL صحيحة.')
       }
 
