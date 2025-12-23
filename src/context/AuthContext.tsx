@@ -34,12 +34,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (storedUser && storedToken) {
         try {
+          // Parse stored user and set token first
           const userData = JSON.parse(storedUser);
-          setUser(userData);
           apiClient.setToken(storedToken);
-          setIsLoading(false);
-          console.log('✅ User already logged in from storage');
-          return;
+          // Validate token by fetching current user from API
+          try {
+            const current = await apiClient.getCurrentUser();
+            // Normalize response: some backends return { user: { ... } }
+            const validatedUser = current?.user || current || userData;
+            setUser(validatedUser);
+            localStorage.setItem('sallamaty_user', JSON.stringify(validatedUser));
+            setIsLoading(false);
+            console.log('✅ Token validated and user set from API');
+            return;
+          } catch (validationError) {
+            console.warn('⚠️ Stored token invalid or expired, clearing stored auth', validationError);
+            localStorage.removeItem('sallamaty_user');
+            localStorage.removeItem('access_token');
+            apiClient.clearToken();
+            // continue to allow manual login flow
+          }
         } catch (error) {
           console.error('Error parsing stored user data:', error);
           localStorage.removeItem('sallamaty_user');
@@ -147,33 +161,65 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      console.log('🔐 Attempting login for:', email);
       const response = await apiClient.login(email, password);
       
-      if (response.access_token) {
+      console.log('📥 AuthContext received response:', {
+        hasResponse: !!response,
+        hasAccessToken: !!response?.access_token,
+        hasUser: !!response?.user,
+        responseKeys: response ? Object.keys(response) : []
+      });
+      
+      if (response && response.access_token) {
+        // Extract user data from response
+        const userData = response.user || response;
+        
+        console.log('👤 User data extracted:', {
+          id: userData?.id,
+          email: userData?.email,
+          username: userData?.username,
+          role: userData?.role
+        });
+        
+        if (!userData || !userData.email) {
+          console.error('❌ Invalid user data in response:', userData);
+          return false;
+        }
+        
         const user: User = {
-          id: response.user.id,
-          username: response.user.username,
-          email: response.user.email,
-          first_name: response.user.first_name,
-          last_name: response.user.last_name,
-          role: response.user.role,
-          department: response.user.department,
-          position: response.user.position,
-          phone: response.user.phone,
-          is_active: response.user.is_active,
-          created_at: response.user.created_at
+          id: userData.id,
+          username: userData.username || userData.email,
+          email: userData.email,
+          first_name: userData.first_name || userData.firstName || '',
+          last_name: userData.last_name || userData.lastName || '',
+          role: userData.role,
+          department: userData.department || '',
+          position: userData.position || '',
+          phone: userData.phone || '',
+          is_active: userData.is_active !== false,
+          created_at: userData.created_at
         };
         
         setUser(user);
         localStorage.setItem('sallamaty_user', JSON.stringify(user));
         localStorage.setItem('access_token', response.access_token);
         apiClient.setToken(response.access_token);
+        console.log('✅ Login successful for user:', user.email);
         return true;
       }
       
+      console.error('❌ Login failed: No access token in response. Response:', response);
       return false;
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch (error: any) {
+      console.error('❌ Login error in AuthContext:', error);
+      // Log detailed error information
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        // Re-throw to let LoginPage handle it
+        throw error;
+      }
       return false;
     }
   };
