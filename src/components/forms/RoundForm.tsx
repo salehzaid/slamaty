@@ -51,8 +51,6 @@ interface EvaluationItem {
 const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, isEdit = false }) => {
   // Form state
   const [formData, setFormData] = useState({
-    title: initialData?.title || '',
-    description: initialData?.description || '',
     round_type: initialData?.roundType || initialData?.round_type || '',
     department: initialData?.department || '',
     scheduled_date: initialData?.scheduledDate ? new Date(initialData.scheduledDate).toISOString().split('T')[0] : '',
@@ -135,11 +133,21 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
             return it ? it.category_id : null
           }).filter(Boolean))) : [])
 
+    // Ensure round_type uses the display name used in roundTypes when initialData provides enum key
+    const resolvedRoundType = (() => {
+      const incoming = initialData.roundType ?? initialData.round_type
+      if (!incoming) return prev.round_type
+      // If incoming looks like an enum key (contains underscore), try to find matching display name in roundTypes
+      if (typeof incoming === 'string' && incoming.includes('_') && roundTypes && roundTypes.length > 0) {
+        const match = roundTypes.find(rt => convertNameToEnum(rt.name) === String(incoming))
+        if (match) return match.name
+      }
+      return incoming
+    })()
+
     setFormData(prev => ({
       ...prev,
-      title: initialData.title ?? prev.title,
-      description: initialData.description ?? prev.description,
-      round_type: initialData.roundType ?? initialData.round_type ?? prev.round_type,
+      round_type: resolvedRoundType,
       department: initialData.department ?? prev.department,
       scheduled_date: initialData.scheduledDate ? new Date(initialData.scheduledDate).toISOString().split('T')[0] : (initialData.scheduled_date ? new Date(initialData.scheduled_date).toISOString().split('T')[0] : prev.scheduled_date),
       deadline: initialData.deadline ?? prev.deadline,
@@ -149,7 +157,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
       selected_items: parsedItems,
       notes: initialData.notes ?? prev.notes
     }))
-  }, [initialData, users, evaluationItems])
+  }, [initialData, users, evaluationItems, roundTypes])
 
   // Data fetching - Use simple useState and useEffect
   const [users, setUsers] = useState<User[]>([])
@@ -587,41 +595,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
               )}
             </div>
 
-            {/* Title and Description */}
-            <div className="space-y-6">
-              <div>
-                <Label htmlFor="title" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  عنوان الجولة
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="أدخل عنوان الجولة"
-                    required
-                    className="h-12 border-2 border-gray-200 hover:border-blue-300 focus:border-blue-500 transition-colors duration-200 pr-10"
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <Tag className="w-4 h-4 text-gray-400" />
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="description" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  وصف الجولة
-                </Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="أدخل وصف الجولة"
-                  rows={3}
-                  className="border-2 border-gray-200 hover:border-blue-300 focus:border-blue-500 transition-colors duration-200"
-                />
-              </div>
-            </div>
+            {/* Removed title and description per requirements */}
 
             {/* Date and Deadline */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
