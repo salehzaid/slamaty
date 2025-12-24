@@ -147,13 +147,34 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
     const parsedItems = parseSelectedItems()
 
     // derive categories from items if not explicitly provided
-    const parsedCategories = initialData.selected_categories && initialData.selected_categories.length > 0
+    let parsedCategories = initialData.selected_categories && initialData.selected_categories.length > 0
       ? initialData.selected_categories
-      : (parsedItems && parsedItems.length > 0 ?
-          Array.from(new Set(parsedItems.map((id: number) => {
-            const it = evaluationItems.find(i => i.id === id)
-            return it ? it.category_id : null
-          }).filter(Boolean))) : [])
+      : []
+
+    if ((!parsedCategories || parsedCategories.length === 0) && parsedItems && parsedItems.length > 0) {
+      // Try to derive from already loaded evaluationItems
+      parsedCategories = Array.from(new Set(parsedItems.map((id: number) => {
+        const it = evaluationItems.find(i => i.id === id)
+        return it ? it.category_id : null
+      }).filter(Boolean)))
+    }
+
+    // If still empty, proactively fetch evaluation items from API for those IDs (ensure mapping available)
+    if ((!parsedCategories || parsedCategories.length === 0) && parsedItems && parsedItems.length > 0) {
+      try {
+        // fetch all items (or could fetch by ids if API supports)
+        const itemsResp = await apiClient.getEvaluationItems()
+        const itemsArr = Array.isArray(itemsResp) ? itemsResp : (itemsResp?.data || [])
+        const derived = Array.from(new Set(parsedItems.map((id: number) => {
+          const it = itemsArr.find((i: any) => Number(i.id) === Number(id))
+          return it ? it.category_id : null
+        }).filter(Boolean)))
+        if (derived.length > 0) parsedCategories = derived
+      } catch (err) {
+        // ignore and proceed; UI will show items once categories load
+        console.debug('Could not fetch evaluation items for category derivation', err)
+      }
+    }
 
     // Ensure round_type uses the display name used in roundTypes when initialData provides enum key
     const resolvedRoundType = (() => {
