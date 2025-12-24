@@ -67,7 +67,19 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
     if (!initialData) return
 
     const parseAssignedUsers = () => {
-      const raw = initialData.assignedTo ?? initialData.assigned_to ?? initialData.assigned_to_json
+      // Accept multiple shapes: assigned_to_ids (array of numbers), assignedTo (array of ids or names),
+      // assigned_to (JSON string of names), assigned_to_ids_json etc.
+      const raw = initialData.assignedTo ?? initialData.assigned_to ?? initialData.assigned_to_json ?? initialData.assigned_to_ids ?? initialData.assignedToIds ?? initialData.assigned_to_ids_json
+      // If we have numeric ids directly (e.g. assigned_to_ids)
+      if (Array.isArray(raw) && raw.length > 0 && typeof raw[0] === 'number') {
+        return raw
+      }
+      try {
+        if (!raw) return []
+        if (Array.isArray(raw)) {
+          // If array of numbers -> use as IDs
+          if (raw.length === 0) return []
+          if (typeof raw[0] === 'number') return raw
       try {
         if (!raw) return []
         if (Array.isArray(raw)) {
@@ -89,7 +101,17 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
         if (typeof raw === 'string') {
           try {
             const parsed = JSON.parse(raw)
-            return Array.isArray(parsed) ? parsed : []
+            if (Array.isArray(parsed)) {
+              // if parsed is array of numbers
+              if (parsed.length > 0 && typeof parsed[0] === 'number') return parsed
+              // else try to map names to ids
+              const mapped = parsed.map((name: string) => {
+                const u = users.find((uu: any) => (uu.first_name + ' ' + uu.last_name).trim() === name.trim() || uu.email === name || uu.username === name)
+                return u ? u.id : null
+              }).filter(Boolean)
+              return mapped
+            }
+            return []
           } catch (err) {
             // maybe single name
             const u = users.find((uu: any) => (uu.first_name + ' ' + uu.last_name).trim() === raw.trim() || uu.email === raw || uu.username === raw)
@@ -137,9 +159,11 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
     const resolvedRoundType = (() => {
       const incoming = initialData.roundType ?? initialData.round_type
       if (!incoming) return prev.round_type
-      // If incoming looks like an enum key (contains underscore), try to find matching display name in roundTypes
-      if (typeof incoming === 'string' && incoming.includes('_') && roundTypes && roundTypes.length > 0) {
-        const match = roundTypes.find(rt => convertNameToEnum(rt.name) === String(incoming))
+      // Normalize case for comparison
+      const incomingKey = typeof incoming === 'string' ? String(incoming).toLowerCase() : incoming
+      // If incoming looks like an enum key (contains underscore) or is uppercase, try to find matching display name in roundTypes
+      if (typeof incomingKey === 'string' && incomingKey.includes('_') && roundTypes && roundTypes.length > 0) {
+        const match = roundTypes.find(rt => convertNameToEnum(rt.name).toLowerCase() === incomingKey)
         if (match) return match.name
       }
       return incoming
