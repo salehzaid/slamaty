@@ -186,17 +186,25 @@ class ApiClient {
 
   // Authentication endpoints
   async login(email: string, password: string) {
-    try {
-      const url = `${this.baseURL}/api/auth/signin`
-      const requestBody = { email, password }
+    const url = `${this.baseURL}/api/auth/signin`
+    const requestBody = { email, password }
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody)
-      })
+    try {
+      let response: Response
+      try {
+        response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody)
+        })
+      } catch (netErr) {
+        // Network-level failure (connection refused / DNS / CORS) — mark API unavailable
+        try { (window as any).__API_UNAVAILABLE__ = true } catch {}
+        console.error('❌ Network error during login fetch:', netErr)
+        throw netErr
+      }
 
       if (!response.ok) {
         let errorMessage = 'فشل في تسجيل الدخول. تحقق من بياناتك.'
@@ -233,7 +241,8 @@ class ApiClient {
       }
 
       const data = await response.json()
-      console.log('📥 Login response data:', {
+      // eslint-disable-next-line no-console
+      console.debug('📥 Login response data:', {
         hasAccessToken: !!data.access_token,
         hasUser: !!data.user,
         userEmail: data.user?.email,
@@ -242,16 +251,23 @@ class ApiClient {
 
       if (data.access_token) {
         this.setToken(data.access_token)
-        console.log('✅ Login successful, token saved')
+        // eslint-disable-next-line no-console
+        console.debug('✅ Login successful, token saved')
       } else {
         console.error('❌ Login response missing access_token. Full response:', data)
         throw new Error('فشل في تسجيل الدخول: لا يوجد رمز الوصول')
       }
 
       return data
-    } catch (error) {
+    } catch (error: any) {
+      // If network-level failure, ensure API_UNAVAILABLE is set to allow demo fallback
+      try {
+        if (!navigator.onLine) {
+          try { (window as any).__API_UNAVAILABLE__ = true } catch {}
+        }
+      } catch {}
+
       console.error('❌ Login error:', error)
-      // Re-throw with user-friendly message
       if (error instanceof Error) {
         throw error
       }
