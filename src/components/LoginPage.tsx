@@ -32,17 +32,22 @@ const LoginPage: React.FC = () => {
     setSuccess(null)
 
     try {
+      console.log('🔐 Login form submission for:', data.email)
       const success = await login(data.email, data.password)
+      console.log('📥 Login result:', success)
       if (success) {
         setSuccess('تم تسجيل الدخول بنجاح!')
         setTimeout(() => {
           navigate('/dashboard')
         }, 1000)
       } else {
-        setError('فشل في تسجيل الدخول. تحقق من بياناتك.')
+        setError('فشل في تسجيل الدخول. تحقق من صحة البريد الإلكتروني وكلمة المرور.')
       }
-    } catch (err) {
-      setError('حدث خطأ أثناء تسجيل الدخول. حاول مرة أخرى.')
+    } catch (err: any) {
+      console.error('❌ Login error in form:', err)
+      const errorMessage = err?.message || 'حدث خطأ أثناء تسجيل الدخول. حاول مرة أخرى.'
+      console.error('Setting error message:', errorMessage)
+      setError(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -54,6 +59,26 @@ const LoginPage: React.FC = () => {
     setSuccess(null)
 
     try {
+      // If backend is unavailable in DEV, allow demo guest login
+      if (typeof window !== 'undefined' && (window as any).__API_UNAVAILABLE__ && import.meta.env.DEV) {
+        const demoUser = { id: 999, username: 'demo', email: 'demo@local', first_name: 'مستخدم', last_name: 'تجريبي', role: 'quality_manager' }
+        try {
+          localStorage.setItem('sallamaty_user', JSON.stringify(demoUser))
+          localStorage.setItem('access_token', 'demo-token')
+          // set token for api client if available
+          try {
+            const { apiClient } = await import('@/lib/api')
+            apiClient.setToken('demo-token')
+          } catch {}
+          setSuccess('تم تسجيل الدخول كعرض تجريبي')
+          setTimeout(() => navigate('/dashboard'), 800)
+          return
+        } catch (e) {
+          setError('فشل في تسجيل الدخول التجريبي.')
+          return
+        }
+      }
+
       const success = await login('testadmin@salamaty.com', 'test123')
       if (success) {
         setSuccess('تم تسجيل الدخول بنجاح!')
@@ -69,6 +94,8 @@ const LoginPage: React.FC = () => {
       setIsLoading(false)
     }
   }
+
+  const isApiUnavailable = typeof window !== 'undefined' && (window as any).__API_UNAVAILABLE__
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
@@ -214,6 +241,11 @@ const LoginPage: React.FC = () => {
               تسجيل سريع تلقائي
             </Button>
 
+            {isApiUnavailable && (
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+                الخادم غير متاح حالياً — يمكنك تجربة العرض التجريبي بالضغط على زر "تسجيل سريع تلقائي".
+              </div>
+            )}
             {/* Register Link */}
             <div className="text-center">
               <p className="text-sm text-gray-600">
