@@ -14,9 +14,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// 🔧 إعدادات تسجيل الدخول التلقائي
-const AUTO_LOGIN_ENABLED = false; // إيقاف تسجيل الدخول التلقائي
-const USE_DIRECT_ADMIN_LOGIN = false; // إيقاف تسجيل الدخول المباشر
+// 🔧 إعدادات تسجيل الدخول التلقائي (مفعل تلقائياً في بيئة التطوير لتسهيل التجربة)
+const AUTO_LOGIN_ENABLED = import.meta.env.DEV ? true : false;
+// Use direct API login flag (keeps behavior explicit)
+const USE_DIRECT_ADMIN_LOGIN = false;
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   console.log('🔧 AuthProvider: Component initialized');
@@ -73,8 +74,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               headers: {
                 'Content-Type': 'application/json',
               },
+              // Use simple test account created by setup scripts
               body: JSON.stringify({
-                email: 'testadmin@salamaty.com',
+                email: 'testqm@local',
                 password: 'test123'
               })
             });
@@ -116,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // 🔄 تسجيل دخول عبر API (أبطأ)
           console.log('🔄 Auto-login: Attempting to login via API...');
           try {
-            const response = await apiClient.login('testadmin@salamaty.com', 'test123');
+            const response = await apiClient.login('testqm@local', 'test123');
             
             if (response.access_token) {
               const user: User = {
