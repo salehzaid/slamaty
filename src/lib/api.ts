@@ -149,25 +149,24 @@ class ApiClient {
       console.error('❌ API request failed:', isAbort ? 'timeout/abort' : error)
       // Mark global flag to indicate backend unavailable
       try { (window as any).__API_UNAVAILABLE__ = true } catch {}
-      if (isAbort) {
-        // In development, offer fallback to mock data to keep UI usable
-        if (import.meta.env.DEV) {
-          // eslint-disable-next-line no-console
-          console.warn('🔁 API timeout — returning mock data in DEV mode (if endpoint supported).')
-          try {
-            const { MOCK_ROUNDS, MOCK_REPORTS, MOCK_CAPAS, MOCK_DEPARTMENTS, MOCK_USERS } = await import('./mockData')
-            // Simple endpoint matching
-            if (endpoint.startsWith('/api/rounds/my/stats')) return MOCK_REPORTS
-            if (endpoint.startsWith('/api/rounds/my') || endpoint.startsWith('/api/rounds')) return MOCK_ROUNDS
-            if (endpoint.startsWith('/api/capas')) return MOCK_CAPAS
-            if (endpoint.startsWith('/api/departments')) return MOCK_DEPARTMENTS
-            if (endpoint.startsWith('/api/users')) return MOCK_USERS
-            // Reports endpoints
-            if (endpoint.startsWith('/api/reports')) return MOCK_REPORTS
-          } catch (mErr) {
-            // ignore mock import errors
-          }
+
+      // In development, attempt to use mock data on any network error (not only timeout)
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.warn('🔁 API network error — attempting DEV mock fallback for endpoint:', endpoint)
+        try {
+          const { MOCK_ROUNDS, MOCK_REPORTS, MOCK_CAPAS, MOCK_DEPARTMENTS, MOCK_USERS } = await import('./mockData')
+          if (endpoint.startsWith('/api/rounds/my/stats')) return MOCK_REPORTS
+          if (endpoint.startsWith('/api/rounds/my') || endpoint.startsWith('/api/rounds')) return MOCK_ROUNDS
+          if (endpoint.startsWith('/api/capas')) return MOCK_CAPAS
+          if (endpoint.startsWith('/api/departments')) return MOCK_DEPARTMENTS
+          if (endpoint.startsWith('/api/users')) return MOCK_USERS
+          if (endpoint.startsWith('/api/reports')) return MOCK_REPORTS
+        } catch (mErr) {
+          // ignore mock import errors
         }
+      }
+      if (isAbort) {
         throw new Error('انتهى وقت الاتصال بالخادم. تأكد من أن الخادم يعمل أو أن إعدادات VITE_API_URL صحيحة.')
       }
 

@@ -213,11 +213,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     } catch (error: any) {
       console.error('❌ Login error in AuthContext:', error);
-      // Log detailed error information
+      // If backend is unavailable in DEV, fallback to demo user automatically
+      if (typeof window !== 'undefined' && (window as any).__API_UNAVAILABLE__ && import.meta.env.DEV) {
+        console.warn('⚠️ Backend unavailable — using demo fallback user for login (DEV)')
+        const demoUser: User = {
+          id: 999,
+          username: 'demo',
+          email: 'demo@local',
+          first_name: 'مستخدم',
+          last_name: 'تجريبي',
+          role: 'quality_manager',
+          department: '',
+          position: '',
+          phone: '',
+          is_active: true,
+          created_at: new Date().toISOString()
+        }
+        setUser(demoUser)
+        try { localStorage.setItem('sallamaty_user', JSON.stringify(demoUser)); localStorage.setItem('access_token','demo-token'); apiClient.setToken('demo-token') } catch {}
+        return true
+      }
+      // Log detailed error information and re-throw so UI can show message
       if (error instanceof Error) {
         console.error('Error message:', error.message);
         console.error('Error stack:', error.stack);
-        // Re-throw to let LoginPage handle it
         throw error;
       }
       return false;
