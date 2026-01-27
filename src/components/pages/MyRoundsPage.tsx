@@ -11,6 +11,7 @@ import { apiClient } from '@/lib/api'
 import CapaForm from '@/components/forms/CapaForm'
 import { CapaCreateForm } from '@/lib/validations'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { isCapaEnabled } from '@/lib/features'
 
 interface RoundStats {
   total: number
@@ -21,13 +22,16 @@ interface RoundStats {
   avg_completion: number
   avg_compliance: number
   high_priority: number
+  needs_capa_count?: number
+  open_capa_count?: number
 }
 
 const MyRoundsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
   const [filterPriority, setFilterPriority] = useState('all')
-  const { user } = useAuth()
+  const auth = useAuth()
+  const user = auth?.user
   const { data: myRounds, loading, error, refetch } = useMyRounds()
   const [stats, setStats] = useState<RoundStats | null>(null)
   const [statsLoading, setStatsLoading] = useState(false)
@@ -57,7 +61,7 @@ const MyRoundsPage: React.FC = () => {
         setStatsLoading(false)
       }
     }
-    
+
     fetchStats()
   }, [myRounds]) // Re-fetch when rounds change
 
@@ -67,7 +71,7 @@ const MyRoundsPage: React.FC = () => {
       const state = location.state as any
       if (state.message) {
         setSuccessMessage(state.message)
-        
+
         // Clear message after 5 seconds
         setTimeout(() => {
           setSuccessMessage(null)
@@ -153,6 +157,16 @@ const MyRoundsPage: React.FC = () => {
     return texts[priority as keyof typeof texts] || priority
   }
 
+  const getPriorityColor = (priority: string) => {
+    const colors = {
+      'low': 'bg-green-100 text-green-800',
+      'medium': 'bg-yellow-100 text-yellow-800',
+      'high': 'bg-orange-100 text-orange-800',
+      'urgent': 'bg-red-100 text-red-800',
+    }
+    return colors[priority as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+  }
+
   const getRoundTypeText = (type: string) => {
     const texts = {
       'patient_safety': 'سلامة المرضى',
@@ -168,7 +182,7 @@ const MyRoundsPage: React.FC = () => {
 
   const filteredRounds = myRounds?.filter(round => {
     const matchesSearch = (round.department || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (round.roundCode || '').toLowerCase().includes(searchTerm.toLowerCase())
+      (round.roundCode || '').toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = filterStatus === 'all' || round.status === filterStatus
     const matchesPriority = filterPriority === 'all' || round.priority === filterPriority
     return matchesSearch && matchesStatus && matchesPriority
@@ -179,7 +193,7 @@ const MyRoundsPage: React.FC = () => {
     if (round.completionPercentage !== undefined && round.completionPercentage !== null) {
       return round.completionPercentage
     }
-    
+
     const progress = {
       'scheduled': 0,
       'in_progress': 50,
@@ -240,7 +254,7 @@ const MyRoundsPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4 bg-white p-2 rounded shadow">تخطي إلى المحتوى</a>
       <div id="main-content" className="p-6 space-y-8">
-        
+
         {/* Success Message Banner */}
         {successMessage && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
@@ -393,29 +407,33 @@ const MyRoundsPage: React.FC = () => {
             </CardContent>
           </Card>
           {/* CAPA Indicators - NEW */}
-          <Card className="bg-gradient-to-r from-rose-500 to-rose-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-rose-100 text-sm font-medium">عناصر تحتاج CAPA</p>
-                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.needs_capa_count || 0)}</p>
-                </div>
-                <AlertTriangle className="w-12 h-12 text-rose-200" />
-              </div>
-            </CardContent>
-          </Card>
+          {isCapaEnabled() && (
+            <>
+              <Card className="bg-gradient-to-r from-rose-500 to-rose-600 text-white border-0 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-rose-100 text-sm font-medium">عناصر تحتاج CAPA</p>
+                      <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.needs_capa_count || 0)}</p>
+                    </div>
+                    <AlertTriangle className="w-12 h-12 text-rose-200" />
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-gradient-to-r from-slate-500 to-slate-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-100 text-sm font-medium">خطط تصحيحية مفتوحة</p>
-                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.open_capa_count || 0)}</p>
-                </div>
-                <Users className="w-12 h-12 text-slate-200" />
-              </div>
-            </CardContent>
-          </Card>
+              <Card className="bg-gradient-to-r from-slate-500 to-slate-600 text-white border-0 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-slate-100 text-sm font-medium">خطط تصحيحية مفتوحة</p>
+                      <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.open_capa_count || 0)}</p>
+                    </div>
+                    <Users className="w-12 h-12 text-slate-200" />
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
         {/* Enhanced Filters */}
@@ -440,11 +458,11 @@ const MyRoundsPage: React.FC = () => {
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 h-14 text-lg"
               >
-              <option value="all">جميع الحالات</option>
-              <option value="scheduled">مجدولة — SCHEDULED</option>
-              <option value="in_progress">قيد التنفيذ — IN_PROGRESS</option>
-              <option value="completed">مكتملة — COMPLETED</option>
-              <option value="overdue">متأخرة — OVERDUE</option>
+                <option value="all">جميع الحالات</option>
+                <option value="scheduled">مجدولة — SCHEDULED</option>
+                <option value="in_progress">قيد التنفيذ — IN_PROGRESS</option>
+                <option value="completed">مكتملة — COMPLETED</option>
+                <option value="overdue">متأخرة — OVERDUE</option>
               </select>
               <select
                 value={filterPriority}
@@ -466,15 +484,14 @@ const MyRoundsPage: React.FC = () => {
           {filteredRounds.map((round) => (
             <div key={round.id} className="bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden">
               {/* Ticket Header */}
-              <div className={`text-white p-3 ${
-                round.status === 'completed' 
-                  ? 'bg-gradient-to-r from-green-600 to-green-700'
-                  : round.status === 'in_progress'
+              <div className={`text-white p-3 ${round.status === 'completed'
+                ? 'bg-gradient-to-r from-green-600 to-green-700'
+                : round.status === 'in_progress'
                   ? 'bg-gradient-to-r from-blue-600 to-blue-700'
                   : round.status === 'scheduled'
-                  ? 'bg-gradient-to-r from-purple-600 to-purple-700'
-                  : 'bg-gradient-to-r from-red-600 to-red-700'
-              }`}>
+                    ? 'bg-gradient-to-r from-purple-600 to-purple-700'
+                    : 'bg-gradient-to-r from-red-600 to-red-700'
+                }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 bg-white/20 rounded-lg">
@@ -492,7 +509,7 @@ const MyRoundsPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Unified header strip */}
               <div className="px-4 py-2 border-b border-gray-100 bg-white flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
@@ -505,16 +522,16 @@ const MyRoundsPage: React.FC = () => {
                 </div>
                 <div className="text-sm text-gray-600">{round.scheduledDate ? new Date(round.scheduledDate).toLocaleDateString() : 'غير محدد'}</div>
               </div>
-              
+
               {/* Ticket Content */}
               <div className="p-4">
                 {/* Removed title/description per requirements */}
-                
+
                 {/* Flight Details Style */}
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div className="text-center">
                     <div className="text-lg font-bold text-gray-900">
-                      {new Date(round.scheduledDate).toLocaleDateString('en-US', { 
+                      {new Date(round.scheduledDate).toLocaleDateString('en-US', {
                         day: '2-digit',
                         month: 'short'
                       })}
@@ -527,28 +544,26 @@ const MyRoundsPage: React.FC = () => {
                     </div>
                     <div className="text-xs text-gray-400 mt-1">تاريخ الجولة</div>
                   </div>
-                  
+
                   <div className="text-center">
-                    <div className={`text-lg font-bold px-3 py-2 rounded-lg ${
-                      round.priority === 'urgent' 
-                        ? 'bg-red-100 text-red-800'
-                        : round.priority === 'high'
+                    <div className={`text-lg font-bold px-3 py-2 rounded-lg ${round.priority === 'urgent'
+                      ? 'bg-red-100 text-red-800'
+                      : round.priority === 'high'
                         ? 'bg-orange-100 text-orange-800'
                         : round.priority === 'medium'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-green-100 text-green-800'
-                    }`}>
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}>
                       {getRoundTypeText(round.roundType)}
                     </div>
-                    <div className={`text-xs px-2 py-1 rounded-full mt-2 inline-block ${
-                      round.priority === 'urgent' 
-                        ? 'bg-red-200 text-red-700'
-                        : round.priority === 'high'
+                    <div className={`text-xs px-2 py-1 rounded-full mt-2 inline-block ${round.priority === 'urgent'
+                      ? 'bg-red-200 text-red-700'
+                      : round.priority === 'high'
                         ? 'bg-orange-200 text-orange-700'
                         : round.priority === 'medium'
-                        ? 'bg-yellow-200 text-yellow-700'
-                        : 'bg-green-200 text-green-700'
-                    }`}>
+                          ? 'bg-yellow-200 text-yellow-700'
+                          : 'bg-green-200 text-green-700'
+                      }`}>
                       {getPriorityText(round.priority)}
                     </div>
                     <div className="text-xs text-gray-400 mt-1">نوع الجولة</div>
@@ -634,7 +649,7 @@ const MyRoundsPage: React.FC = () => {
         {/* Evaluation form is now a separate page */}
 
         {/* Notification banner for created CAPA */}
-        {createdCapaInfo && (
+        {isCapaEnabled() && createdCapaInfo && (
           <div className="fixed top-6 right-6 z-50">
             <div className="bg-white shadow-lg rounded-lg p-4 flex items-center gap-4">
               <div className="text-sm">
@@ -649,7 +664,7 @@ const MyRoundsPage: React.FC = () => {
           </div>
         )}
 
-        {showCapaForm && capaInitialData && (
+        {isCapaEnabled() && showCapaForm && capaInitialData && (
           <div className="fixed inset-0 bg-black/40 flex items-start justify-center p-6 z-50">
             <div className="w-full max-w-4xl">
               <CapaForm
@@ -671,7 +686,7 @@ const MyRoundsPage: React.FC = () => {
                 {searchTerm || filterStatus !== 'all' || filterPriority !== 'all' ? 'لا توجد نتائج' : 'لا توجد جولات مكلف بها'}
               </h3>
               <p className="text-xl text-gray-500 mb-8 max-w-md mx-auto">
-                {searchTerm || filterStatus !== 'all' || filterPriority !== 'all' 
+                {searchTerm || filterStatus !== 'all' || filterPriority !== 'all'
                   ? 'جرب تغيير معايير البحث أو الفلترة للعثور على الجولات المطلوبة'
                   : 'لم يتم تكليفك بأي جولات تقييم حالياً'
                 }

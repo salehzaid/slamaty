@@ -21,6 +21,7 @@ export interface EvaluationItem {
   description?: string
   objective?: string
   category_id: number
+  category_ids?: number[]
   category_name: string
   category_color: string
   is_active: boolean
@@ -128,18 +129,18 @@ export const useEvaluationApi = () => {
     try {
       setLoading(true)
       setError(null)
-      
+
       // تحديث الـ token قبل إرسال الطلب
       apiClient.refreshToken()
-      
+
       console.log('Loading categories from database...')
       console.log('Current token:', localStorage.getItem('access_token') ? 'Token exists' : 'No token')
-      
+
       const response = await apiClient.getEvaluationCategories()
       console.log('Categories response:', response)
       const categoriesData = response.data || response
       console.log('Setting categories:', categoriesData)
-      
+
       // تأكد من أن البيانات صحيحة
       if (Array.isArray(categoriesData)) {
         setCategories(categoriesData)
@@ -149,7 +150,7 @@ export const useEvaluationApi = () => {
       }
     } catch (err: any) {
       console.error('Failed to load categories from database:', err)
-      
+
       // التحقق من أخطاء التوثيق
       if (err.message?.includes('Authentication required') || err.message?.includes('403')) {
         setError('يجب تسجيل الدخول أولاً')
@@ -167,18 +168,18 @@ export const useEvaluationApi = () => {
     try {
       setLoading(true)
       setError(null)
-      
+
       // تحديث الـ token قبل إرسال الطلب
       apiClient.refreshToken()
-      
+
       console.log('Loading items from database...')
       console.log('Current token:', localStorage.getItem('access_token') ? 'Token exists' : 'No token')
-      
+
       const response = await apiClient.getEvaluationItems()
       console.log('Items response:', response)
       const itemsData = response.data || response
       console.log('Setting items:', itemsData)
-      
+
       // تأكد من أن البيانات صحيحة
       if (Array.isArray(itemsData)) {
         setItems(itemsData)
@@ -188,7 +189,7 @@ export const useEvaluationApi = () => {
       }
     } catch (err: any) {
       console.error('Failed to load items from database:', err)
-      
+
       // التحقق من أخطاء التوثيق
       if (err.message?.includes('Authentication required') || err.message?.includes('403')) {
         setError('يجب تسجيل الدخول أولاً')
@@ -287,19 +288,19 @@ export const useEvaluationApi = () => {
     try {
       setLoading(true)
       setError(null)
-      
+
       console.log('🔄 Updating item:', id)
       console.log('📤 Sending data:', itemData)
-      
+
       const response = await apiClient.updateEvaluationItem(id, itemData)
-      
+
       console.log('📥 Response:', response)
-      
+
       const updatedItem = response.data || response
       setItems(prev => prev.map(item => item.id === id ? updatedItem : item))
-      
+
       console.log('✅ Item updated successfully')
-      
+
       return updatedItem
     } catch (err: any) {
       console.error('❌ Failed to update item:', err)

@@ -1,415 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام سلامتي - عرض تجريبي بدون تسجيل دخول</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'arabic': ['"IBM Plex Sans Arabic"', 'Noto Kufi Arabic', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Noto Kufi Arabic', sans-serif; }
-        .demo-banner { 
-            background: linear-gradient(45deg, #fbbf24, #f59e0b);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        .card-hover:hover {
-            transform: translateY(-2px);
-            transition: all 0.3s ease;
-        }
-    </style>
-</head>
-    <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen font-arabic">
-    <!-- Demo Banner -->
-    <div class="demo-banner text-white text-center py-4 px-4 font-bold shadow-lg sticky top-0 z-50">
-        🧪 <span class="text-xl">عرض تجريبي لنظام سلامتي</span> - بدون تسجيل دخول 🚀
-    </div>
-
-    <!-- Main Container -->
-    <div class="container mx-auto px-4 py-8 max-w-7xl">
-        <!-- Header -->
-        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
-            <div class="text-center">
-                <div class="flex justify-center mb-4">
-                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-full">
-                        <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                        </svg>
-                    </div>
-                </div>
-                <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-                    🏥 نظام سلامتي
-                </h1>
-                <p class="text-2xl text-gray-700 mb-4">إدارة جولات الجودة وسلامة المرضى</p>
-                <p class="text-lg text-gray-600">نظام شامل لمراقبة وتحسين جودة الرعاية الصحية</p>
-            </div>
-        </div>
-
-        <!-- Dashboard Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Total Rounds -->
-            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 card-hover border border-white/20">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 mb-2">إجمالي الجولات</p>
-                        <p class="text-4xl font-bold text-blue-600">127</p>
-                        <p class="text-sm text-green-600 mt-1">↗️ +12% هذا الشهر</p>
-                    </div>
-                    <div class="bg-gradient-to-r from-blue-400 to-blue-600 p-4 rounded-xl">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Active CAPAs -->
-            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 card-hover border border-white/20">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 mb-2">خطط التصحيح النشطة</p>
-                        <p class="text-4xl font-bold text-orange-600">34</p>
-                        <p class="text-sm text-orange-600 mt-1">⚡ 8 عاجلة</p>
-                    </div>
-                    <div class="bg-gradient-to-r from-orange-400 to-orange-600 p-4 rounded-xl">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Compliance Rate -->
-            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 card-hover border border-white/20">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 mb-2">معدل الامتثال</p>
-                        <p class="text-4xl font-bold text-green-600">94%</p>
-                        <p class="text-sm text-green-600 mt-1">🎯 الهدف: 95%</p>
-                    </div>
-                    <div class="bg-gradient-to-r from-green-400 to-green-600 p-4 rounded-xl">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Departments -->
-            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 card-hover border border-white/20">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 mb-2">الأقسام النشطة</p>
-                        <p class="text-4xl font-bold text-purple-600">15</p>
-                        <p class="text-sm text-purple-600 mt-1">🏢 جميع الأقسام</p>
-                    </div>
-                    <div class="bg-gradient-to-r from-purple-400 to-purple-600 p-4 rounded-xl">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h4a1 1 0 011 1v5m-6 0V9a1 1 0 011-1h4a1 1 0 011 1v5"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- System Features -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <!-- Recent Rounds -->
-            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
-                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                    🔄 <span class="mr-3">آخر الجولات</span>
-                </h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200">
-                        <div>
-                            <p class="font-bold text-gray-800">جولة مكافحة العدوى - قسم التمريض</p>
-                            <p class="text-sm text-gray-600">📅 منذ يومين • 👤 د. سارة المقيم</p>
-                            <p class="text-sm text-green-700 font-medium">✅ معدل الامتثال: 96%</p>
-                        </div>
-                        <span class="bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold">مكتملة</span>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
-                        <div>
-                            <p class="font-bold text-gray-800">جولة سلامة المرضى - قسم الطوارئ</p>
-                            <p class="text-sm text-gray-600">📅 منذ 3 أيام • 👤 د. أحمد المحمد</p>
-                            <p class="text-sm text-blue-700 font-medium">⏳ التقدم: 75%</p>
-                        </div>
-                        <span class="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-bold">قيد التنفيذ</span>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200">
-                        <div>
-                            <p class="font-bold text-gray-800">جولة الجودة - قسم الجراحة</p>
-                            <p class="text-sm text-gray-600">📅 الغد • 👤 د. فاطمة الأحمد</p>
-                            <p class="text-sm text-yellow-700 font-medium">📋 جاهزة للبدء</p>
-                        </div>
-                        <span class="bg-yellow-500 text-white px-4 py-2 rounded-full text-sm font-bold">مجدولة</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CAPA Plans -->
-            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
-                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                    📋 <span class="mr-3">خطط التصحيح الحديثة</span>
-                </h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-xl border border-red-200">
-                        <div>
-                            <p class="font-bold text-gray-800">تحسين بروتوكول غسل اليدين</p>
-                            <p class="text-sm text-gray-600">🏢 قسم التمريض • ⏰ الموعد النهائي: غداً</p>
-                            <p class="text-sm text-red-700 font-medium">🚨 مخاطر عالية</p>
-                        </div>
-                        <span class="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold">عاجل</span>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl border border-orange-200">
-                        <div>
-                            <p class="font-bold text-gray-800">تدريب الطاقم على السلامة</p>
-                            <p class="text-sm text-gray-600">🏢 قسم الطوارئ • ⏰ خلال أسبوع</p>
-                            <p class="text-sm text-orange-700 font-medium">⚡ مخاطر متوسطة</p>
-                        </div>
-                        <span class="bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold">متوسط</span>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200">
-                        <div>
-                            <p class="font-bold text-gray-800">تحديث معدات الطوارئ</p>
-                            <p class="text-sm text-gray-600">🏢 قسم العناية المركزة • ⏰ خلال شهر</p>
-                            <p class="text-sm text-green-700 font-medium">✅ مخاطر منخفضة</p>
-                        </div>
-                        <span class="bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold">منخفض</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- System Features -->
-        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
-            <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center">🚀 ميزات النظام</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                    <div class="bg-blue-500 p-4 rounded-full inline-block mb-4">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                    </div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">إدارة الجولات</h4>
-                    <p class="text-gray-600">تخطيط وتنفيذ ومتابعة جولات التقييم</p>
-                </div>
-
-                <div class="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
-                    <div class="bg-green-500 p-4 rounded-full inline-block mb-4">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">تقييم الامتثال</h4>
-                    <p class="text-gray-600">قياس ومراقبة معدلات الامتثال للمعايير</p>
-                </div>
-
-                <div class="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
-                    <div class="bg-purple-500 p-4 rounded-full inline-block mb-4">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0h6m-6 0v6a2 2 0 002 2h6a2 2 0 002-2v-6m0 0V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2v0M9 5v4a2 2 0 002 2h2a2 2 0 002-2V5"></path>
-                        </svg>
-                    </div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">خطط التصحيح</h4>
-                    <p class="text-gray-600">إنشاء ومتابعة خطط التحسين والتصحيح</p>
-                </div>
-
-                <div class="text-center p-6 bg-gradient-to-br from-red-50 to-red-100 rounded-xl">
-                    <div class="bg-red-500 p-4 rounded-full inline-block mb-4">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                        </svg>
-                    </div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">إدارة المخاطر</h4>
-                    <p class="text-gray-600">تحديد وتقييم ومعالجة المخاطر</p>
-                </div>
-
-                <div class="text-center p-6 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl">
-                    <div class="bg-indigo-500 p-4 rounded-full inline-block mb-4">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                    </div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">إدارة المستخدمين</h4>
-                    <p class="text-gray-600">صلاحيات وأدوار المستخدمين</p>
-                </div>
-
-                <div class="text-center p-6 bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl">
-                    <div class="bg-teal-500 p-4 rounded-full inline-block mb-4">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                    </div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">التقارير والتحليلات</h4>
-                    <p class="text-gray-600">تقارير شاملة وتحليلات متقدمة</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chart Demo -->
-        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
-            <h3 class="text-2xl font-bold text-gray-800 mb-6">📊 تحليلات الأداء</h3>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Compliance Trend -->
-                <div>
-                    <h4 class="text-lg font-bold text-gray-700 mb-4">اتجاه معدل الامتثال</h4>
-                    <div class="bg-gradient-to-r from-blue-100 to-green-100 p-6 rounded-xl">
-                        <div class="flex items-end space-x-2 h-32">
-                            <div class="bg-blue-500 w-8 h-16 rounded-t"></div>
-                            <div class="bg-blue-600 w-8 h-20 rounded-t"></div>
-                            <div class="bg-green-500 w-8 h-24 rounded-t"></div>
-                            <div class="bg-green-600 w-8 h-28 rounded-t"></div>
-                            <div class="bg-green-700 w-8 h-32 rounded-t"></div>
-                        </div>
-                        <div class="flex justify-between text-sm text-gray-600 mt-2">
-                            <span>يناير</span>
-                            <span>فبراير</span>
-                            <span>مارس</span>
-                            <span>أبريل</span>
-                            <span>مايو</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Department Performance -->
-                <div>
-                    <h4 class="text-lg font-bold text-gray-700 mb-4">أداء الأقسام</h4>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-700">قسم التمريض</span>
-                            <div class="flex items-center">
-                                <div class="bg-gray-200 rounded-full h-2 w-32 mr-3">
-                                    <div class="bg-green-500 h-2 rounded-full" style="width: 96%"></div>
-                                </div>
-                                <span class="text-green-600 font-bold">96%</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-700">قسم الطوارئ</span>
-                            <div class="flex items-center">
-                                <div class="bg-gray-200 rounded-full h-2 w-32 mr-3">
-                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 89%"></div>
-                                </div>
-                                <span class="text-blue-600 font-bold">89%</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-700">قسم الجراحة</span>
-                            <div class="flex items-center">
-                                <div class="bg-gray-200 rounded-full h-2 w-32 mr-3">
-                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 92%"></div>
-                                </div>
-                                <span class="text-yellow-600 font-bold">92%</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-700">العناية المركزة</span>
-                            <div class="flex items-center">
-                                <div class="bg-gray-200 rounded-full h-2 w-32 mr-3">
-                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 98%"></div>
-                                </div>
-                                <span class="text-purple-600 font-bold">98%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Navigation Demo -->
-        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
-            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">🧭 صفحات النظام</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <button onclick="showDemo('dashboard')" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-6 rounded-xl transition-all transform hover:scale-105 shadow-lg">
-                    <div class="text-2xl mb-2">📊</div>
-                    <div class="font-bold">لوحة التحكم</div>
-                </button>
-                <button onclick="showDemo('rounds')" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-6 rounded-xl transition-all transform hover:scale-105 shadow-lg">
-                    <div class="text-2xl mb-2">🔄</div>
-                    <div class="font-bold">إدارة الجولات</div>
-                </button>
-                <button onclick="showDemo('capa')" class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white p-6 rounded-xl transition-all transform hover:scale-105 shadow-lg">
-                    <div class="text-2xl mb-2">📋</div>
-                    <div class="font-bold">خطط التصحيح</div>
-                </button>
-                <button onclick="showDemo('reports')" class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white p-6 rounded-xl transition-all transform hover:scale-105 shadow-lg">
-                    <div class="text-2xl mb-2">📈</div>
-                    <div class="font-bold">التقارير</div>
-                </button>
-            </div>
-        </div>
-
-        <!-- Login Info -->
-        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-xl p-8 text-center text-white">
-            <h3 class="text-3xl font-bold mb-6">🔑 للوصول الكامل للنظام</h3>
-            <div class="bg-white/20 backdrop-blur-sm rounded-xl p-6 inline-block mb-6">
-                <p class="text-2xl font-bold mb-4">بيانات تسجيل الدخول:</p>
-                <div class="bg-white/30 rounded-lg p-4 mb-2">
-                    <p class="text-xl font-mono">👤 اسم المستخدم: <span class="font-bold">testuser</span></p>
-                </div>
-                <div class="bg-white/30 rounded-lg p-4">
-                    <p class="text-xl font-mono">🔑 كلمة المرور: <span class="font-bold">test123</span></p>
-                </div>
-            </div>
-            <div class="flex justify-center space-x-4">
-                <a href="/" class="bg-white text-indigo-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-100 transition-colors">
-                    🚀 دخول للنظام الكامل
-                </a>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="text-center mt-8 text-gray-600">
-            <p>🏥 نظام سلامتي - إدارة جولات الجودة وسلامة المرضى</p>
-            <p class="text-sm mt-2">تم تطوير هذا النظام لضمان أعلى معايير الجودة والسلامة</p>
-        </div>
-    </div>
-
-    <script>
-        function showDemo(section) {
-            const messages = {
-                'dashboard': '📊 لوحة التحكم تعرض إحصائيات شاملة ومؤشرات الأداء الرئيسية',
-                'rounds': '🔄 إدارة الجولات تتيح تخطيط وتنفيذ ومتابعة جولات التقييم',
-                'capa': '📋 خطط التصحيح تساعد في إنشاء ومتابعة خطط التحسين',
-                'reports': '📈 التقارير توفر تحليلات متقدمة وإحصائيات مفصلة'
-            };
-            
-            alert(`🧪 عرض تجريبي\n\n${messages[section]}\n\nللوصول الكامل استخدم:\n👤 testuser\n🔑 test123`);
-        }
-
-        // Add smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // Add loading animation
-        window.addEventListener('load', () => {
-            document.body.style.opacity = '0';
-            document.body.style.transition = 'opacity 0.5s ease-in-out';
-            setTimeout(() => {
-                document.body.style.opacity = '1';
-            }, 100);
-        });
-    </script>
-</body>
-</html>

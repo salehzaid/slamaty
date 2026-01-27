@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار حذف الجولة</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-area {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            margin: 10px 0;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: scale(1.02);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+        label {
+            font-weight: bold;
+            color: #495057;
+            display: block;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ اختبار حذف الجولة مباشرة</h1>
+        
+        <div class="test-area">
+            <label>رقم الجولة (Round ID):</label>
+            <input type="number" id="roundId" value="76" placeholder="أدخل رقم الجولة">
+            
+            <label>التوكن (Token):</label>
+            <input type="text" id="token" placeholder="سيتم جلبه تلقائياً من localStorage">
+            
+            <button onclick="testDelete()">🗑️ حذف الجولة</button>
+            <button onclick="loadToken()" style="background: #6c757d;">🔑 تحميل التوكن</button>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Load token automatically on page load
+        window.onload = function() {
+            loadToken();
+        };
+
+        function loadToken() {
+            const token = localStorage.getItem('access_token');
+            document.getElementById('token').value = token || '';
+            if (token) {
+                showResult('✅ تم تحميل التوكن بنجاح', 'success');
+            } else {
+                showResult('⚠️ لم يتم العثور على توكن. يرجى تسجيل الدخول أولاً.', 'error');
+            }
+        }
+
+        async function testDelete() {
+            const roundId = document.getElementById('roundId').value;
+            const token = document.getElementById('token').value;
+            
+            if (!roundId) {
+                showResult('❌ يرجى إدخال رقم الجولة', 'error');
+                return;
+            }
+            
+            if (!token) {
+                showResult('❌ يرجى إدخال التوكن أو تسجيل الدخول', 'error');
+                return;
+            }
+            
+            showResult('⏳ جاري الحذف...', 'info');
+            
+            try {
+                const response = await fetch(`http://localhost:8000/api/rounds/${roundId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(`✅ تم الحذف بنجاح!
+
+الحالة: ${response.status}
+الرسالة: ${JSON.stringify(data, null, 2)}
+
+🎉 الجولة ${roundId} تم حذفها من قاعدة البيانات`, 'success');
+                } else {
+                    showResult(`❌ فشل الحذف
+
+الحالة: ${response.status}
+الخطأ: ${JSON.stringify(data, null, 2)}
+
+${response.status === 403 ? '⚠️ قد لا تملك الصلاحيات الكافية (يجب أن تكون super_admin أو quality_manager)' : ''}
+${response.status === 401 ? '⚠️ التوكن غير صحيح أو منتهي. جرب تسجيل دخول جديد.' : ''}
+${response.status === 404 ? '⚠️ الجولة غير موجودة أو محذوفة مسبقاً.' : ''}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ خطأ في الاتصال بالسيرفر
+
+التفاصيل: ${error.message}
+
+🔍 تأكد من:
+1. الباك اند شغال على http://localhost:8000
+2. لا يوجد firewall يمنع الاتصال
+3. CORS مُفعّل في الباك اند
+
+للتحقق: افتح http://localhost:8000/docs`, 'error');
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+        }
+    </script>
+</body>
+</html>
+

@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Calendar, 
-  Users, 
-  User,
-  Building2, 
-  BarChart3, 
-  Settings, 
+import {
+  LayoutDashboard,
+  FileText,
+  Users,
+  Building2,
+  BarChart3,
+  Settings,
   Shield,
   ChevronLeft,
   ChevronRight,
@@ -17,13 +15,12 @@ import {
   Menu,
   Target,
   Trophy,
-  ChevronDown,
-  Folder
+  ArrowRightLeft
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { useLayout } from '@/context/LayoutContext'
+import { isCapaEnabled } from '@/lib/features'
 
 interface AnimatedSidebarProps {
   onLogout: () => void
@@ -36,7 +33,6 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
-  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['unified-evaluation']))
 
   // Sync with layout context
   useEffect(() => {
@@ -52,7 +48,7 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
         setIsSidebarCollapsed(true)
       }
     }
-    
+
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
@@ -65,7 +61,7 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
         setIsMobileOpen(prev => !prev)
       }
     }
-    
+
     window.addEventListener("toggle-mobile-sidebar", handleMobileToggle)
     return () => window.removeEventListener("toggle-mobile-sidebar", handleMobileToggle)
   }, [])
@@ -85,33 +81,8 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       icon: FileText,
       badge: null,
       color: 'text-green-600',
-      hasSubmenu: true,
-      path: '/rounds',
-      submenu: [
-        {
-          id: 'rounds-list',
-          label: 'عرض الجولات',
-          icon: BarChart3,
-          color: 'text-green-500',
-          path: '/rounds/list'
-        },
-        {
-          id: 'rounds-calendar',
-          label: 'تقويم الجولات',
-          icon: Calendar,
-          color: 'text-blue-500',
-          path: '/rounds/calendar'
-        },
-        {
-          id: 'my-rounds',
-          label: 'جولاتي',
-          icon: User,
-          color: 'text-purple-500',
-          path: '/rounds/my-rounds'
-        },
-      ]
+      path: '/rounds'
     },
-    // removed deprecated capa-enhanced menu item; redirect handles old links
     {
       id: 'capa-dashboard',
       label: 'داشبورد الخطط',
@@ -120,7 +91,6 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       color: 'text-blue-600',
       path: '/capa-dashboard'
     },
-    // Reports removed from sidebar as requested
     {
       id: 'departments',
       label: 'الأقسام',
@@ -146,29 +116,20 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       path: '/templates'
     },
     {
-      id: 'unified-evaluation',
+      id: 'evaluation',
       label: 'لوحة التقييمات',
       icon: Target,
       badge: null,
       color: 'text-blue-600',
-      hasSubmenu: true,
-      path: '/unified-evaluation',
-      submenu: [
-        {
-          id: 'evaluation-categories',
-          label: 'تصنيفات التقييم',
-          icon: Folder,
-          color: 'text-blue-500',
-          path: '/evaluation-categories'
-        },
-        {
-          id: 'evaluation-items',
-          label: 'عناصر التقييم',
-          icon: FileText,
-          color: 'text-green-500',
-          path: '/evaluation-items'
-        },
-      ]
+      path: '/evaluation'
+    },
+    {
+      id: 'category-mapping',
+      label: 'ربط التصنيفات',
+      icon: ArrowRightLeft,
+      badge: null,
+      color: 'text-orange-600',
+      path: '/category-mapping'
     },
     {
       id: 'gamified-system',
@@ -179,6 +140,11 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       path: '/gamified-system'
     }
   ]
+
+  const visibleMenuItems = menuItems.filter(item => {
+    if (item.id === 'capa-dashboard' && !isCapaEnabled()) return false
+    return true
+  })
 
   const bottomItems = [
     {
@@ -198,22 +164,6 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
       path: '/settings'
     },
     {
-      id: 'test-api',
-      label: 'اختبار API',
-      icon: HelpCircle,
-      badge: null,
-      color: 'text-red-600',
-      path: '/test-api'
-    },
-    {
-      id: 'layout-test',
-      label: 'اختبار التخطيط',
-      icon: LayoutDashboard,
-      badge: null,
-      color: 'text-indigo-600',
-      path: '/layout-test'
-    },
-    {
       id: 'help',
       label: 'المساعدة',
       icon: HelpCircle,
@@ -227,15 +177,15 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
     const newCollapsedState = !isCollapsed
     setIsCollapsed(newCollapsedState)
     setIsSidebarCollapsed(newCollapsedState)
-    
+
     // Store state in localStorage
     localStorage.setItem('sidebar-collapsed', newCollapsedState.toString())
-    
+
     // Emit custom event for other components
-    window.dispatchEvent(new CustomEvent('sidebar-toggle', { 
-      detail: { collapsed: newCollapsedState } 
+    window.dispatchEvent(new CustomEvent('sidebar-toggle', {
+      detail: { collapsed: newCollapsedState }
     }))
-    
+
     if (window.innerWidth < 1024) {
       setIsMobileOpen(!isMobileOpen)
     }
@@ -255,23 +205,11 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
     return location.pathname.startsWith(path)
   }
 
-  const toggleSubmenu = (itemId: string) => {
-    setExpandedMenus(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(itemId)) {
-        newSet.delete(itemId)
-      } else {
-        newSet.add(itemId)
-      }
-      return newSet
-    })
-  }
-
   return (
     <>
       {/* Mobile Overlay */}
       {isMobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
@@ -299,7 +237,7 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
               </div>
             </div>
           )}
-          
+
           <Button
             variant="ghost"
             size="sm"
@@ -317,17 +255,15 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4">
           <div className="px-3 space-y-1">
-            {menuItems.map((item) => {
+            {visibleMenuItems.map((item) => {
               const Icon = item.icon
-              const active = isActive(item.path) || (item.submenu && item.submenu.some(sub => isActive(sub.path)))
+              const active = isActive(item.path)
               const isHovered = hoveredItem === item.id
-              const isExpanded = expandedMenus.has(item.id)
-              const hasSubmenu = item.hasSubmenu && item.submenu
 
               return (
                 <div key={item.id} className="space-y-1">
                   <button
-                    onClick={() => hasSubmenu ? toggleSubmenu(item.id) : handleItemClick(item.path)}
+                    onClick={() => handleItemClick(item.path)}
                     onMouseEnter={() => setHoveredItem(item.id)}
                     onMouseLeave={() => setHoveredItem(null)}
                     className={cn(
@@ -361,82 +297,19 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
                         )}>
                           {item.label}
                         </span>
-                        
-                        <div className="flex items-center gap-2">
-                          {item.badge && (
-                            <Badge 
-                              variant="secondary" 
-                              className={cn(
-                                "text-xs px-2 py-0.5 transition-all duration-200",
-                                active && "bg-blue-500/20 text-blue-300 border-blue-400/30 shadow-lg shadow-blue-400/20"
-                              )}
-                            >
-                              {item.badge}
-                            </Badge>
-                          )}
-                          {hasSubmenu && (
-                            <div className="w-4 h-4 flex items-center justify-center">
-                              {isExpanded ? (
-                                <ChevronDown className="w-3 h-3 text-slate-400" />
-                              ) : (
-                                <ChevronRight className="w-3 h-3 text-slate-400" />
-                              )}
-                            </div>
-                          )}
-                        </div>
                       </div>
                     )}
 
                     {/* Tooltip for collapsed state */}
-                    {isCollapsed && (
+                    {isCollapsed && !isMobileOpen && (
                       <div className={cn(
                         "absolute right-full mr-2 px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 pointer-events-none transition-opacity duration-200 shadow-lg shadow-blue-500/20",
                         isHovered && "opacity-100"
                       )}>
                         {item.label}
-                        {item.badge && (
-                          <span className="ml-1 px-1 py-0.5 bg-blue-500/20 rounded text-xs">
-                            {item.badge}
-                          </span>
-                        )}
                       </div>
                     )}
                   </button>
-
-                  {/* Submenu */}
-                  {hasSubmenu && isExpanded && (!isCollapsed || isMobileOpen) && (
-                    <div className="mr-4 space-y-1">
-                      {item.submenu.map((subItem) => {
-                        const SubIcon = subItem.icon
-                        const subActive = isActive(subItem.path)
-                        
-                        return (
-                          <button
-                            key={subItem.id}
-                            onClick={() => handleItemClick(subItem.path)}
-                            className={cn(
-                              "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group relative",
-                              "hover:bg-slate-800",
-                              subActive && "bg-blue-900/20 text-blue-300 shadow-lg shadow-blue-400/10"
-                            )}
-                          >
-                            <div className={cn(
-                              "flex-shrink-0 w-4 h-4 transition-all duration-200",
-                              subActive ? "text-blue-400 drop-shadow-lg shadow-blue-400/50" : "text-slate-500"
-                            )}>
-                              <SubIcon className="w-full h-full" />
-                            </div>
-                            <span className={cn(
-                              "text-xs font-medium truncate transition-all duration-200",
-                              subActive ? "text-blue-300 drop-shadow-md" : "text-slate-400"
-                            )}>
-                              {subItem.label}
-                            </span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )}
                 </div>
               )
             })}
@@ -488,33 +361,16 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
                       )}>
                         {item.label}
                       </span>
-                      
-                      {item.badge && (
-                        <Badge 
-                          variant="secondary" 
-                          className={cn(
-                            "text-xs px-2 py-0.5 transition-all duration-200",
-                            active && "bg-blue-500/20 text-blue-300 border-blue-400/30 shadow-lg shadow-blue-400/20"
-                          )}
-                        >
-                          {item.badge}
-                        </Badge>
-                      )}
                     </div>
                   )}
 
                   {/* Tooltip for collapsed state */}
-                  {isCollapsed && (
+                  {isCollapsed && !isMobileOpen && (
                     <div className={cn(
                       "absolute right-full mr-2 px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 pointer-events-none transition-opacity duration-200 shadow-lg shadow-blue-500/20",
                       isHovered && "opacity-100"
                     )}>
                       {item.label}
-                      {item.badge && (
-                        <span className="ml-1 px-1 py-0.5 bg-blue-500/20 rounded text-xs">
-                          {item.badge}
-                        </span>
-                      )}
                     </div>
                   )}
                 </button>
@@ -525,15 +381,7 @@ const AnimatedSidebar: React.FC<AnimatedSidebarProps> = () => {
 
         {/* Footer */}
         <div className="border-t border-slate-700 p-4 mt-auto">
-          {!isCollapsed ? (
-            <div className="space-y-3">
-              {/* Empty space for future additions */}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center space-y-3">
-              {/* Empty space for future additions */}
-            </div>
-          )}
+          {/* Footer content removed for clarity */}
         </div>
       </div>
 

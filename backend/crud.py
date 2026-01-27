@@ -1256,13 +1256,105 @@ def create_evaluation_item(db: Session, item_data: dict):
     db.refresh(db_item)
     return db_item
 
+
+# Category-Item Mapping CRUD operations
+def assign_items_to_category(db: Session, category_id: int, item_ids: list[int]):
+    """Assign multiple items to a category"""
+    if not EVALUATION_MODELS_AVAILABLE:
+        return 0
+    
+    from models_updated import EvaluationCategoryMapping
+    
+    added_count = 0
+    for item_id in item_ids:
+        # Check if mapping already exists
+        existing = db.query(EvaluationCategoryMapping).filter(
+            EvaluationCategoryMapping.category_id == category_id,
+            EvaluationCategoryMapping.item_id == item_id
+        ).first()
+        
+        if not existing:
+            # Get max sort order to append at end
+            max_sort = db.query(func.max(EvaluationCategoryMapping.sort_order)).filter(
+                EvaluationCategoryMapping.category_id == category_id
+            ).scalar() or 0
+            
+            mapping = EvaluationCategoryMapping(
+                category_id=category_id,
+                item_id=item_id,
+                sort_order=max_sort + 1,
+                is_active=True
+            )
+            db.add(mapping)
+            added_count += 1
+            
+    db.commit()
+    return added_count
+
+def unassign_items_from_category(db: Session, category_id: int, item_ids: list[int]):
+    """Remove multiple items from a category"""
+    if not EVALUATION_MODELS_AVAILABLE:
+        return 0
+        
+    from models_updated import EvaluationCategoryMapping
+    
+    deleted = db.query(EvaluationCategoryMapping).filter(
+        EvaluationCategoryMapping.category_id == category_id,
+        EvaluationCategoryMapping.item_id.in_(item_ids)
+    ).delete(synchronize_session=False)
+    
+    db.commit()
+    return deleted
+
+def reorder_category_items(db: Session, category_id: int, ordered_item_ids: list[int]):
+    """Update sort order for items in a category"""
+    if not EVALUATION_MODELS_AVAILABLE:
+        return
+        
+    from models_updated import EvaluationCategoryMapping
+    
+    # Update sort_order based on index in the list
+    for index, item_id in enumerate(ordered_item_ids):
+        db.query(EvaluationCategoryMapping).filter(
+            EvaluationCategoryMapping.category_id == category_id,
+            EvaluationCategoryMapping.item_id == item_id
+        ).update({"sort_order": index})
+        
+    db.commit()
+
+def get_items_by_category_ordered(db: Session, category_id: int):
+    """Get items for a category ordered by sort_order"""
+    if not EVALUATION_MODELS_AVAILABLE:
+        return []
+        
+    from models_updated import EvaluationCategoryMapping, EvaluationItem
+    
+    # Join items with mapping and order by mapping.sort_order
+    results = db.query(EvaluationItem).join(
+        EvaluationCategoryMapping,
+        EvaluationItem.id == EvaluationCategoryMapping.item_id
+    ).filter(
+        EvaluationCategoryMapping.category_id == category_id,
+        EvaluationCategoryMapping.is_active == True,
+        EvaluationItem.is_active == True
+    ).order_by(EvaluationCategoryMapping.sort_order).all()
+    
+    return results
+
 def get_evaluation_items_by_category(db: Session, category_id: int, skip: int = 0, limit: int = 100):
     if not EVALUATION_MODELS_AVAILABLE:
         return []
-    return db.query(EvaluationItem).filter(
-        EvaluationItem.category_id == category_id,
-        EvaluationItem.is_active == True
-    ).offset(skip).limit(limit).all()
+    
+    # Use the new mapping logic if available, otherwise fallback
+    try:
+        from models_updated import EvaluationCategoryMapping
+        return get_items_by_category_ordered(db, category_id)
+    except Exception:
+        # Fallback to old logic
+        return db.query(EvaluationItem).filter(
+            EvaluationItem.category_id == category_id,
+            EvaluationItem.is_active == True
+        ).offset(skip).limit(limit).all()
 
 def get_evaluation_items(db: Session, skip: int = 0, limit: int = 100):
     if not EVALUATION_MODELS_AVAILABLE:

@@ -235,6 +235,7 @@ class EvaluationCategory(Base):
     
     # Relationships
     evaluation_items = relationship("EvaluationItem", back_populates="category")
+    item_mappings = relationship("EvaluationCategoryMapping", back_populates="category", cascade="all, delete-orphan")
 
 class EvaluationItem(Base):
     __tablename__ = "evaluation_items"
@@ -262,6 +263,29 @@ class EvaluationItem(Base):
     # Relationships
     category = relationship("EvaluationCategory", back_populates="evaluation_items")
     evaluation_results = relationship("EvaluationResult", back_populates="item")
+    category_mappings = relationship("EvaluationCategoryMapping", back_populates="item", cascade="all, delete-orphan")
+
+    @property
+    def category_ids(self):
+        """Return list of category IDs this item belongs to (including primary)"""
+        ids = {self.category_id}
+        for m in self.category_mappings:
+            ids.add(m.category_id)
+        return list(ids)
+
+class EvaluationCategoryMapping(Base):
+    __tablename__ = "evaluation_category_mappings"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    category_id = Column(Integer, ForeignKey("evaluation_categories.id", ondelete="CASCADE"), nullable=False, index=True)
+    item_id = Column(Integer, ForeignKey("evaluation_items.id", ondelete="CASCADE"), nullable=False, index=True)
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relationships
+    category = relationship("EvaluationCategory", back_populates="item_mappings")
+    item = relationship("EvaluationItem", back_populates="category_mappings")
 
 class ObjectiveOption(Base):
     __tablename__ = "objective_options"

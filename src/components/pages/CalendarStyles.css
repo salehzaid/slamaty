@@ -1,0 +1,120 @@
+/* Custom styles for FullCalendar to match Salamaty design system */
+
+.fc {
+    direction: rtl;
+    font-family: inherit;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.fc .fc-button-primary {
+    background-color: #ffffff;
+    border-color: #e2e8f0;
+    color: #475569;
+    font-weight: 500;
+    text-transform: capitalize;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    color: #1e293b;
+}
+
+.fc .fc-button-active {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+.fc .fc-button-primary:not(:disabled):active,
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+
+.fc .fc-col-header-cell {
+    background-color: #f8fafc;
+    padding: 0.75rem 0;
+    font-weight: 600;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.fc td,
+.fc th {
+    border: 1px solid #e2e8f0;
+}
+
+.fc .fc-day-today {
+    background-color: #eff6ff !important;
+}
+
+.fc-event {
+    cursor: pointer;
+    border: none;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    transition: transform 0.1s;
+}
+
+.fc-event:hover {
+    transform: scale(1.02);
+    filter: brightness(0.95);
+}
+
+.fc-v-event .fc-event-main {
+    color: inherit;
+}
+
+.fc .fc-timegrid-slot {
+    height: 3rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.fc-direction-rtl .fc-toolbar>*> :not(:first-child) {
+    margin-right: 0.75rem;
+}
+
+.fc .fc-daygrid-day-number {
+    padding: 8px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.fc .fc-daygrid-day-top {
+    flex-direction: row-reverse;
+}
+
+/* Event status colors */
+.event-status-active {
+    background-color: #3b82f6;
+    border-right: 4px solid #1d4ed8 !important;
+    color: white;
+}
+
+.event-status-pending {
+    background-color: #f59e0b;
+    border-right: 4px solid #d97706 !important;
+    color: white;
+}
+
+.event-status-completed {
+    background-color: #10b981;
+    border-right: 4px solid #059669 !important;
+    color: white;
+}
+
+.event-status-missed {
+    background-color: #ef4444;
+    border-right: 4px solid #dc2626 !important;
+    color: white;
+}

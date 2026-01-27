@@ -1,18 +1,13 @@
 import React, { useState, useMemo } from 'react'
-import { 
-  Network, 
-  BarChart3, 
-  Zap, 
-  Target, 
-  Link, 
-  Plus, 
-  Settings, 
-  Eye, 
-  Edit3,
-  Trash2,
+import {
+  Network,
+  BarChart3,
+  Zap,
+  Target,
+  Plus,
+  Eye,
   Star,
   TrendingUp,
-  Users,
   Award,
   Lightbulb
 } from 'lucide-react'
@@ -20,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useEvaluation } from '../context/EvaluationContext'
+import { cn } from '@/lib/utils'
 
 interface QuickStats {
   totalCategories: number
@@ -29,33 +25,15 @@ interface QuickStats {
   averageWeight: number
 }
 
-interface RelationshipNode {
-  id: string
-  type: 'category' | 'item'
-  label: string
-  color: string
-  size: number
-  x?: number
-  y?: number
-}
-
-interface RelationshipLink {
-  source: string
-  target: string
-  strength: number
-  type: 'belongs_to' | 'related_to'
-}
-
 const UnifiedEvaluationDashboard: React.FC = () => {
-  const { categories, items, addItem, addCategory } = useEvaluation()
+  const { categories, items } = useEvaluation()
   const [activeView, setActiveView] = useState<'overview' | 'builder' | 'analytics' | 'relationships'>('overview')
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
 
   // حساب الإحصائيات السريعة
   const quickStats: QuickStats = useMemo(() => {
     const activeItems = items.filter(item => item.isActive).length
     const totalWeight = items.reduce((sum, item) => sum + item.weight, 0)
-    
+
     return {
       totalCategories: categories.length,
       totalItems: items.length,
@@ -65,258 +43,205 @@ const UnifiedEvaluationDashboard: React.FC = () => {
     }
   }, [categories, items])
 
-  // إنشاء بيانات الشبكة للعلاقات
-  const networkData = useMemo(() => {
-    const nodes: RelationshipNode[] = []
-    const links: RelationshipLink[] = []
-
-    // إضافة التصنيفات كعقد
-    categories.forEach(category => {
-      const itemCount = items.filter(item => item.categoryId === category.id).length
-      nodes.push({
-        id: `category-${category.id}`,
-        type: 'category',
-        label: category.name,
-        color: category.color,
-        size: Math.max(20, itemCount * 3)
-      })
-    })
-
-    // إضافة العناصر كعقد
-    items.forEach(item => {
-      nodes.push({
-        id: `item-${item.id}`,
-        type: 'item',
-        label: item.title,
-        color: item.categoryColor,
-        size: Math.max(10, item.weight * 2)
-      })
-
-      // إضافة الروابط
-      links.push({
-        source: `category-${item.categoryId}`,
-        target: `item-${item.id}`,
-        strength: item.weight,
-        type: 'belongs_to'
-      })
-    })
-
-    return { nodes, links }
-  }, [categories, items])
-
   const getColorClasses = (color: string) => {
     const colors = {
       red: 'bg-red-100 text-red-800 border-red-200',
       blue: 'bg-blue-100 text-blue-800 border-blue-200',
       green: 'bg-green-100 text-green-800 border-green-200',
-      orange: 'bg-orange-100 text-orange-800 border-orange-200',
       purple: 'bg-purple-100 text-purple-800 border-purple-200',
-      cyan: 'bg-cyan-100 text-cyan-800 border-cyan-200'
+      orange: 'bg-orange-100 text-orange-800 border-orange-200',
+      cyan: 'bg-cyan-100 text-cyan-800 border-cyan-200',
+      pink: 'bg-pink-100 text-pink-800 border-pink-200',
+      teal: 'bg-teal-100 text-teal-800 border-teal-200'
     }
-    return colors[color as keyof typeof colors] || colors.blue
+    return colors[color as keyof typeof colors] || 'bg-slate-100 text-slate-800 border-slate-200'
   }
 
   const renderOverview = () => (
-    <div className="space-y-6">
-      {/* الإحصائيات السريعة */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm">إجمالي التصنيفات</p>
-                <p className="text-2xl font-bold">{quickStats.totalCategories}</p>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        {[
+          { label: 'إجمالي التصنيفات', value: quickStats.totalCategories, icon: Target, color: 'blue' },
+          { label: 'إجمالي العناصر', value: quickStats.totalItems, icon: BarChart3, color: 'purple' },
+          { label: 'العناصر النشطة', value: quickStats.activeItems, icon: Zap, color: 'green' },
+          { label: 'نسبة التغطية', value: `${quickStats.completionRate.toFixed(1)}%`, icon: Award, color: 'orange' },
+          { label: 'متوسط الوزن', value: quickStats.averageWeight.toFixed(1), icon: Star, color: 'cyan' }
+        ].map((stat, idx) => (
+          <Card key={idx} className="border-none shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden bg-white">
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center text-center space-y-3">
+                <div className={cn(
+                  "p-3 rounded-2xl transition-transform duration-300 group-hover:scale-110",
+                  getColorClasses(stat.color)
+                )}>
+                  <stat.icon className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{stat.label}</p>
+                </div>
               </div>
-              <BarChart3 className="w-8 h-8 text-blue-200" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm">إجمالي العناصر</p>
-                <p className="text-2xl font-bold">{quickStats.totalItems}</p>
-              </div>
-              <Target className="w-8 h-8 text-green-200" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm">معدل الإكمال</p>
-                <p className="text-2xl font-bold">{quickStats.completionRate.toFixed(1)}%</p>
-              </div>
-              <TrendingUp className="w-8 h-8 text-purple-200" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-orange-100 text-sm">متوسط الوزن</p>
-                <p className="text-2xl font-bold">{quickStats.averageWeight.toFixed(1)}</p>
-              </div>
-              <Star className="w-8 h-8 text-orange-200" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* التصنيفات مع العناصر */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {categories.map(category => {
-          const categoryItems = items.filter(item => item.categoryId === category.id)
-          return (
-            <Card key={category.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-4 h-4 rounded-full bg-${category.color}-500`}></div>
-                    <CardTitle className="text-lg">{category.name}</CardTitle>
-                  </div>
-                  <Badge className={getColorClasses(category.color)}>
-                    {categoryItems.length} عنصر
-                  </Badge>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {categories.map(category => (
+          <Card key={category.id} className="border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden bg-white group">
+            <CardHeader className={cn(
+              "flex flex-row items-center justify-between space-y-0 pb-4 border-b border-slate-100 transition-colors duration-300",
+              `bg-${category.color}-50/30 group-hover:bg-${category.color}-50/50`
+            )}>
+              <div className="flex items-center gap-4">
+                <div className={cn(
+                  "w-12 h-12 rounded-xl flex items-center justify-center shadow-sm",
+                  getColorClasses(category.color)
+                )}>
+                  <Target className="w-6 h-6" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {categoryItems.slice(0, 3).map(item => (
-                    <div key={item.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                      <span className="text-sm font-medium">{item.title}</span>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
-                          وزن: {item.weight}
-                        </Badge>
-                        {item.isRequired && (
-                          <Badge variant="destructive" className="text-xs">مطلوب</Badge>
-                        )}
-                      </div>
+                <div>
+                  <CardTitle className="text-lg font-bold text-slate-800">{category.name}</CardTitle>
+                  <p className="text-xs text-slate-500 font-medium">إجمالي العناصر: {items.filter(i => i.categoryId === category.id).length}</p>
+                </div>
+              </div>
+              <Badge variant="outline" className={cn("px-3 py-1 font-semibold", getColorClasses(category.color))}>
+                وزن: {category.weight}%
+              </Badge>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-3">
+                {items.filter(i => i.categoryId === category.id).slice(0, 4).map(item => (
+                  <div key={item.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-200 hover:bg-white hover:shadow-sm transition-all duration-200 group/item">
+                    <div className="flex items-center gap-3">
+                      <div className={cn("w-2 h-2 rounded-full", `bg-${category.color}-500 shadow-sm`)} />
+                      <span className="text-sm font-semibold text-slate-700 group-hover/item:text-slate-900">{item.title}</span>
                     </div>
-                  ))}
-                  {categoryItems.length > 3 && (
-                    <p className="text-sm text-gray-500 text-center">
-                      و {categoryItems.length - 3} عنصر آخر...
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+                    <Badge variant="secondary" className="text-xs font-bold text-slate-500 group-hover/item:text-blue-600 transition-colors">
+                      {item.weight} نقطة
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+              <Button variant="ghost" className="w-full mt-6 text-slate-500 hover:text-blue-600 hover:bg-blue-50 font-bold group/btn">
+                <span>عرض الكل</span>
+                <Plus className="w-4 h-4 mr-2 transition-transform group-hover/btn:rotate-90" />
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   )
 
   const renderBuilder = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="w-5 h-5" />
-            منشئ التقييمات الذكي
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">إضافة سريعة</h3>
-              <Button variant="outline" className="w-full">
-                <Plus className="w-4 h-4 mr-2" />
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="lg:col-span-2 space-y-6">
+        <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+            <CardTitle className="text-xl font-bold flex items-center gap-3">
+              <Plus className="w-5 h-5 text-blue-600" />
+              أداة بناء التقييمات
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-8">
+            <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/50 group hover:border-blue-300 hover:bg-blue-50/20 transition-all duration-300">
+              <div className="w-20 h-20 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Target className="w-10 h-10 text-slate-300 group-hover:text-blue-400" />
+              </div>
+              <p className="text-slate-500 font-bold text-lg">اسحب العناصر هنا لبناء نموذج التقييم</p>
+              <p className="text-sm text-slate-400 mt-2">أو قم بإضافة تصنيف جديد للبدء</p>
+              <Button className="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 px-8 rounded-xl shadow-md">
                 إضافة تصنيف جديد
               </Button>
             </div>
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">الاقتراحات الذكية</h3>
-              <div className="space-y-2">
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Lightbulb className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm font-medium">اقتراح ذكي</span>
-                  </div>
-                  <p className="text-xs text-gray-600">
-                    يمكنك إضافة عنصر "فحص نظافة الأدوات" لتصنيف النظافة والتعقيم
-                  </p>
-                </div>
-                <div className="p-3 bg-green-50 rounded-lg">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Award className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-medium">تحسين مقترح</span>
-                  </div>
-                  <p className="text-xs text-gray-600">
-                    تصنيف "الجودة" يحتاج إلى عناصر أكثر لتحسين التغطية
-                  </p>
-                </div>
+          </CardContent>
+        </Card>
+      </div>
+      <div className="space-y-6">
+        <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+            <CardTitle className="text-lg font-bold flex items-center gap-3">
+              <Lightbulb className="w-5 h-5 text-amber-500" />
+              اقتراحات ذكية
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 space-y-4">
+            {[
+              { text: 'إضافة قسم خاص بسلامة الأدوية', color: 'blue' },
+              { text: 'تحديث معايير مكافحة العدوى', color: 'purple' },
+              { text: 'دمج تقييم البيئة مع الجولات', color: 'green' }
+            ].map((sug, i) => (
+              <div key={i} className={cn(
+                "p-4 rounded-2xl border transition-all duration-200 cursor-pointer hover:shadow-md",
+                `bg-${sug.color}-50 border-${sug.color}-100 hover:bg-${sug.color}-100`
+              )}>
+                <p className={cn("text-sm font-bold flex items-center gap-2", `text-${sug.color}-700`)}>
+                  <Plus className="w-4 h-4" />
+                  {sug.text}
+                </p>
               </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 
   const renderAnalytics = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5" />
-            التحليلات والإحصائيات
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden">
+        <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+          <CardTitle className="text-xl font-bold flex items-center gap-3">
+            <TrendingUp className="w-5 h-5 text-green-600" />
+            تحليل الأوزان النسبية
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">توزيع العناصر</h3>
-              <div className="space-y-3">
-                {categories.map(category => {
-                  const categoryItems = items.filter(item => item.categoryId === category.id)
-                  const percentage = items.length > 0 ? (categoryItems.length / items.length) * 100 : 0
-                  return (
-                    <div key={category.id} className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span>{category.name}</span>
-                        <span>{categoryItems.length} عنصر</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full bg-${category.color}-500`}
-                          style={{ width: `${percentage}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  )
-                })}
+        <CardContent className="p-8 space-y-8">
+          {categories.map(cat => (
+            <div key={cat.id} className="space-y-3 group">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">{cat.name}</span>
+                <span className="text-sm font-bold text-blue-600">{cat.weight}%</span>
               </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">نظرة عامة</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span>إجمالي التصنيفات</span>
-                  <Badge variant="outline">{quickStats.totalCategories}</Badge>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span>إجمالي العناصر</span>
-                  <Badge variant="outline">{quickStats.totalItems}</Badge>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span>العناصر النشطة</span>
-                  <Badge variant="outline">{quickStats.activeItems}</Badge>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span>متوسط الوزن</span>
-                  <Badge variant="outline">{quickStats.averageWeight.toFixed(1)}</Badge>
+              <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden p-0.5">
+                <div
+                  className={cn("h-full rounded-full transition-all duration-1000 flex items-center justify-end px-1", `bg-${cat.color}-500`)}
+                  style={{ width: `${cat.weight}%` }}
+                >
+                  <div className="w-1 h-1 bg-white/50 rounded-full" />
                 </div>
               </div>
             </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden">
+        <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+          <CardTitle className="text-xl font-bold flex items-center gap-3">
+            <BarChart3 className="w-5 h-5 text-blue-600" />
+            توزيع عناصر التقييم
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-8 flex flex-col items-center justify-center">
+          <div className="w-48 h-48 rounded-full border-[16px] border-slate-100 flex items-center justify-center relative group">
+            <div className="absolute inset-0 rounded-full border-[16px] border-blue-500 border-t-transparent border-l-transparent rotate-45 group-hover:rotate-90 transition-transform duration-1000" />
+            <div className="text-center space-y-1">
+              <span className="text-4xl font-black text-slate-900">{items.length}</span>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">إجمالي العناصر</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4 w-full mt-12">
+            {[
+              { label: 'نشطة', count: quickStats.activeItems, color: 'green' },
+              { label: 'غير نشطة', count: items.length - quickStats.activeItems, color: 'red' }
+            ].map((st, i) => (
+              <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-sm transition-all duration-200">
+                <span className="text-sm font-bold text-slate-600">{st.label}</span>
+                <span className={cn("text-lg font-black", `text-${st.color}-600`)}>{st.count}</span>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -324,95 +249,96 @@ const UnifiedEvaluationDashboard: React.FC = () => {
   )
 
   const renderRelationships = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Network className="w-5 h-5" />
-            خريطة العلاقات التفاعلية
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-gray-50 rounded-lg p-6 min-h-[400px] flex items-center justify-center">
-            <div className="text-center">
-              <Network className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-600 mb-2">خريطة العلاقات</h3>
-              <p className="text-gray-500 mb-4">
-                عرض تفاعلي للعلاقات بين التصنيفات والعناصر
-              </p>
-              <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                {categories.map(category => {
-                  const categoryItems = items.filter(item => item.categoryId === category.id)
-                  return (
-                    <div key={category.id} className="p-3 bg-white rounded-lg shadow-sm">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className={`w-3 h-3 rounded-full bg-${category.color}-500`}></div>
-                        <span className="text-sm font-medium">{category.name}</span>
-                      </div>
-                      <p className="text-xs text-gray-500">{categoryItems.length} عنصر مرتبط</p>
-                    </div>
-                  )
-                })}
-              </div>
+    <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+        <CardTitle className="text-xl font-bold flex items-center gap-3">
+          <Network className="w-5 h-5 text-purple-600" />
+          شبكة علاقات التقييم
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-12 text-center">
+        <div className="max-w-md mx-auto space-y-8">
+          <div className="relative">
+            <div className="w-32 h-32 bg-purple-50 rounded-full mx-auto flex items-center justify-center relative z-10">
+              <Network className="w-16 h-16 text-purple-200" />
             </div>
+            <div className="absolute inset-0 bg-purple-100 rounded-full animate-ping scale-75 opacity-50" />
           </div>
-        </CardContent>
-      </Card>
-    </div>
+          <div className="space-y-3">
+            <h3 className="text-2xl font-bold text-slate-900">تصور تفاعلي للبيانات</h3>
+            <p className="text-slate-500 font-medium leading-relaxed">
+              هذا القسم سيوفر تصوراً ثلاثي الأبعاد للعلاقة بين التصنيفات وعناصر التقييم وأوزانها النسبية في جولات السلامة.
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-4">
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white font-bold h-11 px-8 rounded-xl shadow-md">
+              تفعيل العرض ثلاثي الأبعاد
+            </Button>
+            <Button variant="outline" className="border-slate-200 font-bold h-11 px-8 rounded-xl">
+              المزيد من التفاصيل
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Target className="w-6 h-6 text-blue-600" />
-            لوحة التقييمات الموحدة
-          </h1>
-          <p className="text-gray-600">إدارة شاملة للتصنيفات والعناصر والعلاقات</p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant={activeView === 'overview' ? 'default' : 'outline'}
-            onClick={() => setActiveView('overview')}
-            size="sm"
-          >
-            <Eye className="w-4 h-4 mr-2" />
-            نظرة عامة
-          </Button>
-          <Button
-            variant={activeView === 'builder' ? 'default' : 'outline'}
-            onClick={() => setActiveView('builder')}
-            size="sm"
-          >
-            <Zap className="w-4 h-4 mr-2" />
-            المنشئ
-          </Button>
-          <Button
-            variant={activeView === 'analytics' ? 'default' : 'outline'}
-            onClick={() => setActiveView('analytics')}
-            size="sm"
-          >
-            <BarChart3 className="w-4 h-4 mr-2" />
-            التحليلات
-          </Button>
-          <Button
-            variant={activeView === 'relationships' ? 'default' : 'outline'}
-            onClick={() => setActiveView('relationships')}
-            size="sm"
-          >
-            <Network className="w-4 h-4 mr-2" />
-            العلاقات
-          </Button>
+    <div className="min-h-screen bg-[#f8fafc] p-0 space-y-0">
+      {/* Dynamic Header Background */}
+      <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-br from-[#f0f4ff] via-[#f8fafc] to-[#f5f3ff] z-0" />
+
+      <div className="relative z-10 space-y-8 p-8 max-w-[1600px] mx-auto">
+        {/* Modern Header Section */}
+        <Card className="border-none shadow-xl shadow-blue-500/5 bg-white/80 backdrop-blur-xl overflow-hidden rounded-3xl">
+          <CardContent className="p-10">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+              <div className="flex items-center gap-8">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-600/30 transform transition-transform hover:scale-105 duration-300">
+                  <Target className="w-12 h-12 text-white" />
+                </div>
+                <div className="space-y-3">
+                  <h1 className="text-4xl font-black text-slate-900 tracking-tight">نظام التقييم الموحد</h1>
+                  <p className="text-slate-500 font-bold text-lg max-w-xl">
+                    إدارة وتحليل معايير التقييم لجولات السلامة والجودة بمنظور عصري وتفاعلي
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 bg-slate-100/50 p-2 rounded-2xl border border-slate-200/50">
+                {[
+                  { id: 'overview', label: 'نظرة عامة', icon: Eye },
+                  { id: 'builder', label: 'المنشئ الذكي', icon: Plus },
+                  { id: 'analytics', label: 'التحليلات', icon: BarChart3 },
+                  { id: 'relationships', label: 'شبكة العلاقات', icon: Network }
+                ].map((view) => (
+                  <Button
+                    key={view.id}
+                    onClick={() => setActiveView(view.id as any)}
+                    className={cn(
+                      "flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-300",
+                      activeView === view.id
+                        ? "bg-white text-blue-600 shadow-lg shadow-blue-500/10 scale-105"
+                        : "bg-transparent text-slate-500 hover:text-slate-900 hover:bg-white/50"
+                    )}
+                  >
+                    <view.icon className={cn("w-5 h-5", activeView === view.id ? "text-blue-600" : "text-slate-400")} />
+                    {view.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* View Content Area */}
+        <div className="min-h-[600px]">
+          {activeView === 'overview' && renderOverview()}
+          {activeView === 'builder' && renderBuilder()}
+          {activeView === 'analytics' && renderAnalytics()}
+          {activeView === 'relationships' && renderRelationships()}
         </div>
       </div>
-
-      {/* Content */}
-      {activeView === 'overview' && renderOverview()}
-      {activeView === 'builder' && renderBuilder()}
-      {activeView === 'analytics' && renderAnalytics()}
-      {activeView === 'relationships' && renderRelationships()}
     </div>
   )
 }

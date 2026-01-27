@@ -11,7 +11,8 @@ const isNumeric = (s: string) => /^\d+$/.test(s.trim())
 const AssignedUsers: React.FC<Props> = ({ users = [], maxVisible = 3 }) => {
   const [open, setOpen] = useState(false)
 
-  const filtered = users.filter(u => !!u && !isNumeric(u))
+  const safeUsers = Array.isArray(users) ? users : []
+  const filtered = safeUsers.filter(u => !!u && !isNumeric(u))
   if (!filtered || filtered.length === 0) {
     return <span className="text-gray-500">غير محدد</span>
   }

@@ -1,0 +1,106 @@
+/* Base FullCalendar Styles Customization */
+.fc {
+  font-family: inherit;
+  direction: rtl;
+}
+
+.fc-toolbar-title {
+  font-size: 1.5rem !important;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.fc-button-primary {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+  transition: all 0.2s;
+  text-transform: capitalize;
+  font-weight: 500;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.fc-button-primary:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+.fc-button-primary:active, 
+.fc-button-primary.fc-button-active {
+  background-color: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  color: #3b82f6 !important;
+  box-shadow: none;
+}
+
+.fc-daygrid-day-number,
+.fc-col-header-cell-cushion {
+  color: #475569;
+  text-decoration: none !important;
+}
+
+.fc-event {
+  cursor: pointer;
+  border: none !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+  padding: 2px 4px;
+  border-radius: 6px;
+  margin-bottom: 2px !important;
+}
+
+.fc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 5;
+}
+
+.fc-day-today {
+  background-color: #f8fafc !important;
+}
+
+.fc-daygrid-day-frame {
+  padding: 4px;
+}
+
+/* RTL Specific fixes */
+.fc-header-toolbar {
+  flex-direction: row-reverse;
+}
+
+/* Event content styling */
+.fc-event-main {
+  padding: 2px 4px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* More spacious grid */
+.fc-view-harness {
+  background-color: white;
+  min-height: 600px;
+}
+
+.fc .fc-bg-event {
+  opacity: 0.1;
+}
+
+.fc-timegrid-slot-label-cushion {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* Week/Day View header */
+.fc-col-header-cell {
+  background-color: #f8fafc;
+  padding: 12px 0;
+}
+
+/* Fix z-index for popovers/tooltips */
+.fc-popover {
+  z-index: 50 !important;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}

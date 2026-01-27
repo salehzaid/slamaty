@@ -283,6 +283,7 @@ class EvaluationItemResponse(EvaluationItemBase):
     id: int
     category_name: str
     category_color: str
+    category_ids: List[int] = [] 
     is_active: bool
     created_at: datetime
     updated_at: datetime

@@ -15,6 +15,9 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv('env.local')
 
+# Feature Flags
+FEATURE_CAPA = os.getenv('FEATURE_CAPA', 'false').lower() == 'true'
+
 from database import get_db, engine
 from models_updated import Base, UserRole, User, Round, Capa, Department
 from schemas import (
@@ -990,19 +993,22 @@ async def get_my_rounds_stats(db: Session = Depends(get_db), current_user = Depe
         # Additional CAPA-related counts
         try:
             from models_updated import EvaluationResult, Capa
-            round_ids = [r.id for r in rounds]
+            
             needs_capa_count = 0
             open_capa_count = 0
-            if round_ids:
-                needs_capa_count = db.query(EvaluationResult).filter(
-                    EvaluationResult.round_id.in_(round_ids),
-                    EvaluationResult.needs_capa == True
-                ).count()
+            
+            if FEATURE_CAPA:
+                round_ids = [r.id for r in rounds]
+                if round_ids:
+                    needs_capa_count = db.query(EvaluationResult).filter(
+                        EvaluationResult.round_id.in_(round_ids),
+                        EvaluationResult.needs_capa == True
+                    ).count()
 
-                open_capa_count = db.query(Capa).filter(
-                    Capa.round_id.in_(round_ids),
-                    Capa.status.in_(['pending', 'in_progress', 'assigned'])
-                ).count()
+                    open_capa_count = db.query(Capa).filter(
+                        Capa.round_id.in_(round_ids),
+                        Capa.status.in_(['pending', 'in_progress', 'assigned'])
+                    ).count()
 
             stats["needs_capa_count"] = int(needs_capa_count)
             stats["open_capa_count"] = int(open_capa_count)
@@ -1187,7 +1193,8 @@ async def finalize_evaluation_endpoint(round_id: int, payload: dict = Body(...),
         raise HTTPException(status_code=500, detail=str(e))
 
 # CAPA endpoints
-@app.post("/api/capa", response_model=CapaResponse)
+if FEATURE_CAPA:
+    @app.post("/api/capa", response_model=CapaResponse)
 async def create_new_capa(capa: CapaCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # Create the CAPA
     created_capa = create_capa(db, capa, current_user.id)
@@ -1215,13 +1222,13 @@ async def create_new_capa(capa: CapaCreate, db: Session = Depends(get_db), curre
     
     return created_capa
 
-@app.get("/api/capa", response_model=List[CapaResponse])
+    @app.get("/api/capa", response_model=List[CapaResponse])
 async def get_all_capas(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Get CAPAs filtered to show only those linked to non-compliant evaluation items"""
     capas = get_capas(db, skip=skip, limit=limit)
     return capas
 
-@app.get("/api/capa/all", response_model=List[CapaResponse])
+    @app.get("/api/capa/all", response_model=List[CapaResponse])
 async def get_all_capas_unfiltered_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Get all CAPAs without filtering - for admin purposes only"""
     # Previously restricted to super_admin and quality_manager.
@@ -1229,7 +1236,7 @@ async def get_all_capas_unfiltered_endpoint(skip: int = 0, limit: int = 100, db:
     capas = get_all_capas_unfiltered(db, skip=skip, limit=limit)
     return capas
 
-@app.get("/api/capa/{capa_id}", response_model=CapaResponse)
+    @app.get("/api/capa/{capa_id}", response_model=CapaResponse)
 async def get_capa_by_id_endpoint(capa_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Get a single CAPA by ID with evaluation item details"""
     capa = get_capa_by_id(db, capa_id)
@@ -1238,7 +1245,7 @@ async def get_capa_by_id_endpoint(capa_id: int, db: Session = Depends(get_db), c
     
     return capa
 
-@app.patch("/capa/{capa_id}", response_model=CapaResponse)
+    @app.patch("/capa/{capa_id}", response_model=CapaResponse)
 async def update_capa_endpoint(capa_id: int, capa_data: CapaCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Update a CAPA by ID"""
     # Check if CAPA exists
@@ -1253,7 +1260,7 @@ async def update_capa_endpoint(capa_id: int, capa_data: CapaCreate, db: Session 
     
     return updated_capa
 
-@app.delete("/api/capa/all")
+    @app.delete("/api/capa/all")
 async def delete_all_capas_endpoint(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Delete all CAPAs - Only super_admin can delete all CAPAs"""
     # Check if user has permission to delete all CAPAs (super_admin only)
@@ -1272,7 +1279,7 @@ async def delete_all_capas_endpoint(db: Session = Depends(get_db), current_user 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"حدث خطأ أثناء حذف خطط التحسين: {str(e)}")
 
-@app.delete("/api/capa/{capa_id}")
+    @app.delete("/api/capa/{capa_id}")
 async def delete_capa_endpoint(capa_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """Delete a CAPA - Only super_admin and quality_manager can delete CAPAs"""
     # Check if user has permission to delete CAPAs (super_admin or quality_manager only)
@@ -1512,6 +1519,59 @@ async def delete_evaluation_item_endpoint(item_id: int, db: Session = Depends(ge
 @app.get("/api/evaluation-items/category/{category_id}", response_model=List[EvaluationItemResponse])
 async def get_evaluation_items_by_category_endpoint(category_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     items = get_evaluation_items_by_category(db, category_id, skip=skip, limit=limit)
+    return items
+
+# Category-Item Mapping Endpoints
+class MappingAssignRequest(BaseModel):
+    category_id: int
+    item_ids: List[int]
+
+class MappingReorderRequest(BaseModel):
+    category_id: int
+    ordered_item_ids: List[int]
+
+@app.post("/api/mapping/bulk-assign")
+async def bulk_assign_items_endpoint(
+    request: MappingAssignRequest,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """Assign multiple items to a category"""
+    from crud import assign_items_to_category
+    count = assign_items_to_category(db, request.category_id, request.item_ids)
+    return {"message": f"Successfully assigned {count} items", "assigned_count": count}
+
+@app.post("/api/mapping/bulk-unassign")
+async def bulk_unassign_items_endpoint(
+    request: MappingAssignRequest,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """Remove multiple items from a category"""
+    from crud import unassign_items_from_category
+    count = unassign_items_from_category(db, request.category_id, request.item_ids)
+    return {"message": f"Successfully removed {count} items", "removed_count": count}
+
+@app.post("/api/mapping/reorder")
+async def reorder_items_endpoint(
+    request: MappingReorderRequest,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """Update sort order of items in a category"""
+    from crud import reorder_category_items
+    reorder_category_items(db, request.category_id, request.ordered_item_ids)
+    return {"message": "Order updated successfully"}
+
+@app.get("/api/mapping/{category_id}/items", response_model=List[EvaluationItemResponse])
+async def get_mapped_items_endpoint(
+    category_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """Get items for a category ordered by sort_order"""
+    from crud import get_items_by_category_ordered
+    items = get_items_by_category_ordered(db, category_id)
     return items
 
 # Assessors endpoints
