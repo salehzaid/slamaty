@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from fastapi import FastAPI, Depends, HTTPException, status, Form, Body, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -69,18 +70,41 @@ app = FastAPI(
 )
 
 # CORS middleware - Must be added immediately after creating the app
-# Allow all localhost origins for development
-app.add_middleware(
-    CORSMiddleware,
-    allow_origin_regex=r"http://localhost:\d+|http://127\.0\.0\.1:\d+",  # Allow any localhost port
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-    max_age=3600,
-)
+# Allow localhost origins for development AND Vercel/Render for production
+import os
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
 
-print(f"✅ CORS enabled for all localhost origins")
+if ENVIRONMENT == 'production':
+    # Production: Allow Vercel frontend domains
+    allowed_origins = [
+        "https://slamaty.vercel.app",
+        "https://slamaty-git-main-saleh-nasser-alzaids-projects.vercel.app",
+        "https://slamaty-f3ilxlvi1-saleh-nasser-alzaids-projects.vercel.app",
+        "https://salamaty-5fw9.onrender.com",
+    ]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+        allow_headers=["*"],
+        expose_headers=["*"],
+        max_age=3600,
+    )
+    print(f"✅ CORS enabled for production origins: {allowed_origins}")
+else:
+    # Development: Allow any localhost port
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=r"http://localhost:\d+|http://127\.0\.0\.1:\d+",
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+        allow_headers=["*"],
+        expose_headers=["*"],
+        max_age=3600,
+    )
+    print(f"✅ CORS enabled for all localhost origins (development)")
+
 
 # Temporary diagnostic endpoint to list registered routes (hidden from docs)
 @app.get("/__routes", include_in_schema=False)
@@ -1195,105 +1219,105 @@ async def finalize_evaluation_endpoint(round_id: int, payload: dict = Body(...),
 # CAPA endpoints
 if FEATURE_CAPA:
     @app.post("/api/capa", response_model=CapaResponse)
-async def create_new_capa(capa: CapaCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    # Create the CAPA
-    created_capa = create_capa(db, capa, current_user.id)
-    
-    # Send notification to assigned user
-    if created_capa and capa.assigned_to:
-        try:
-            notification_service = get_notification_service(db)
-            creator_name = f"{current_user.first_name} {current_user.last_name}"
-            
-            # Get assigned user ID (assuming assigned_to is a user ID)
-            assigned_user_id = int(capa.assigned_to) if capa.assigned_to.isdigit() else None
-            
-            if assigned_user_id:
-                notification_service.send_capa_assignment_notification(
-                    capa_id=created_capa.id,
-                    capa_title=created_capa.title,
-                    capa_department=created_capa.department,
-                    assigned_user_id=assigned_user_id,
-                    created_by_name=creator_name
-                )
-        except Exception as e:
-            # Log error but don't fail the CAPA creation
-            print(f"Error sending CAPA assignment notification: {str(e)}")
-    
-    return created_capa
+    async def create_new_capa(capa: CapaCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+        # Create the CAPA
+        created_capa = create_capa(db, capa, current_user.id)
+        
+        # Send notification to assigned user
+        if created_capa and capa.assigned_to:
+            try:
+                notification_service = get_notification_service(db)
+                creator_name = f"{current_user.first_name} {current_user.last_name}"
+                
+                # Get assigned user ID (assuming assigned_to is a user ID)
+                assigned_user_id = int(capa.assigned_to) if capa.assigned_to.isdigit() else None
+                
+                if assigned_user_id:
+                    notification_service.send_capa_assignment_notification(
+                        capa_id=created_capa.id,
+                        capa_title=created_capa.title,
+                        capa_department=created_capa.department,
+                        assigned_user_id=assigned_user_id,
+                        created_by_name=creator_name
+                    )
+            except Exception as e:
+                # Log error but don't fail the CAPA creation
+                print(f"Error sending CAPA assignment notification: {str(e)}")
+        
+        return created_capa
 
     @app.get("/api/capa", response_model=List[CapaResponse])
-async def get_all_capas(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    """Get CAPAs filtered to show only those linked to non-compliant evaluation items"""
-    capas = get_capas(db, skip=skip, limit=limit)
-    return capas
+    async def get_all_capas(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+        """Get CAPAs filtered to show only those linked to non-compliant evaluation items"""
+        capas = get_capas(db, skip=skip, limit=limit)
+        return capas
 
     @app.get("/api/capa/all", response_model=List[CapaResponse])
-async def get_all_capas_unfiltered_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    """Get all CAPAs without filtering - for admin purposes only"""
-    # Previously restricted to super_admin and quality_manager.
-    # Per request, return all CAPAs to any authenticated user.
-    capas = get_all_capas_unfiltered(db, skip=skip, limit=limit)
-    return capas
+    async def get_all_capas_unfiltered_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+        """Get all CAPAs without filtering - for admin purposes only"""
+        # Previously restricted to super_admin and quality_manager.
+        # Per request, return all CAPAs to any authenticated user.
+        capas = get_all_capas_unfiltered(db, skip=skip, limit=limit)
+        return capas
 
     @app.get("/api/capa/{capa_id}", response_model=CapaResponse)
-async def get_capa_by_id_endpoint(capa_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    """Get a single CAPA by ID with evaluation item details"""
-    capa = get_capa_by_id(db, capa_id)
-    if not capa:
-        raise HTTPException(status_code=404, detail="خطة التصحيح غير موجودة")
-    
-    return capa
+    async def get_capa_by_id_endpoint(capa_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+        """Get a single CAPA by ID with evaluation item details"""
+        capa = get_capa_by_id(db, capa_id)
+        if not capa:
+            raise HTTPException(status_code=404, detail="خطة التصحيح غير موجودة")
+        
+        return capa
 
-    @app.patch("/capa/{capa_id}", response_model=CapaResponse)
-async def update_capa_endpoint(capa_id: int, capa_data: CapaCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    """Update a CAPA by ID"""
-    # Check if CAPA exists
-    existing_capa = get_capa_by_id(db, capa_id)
-    if not existing_capa:
-        raise HTTPException(status_code=404, detail="خطة التصحيح غير موجودة")
-    
-    # Update the CAPA
-    updated_capa = update_capa(db, capa_id, capa_data)
-    if not updated_capa:
-        raise HTTPException(status_code=500, detail="فشل في تحديث خطة التصحيح")
-    
-    return updated_capa
+    @app.patch("/api/capa/{capa_id}", response_model=CapaResponse)
+    async def update_capa_endpoint(capa_id: int, capa_data: CapaCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+        """Update a CAPA by ID"""
+        # Check if CAPA exists
+        existing_capa = get_capa_by_id(db, capa_id)
+        if not existing_capa:
+            raise HTTPException(status_code=404, detail="خطة التصحيح غير موجودة")
+        
+        # Update the CAPA
+        updated_capa = update_capa(db, capa_id, capa_data)
+        if not updated_capa:
+            raise HTTPException(status_code=500, detail="فشل في تحديث خطة التصحيح")
+        
+        return updated_capa
 
     @app.delete("/api/capa/all")
-async def delete_all_capas_endpoint(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    """Delete all CAPAs - Only super_admin can delete all CAPAs"""
-    # Check if user has permission to delete all CAPAs (super_admin only)
-    if current_user.role != "super_admin":
-        raise HTTPException(
-            status_code=403,
-            detail="ليس لديك صلاحية لحذف جميع خطط التحسين. هذه الصلاحية محصورة على مدير النظام فقط."
-        )
-    
-    try:
-        deleted_count = delete_all_capas(db)
-        return {
-            "message": f"تم حذف جميع خطط التحسين بنجاح",
-            "deleted_count": deleted_count
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"حدث خطأ أثناء حذف خطط التحسين: {str(e)}")
+    async def delete_all_capas_endpoint(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+        """Delete all CAPAs - Only super_admin can delete all CAPAs"""
+        # Check if user has permission to delete all CAPAs (super_admin only)
+        if current_user.role != "super_admin":
+            raise HTTPException(
+                status_code=403,
+                detail="ليس لديك صلاحية لحذف جميع خطط التحسين. هذه الصلاحية محصورة على مدير النظام فقط."
+            )
+        
+        try:
+            deleted_count = delete_all_capas(db)
+            return {
+                "message": f"تم حذف جميع خطط التحسين بنجاح",
+                "deleted_count": deleted_count
+            }
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"حدث خطأ أثناء حذف خطط التحسين: {str(e)}")
 
     @app.delete("/api/capa/{capa_id}")
-async def delete_capa_endpoint(capa_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    """Delete a CAPA - Only super_admin and quality_manager can delete CAPAs"""
-    # Check if user has permission to delete CAPAs (super_admin or quality_manager only)
-    if current_user.role not in ["super_admin", "quality_manager"]:
-        raise HTTPException(
-            status_code=403,
-            detail="ليس لديك صلاحية لحذف خطط التحسين. هذه الصلاحية محصورة على مدير النظام ومدير الجودة فقط."
-        )
-    
-    deleted_capa = delete_capa(db, capa_id)
-    if deleted_capa is None:
-        raise HTTPException(status_code=404, detail="خطة التحسين غير موجودة")
-    
-    return {"message": "تم حذف خطة التحسين بنجاح", "deleted_capa_id": capa_id}
+    async def delete_capa_endpoint(capa_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+        """Delete a CAPA - Only super_admin and quality_manager can delete CAPAs"""
+        # Check if user has permission to delete CAPAs (super_admin or quality_manager only)
+        if current_user.role not in ["super_admin", "quality_manager"]:
+            raise HTTPException(
+                status_code=403,
+                detail="ليس لديك صلاحية لحذف خطط التحسين. هذه الصلاحية محصورة على مدير النظام ومدير الجودة فقط."
+            )
+        
+        deleted_capa = delete_capa(db, capa_id)
+        if deleted_capa is None:
+            raise HTTPException(status_code=404, detail="خطة التحسين غير موجودة")
+        
+        return {"message": "تم حذف خطة التحسين بنجاح", "deleted_capa_id": capa_id}
 
 # User endpoints
 @app.get("/api/users", response_model=List[UserResponse])
@@ -1306,6 +1330,11 @@ async def get_all_users(skip: int = 0, limit: int = 100, db: Session = Depends(g
         )
     users = get_users(db, skip=skip, limit=limit)
     return users
+
+@app.get("/api/users/assessors", response_model=List[UserResponse])
+async def get_assessors_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    from crud import get_assessors
+    return get_assessors(db, skip=skip, limit=limit)
 
 @app.post("/api/users", response_model=UserResponse)
 async def create_new_user(user: UserCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
