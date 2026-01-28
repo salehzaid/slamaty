@@ -22,10 +22,11 @@ from auth import get_password_hash
 def test_database_connection():
     """Test database connection"""
     try:
-        DATABASE_URL = os.getenv("DATABASE_URL")
+        DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_CyaX5JnSc3RZ@ep-bitter-unit-ahcoel9w-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require")
         if not DATABASE_URL:
             print("❌ DATABASE_URL not found in environment variables")
             return False
+
             
         print(f"🔗 Testing connection to database...")
         engine = create_engine(DATABASE_URL)
@@ -44,7 +45,7 @@ def create_tables():
     """Create all database tables"""
     print("📋 Creating database tables...")
     try:
-        DATABASE_URL = os.getenv("DATABASE_URL")
+        DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_CyaX5JnSc3RZ@ep-bitter-unit-ahcoel9w-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require")
         engine = create_engine(DATABASE_URL)
         
         Base.metadata.create_all(bind=engine)
@@ -59,7 +60,7 @@ def create_initial_data():
     print("👥 Creating initial data...")
     
     try:
-        DATABASE_URL = os.getenv("DATABASE_URL")
+        DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_CyaX5JnSc3RZ@ep-bitter-unit-ahcoel9w-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require")
         engine = create_engine(DATABASE_URL)
         SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
         
@@ -124,7 +125,7 @@ def create_sample_rounds():
     print("🔄 Creating sample rounds...")
     
     try:
-        DATABASE_URL = os.getenv("DATABASE_URL")
+        DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_CyaX5JnSc3RZ@ep-bitter-unit-ahcoel9w-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require")
         engine = create_engine(DATABASE_URL)
         SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
         db = SessionLocal()

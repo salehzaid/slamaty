@@ -12,7 +12,8 @@ from auth import get_password_hash
 from datetime import datetime
 
 # إعدادات قاعدة البيانات Neon
-NEON_DATABASE_URL = "postgresql://neondb_owner:npg_ERS5fHwxWiu2@ep-lingering-morning-adejreab-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+NEON_DATABASE_URL = "postgresql://neondb_owner:npg_CyaX5JnSc3RZ@ep-bitter-unit-ahcoel9w-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
+
 
 def create_neon_users():
     """إنشاء المستخدمين في قاعدة بيانات Neon"""
