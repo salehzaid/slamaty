@@ -1252,6 +1252,18 @@ def create_evaluation_item(db: Session, item_data: dict):
         standard_version=item_data.get("standard_version")
     )
     db.add(db_item)
+    db.flush() # Flush to get db_item.id
+    
+    # Create initial mapping for the M:N relationship source of truth
+    from models_updated import EvaluationCategoryMapping
+    mapping = EvaluationCategoryMapping(
+        category_id=item_data["category_id"],
+        item_id=db_item.id,
+        sort_order=0,
+        is_active=True
+    )
+    db.add(mapping)
+    
     db.commit()
     db.refresh(db_item)
     return db_item
@@ -1359,7 +1371,7 @@ def get_evaluation_items_by_category(db: Session, category_id: int, skip: int = 
 def get_evaluation_items(db: Session, skip: int = 0, limit: int = 100):
     if not EVALUATION_MODELS_AVAILABLE:
         return []
-    return db.query(EvaluationItem).filter(EvaluationItem.is_active == True).offset(skip).limit(limit).all()
+    return db.query(EvaluationItem).options(joinedload(EvaluationItem.category_mappings)).filter(EvaluationItem.is_active == True).offset(skip).limit(limit).all()
 
 def get_evaluation_item_by_id(db: Session, item_id: int):
     if not EVALUATION_MODELS_AVAILABLE:
@@ -1419,11 +1431,12 @@ def create_evaluation_results(db: Session, round_id: int, evaluations: list, eva
     if not EVALUATION_MODELS_AVAILABLE:
         return [], None
 
-    from models_updated import EvaluationItem, EvaluationResult, Round, RoundStatus
+    from models_updated import EvaluationItem, EvaluationResult, Round, RoundStatus, EvaluationCategory
     created_results = []
 
-    total_weighted_score = 0.0
-    total_weight = 0.0
+    # Scoring breakdown data structures
+    category_scores = {}  # {cat_id: {'weighted_sum': 0, 'max_weighted_sum': 0}}
+    item_cache = {}
 
     for ev in evaluations:
         item_id = ev.get('item_id')
@@ -1446,9 +1459,22 @@ def create_evaluation_results(db: Session, round_id: int, evaluations: list, eva
             score = 0
             include_in_calc = False
 
-        # Get item weight (default 1)
+        # Get item
         item = db.query(EvaluationItem).filter(EvaluationItem.id == item_id).first()
+        if not item:
+            continue
+            
         weight = float(item.weight) if item and getattr(item, 'weight', None) is not None else 1.0
+        
+        # Track category scores
+        if include_in_calc:
+            cat_id = item.category_id
+            if cat_id not in category_scores:
+                category_scores[cat_id] = {'weighted_sum': 0, 'max_weighted_sum': 0}
+            
+            category_scores[cat_id]['weighted_sum'] += (score * weight)
+            # Max possible score for this item is 100 * weight
+            category_scores[cat_id]['max_weighted_sum'] += (100.0 * weight)
 
         # Insert evaluation result (score is required by schema)
         db_result = EvaluationResult(
@@ -1467,38 +1493,69 @@ def create_evaluation_results(db: Session, round_id: int, evaluations: list, eva
         except Exception:
             pass
         db.add(db_result)
-        db.commit()
-        db.refresh(db_result)
         created_results.append(db_result)
+        
+    db.commit()
 
-        # Accumulate for weighted average if included
-        if include_in_calc:
-            total_weighted_score += (score * weight)
-            total_weight += weight
+    # Calculate final weighted score
+    final_score = 0.0
+    total_cat_weight = 0.0
+    score_details = []
+
+    # Get all categories involved or all active categories
+    # For accuracy, we should check against active categories' weights
+    # But here we only count categories that were actually evaluated or present
+   
+    for cat_id, stats in category_scores.items():
+        cat = db.query(EvaluationCategory).filter(EvaluationCategory.id == cat_id).first()
+        if not cat: 
+            continue
+            
+        cat_weight_percent = float(getattr(cat, 'weight_percent', 10.0))
+        
+        # Calculate category compliance (0-100)
+        if stats['max_weighted_sum'] > 0:
+            cat_compliance = (stats['weighted_sum'] / stats['max_weighted_sum']) * 100.0
+        else:
+            cat_compliance = 0.0
+
+        # Contribution to total score
+        # We accumulate (compliance * weight) then dived later by total_weight if needed
+        # Or if we assume weights sum to 100 (or we normalize them)
+        
+        score_details.append({
+            'category_id': cat_id,
+            'category_name': cat.name,
+            'category_name_en': cat.name_en,
+            'category_weight': cat_weight_percent,
+            'score': round(cat_compliance, 1),
+            'weighted_contribution': 0 # computed below
+        })
+        
+        # To handle cases where weights don't sum to 100, we do a weighted average of the available categories
+        final_score += (cat_compliance * cat_weight_percent)
+        total_cat_weight += cat_weight_percent
+
+    # Normalize final score
+    if total_cat_weight > 0:
+        compliance_result = final_score / total_cat_weight * 100.0 if total_cat_weight != 100 else final_score
+        
+        # Adjust contribution display
+        for detail in score_details:
+             # actual contribution to the final number
+             detail['weighted_contribution'] = round((detail['score'] * detail['category_weight']) / total_cat_weight, 1)
+    else:
+        compliance_result = 0.0
 
     # Update round compliance percentage using weighted average
     db_round = db.query(Round).filter(Round.id == round_id).first()
     if db_round:
         try:
-            if total_weight > 0:
-                compliance = round(total_weighted_score / total_weight)
-                db_round.compliance_percentage = int(compliance)
-            else:
-                # If no items included in calculation, leave compliance as-is (or set to 0)
-                db_round.compliance_percentage = int(db_round.compliance_percentage or 0)
-
-            # Calculate completion percentage
-            # Get all evaluation items for this round
-            round_item_ids = []
-            if db_round.evaluation_items:
-                try:
-                    round_item_ids = json.loads(db_round.evaluation_items) if isinstance(db_round.evaluation_items, str) else db_round.evaluation_items
-                except:
-                    round_item_ids = []
+            db_round.score_details = json.dumps(score_details)
             
             # Count how many items have been evaluated (excluding 'na' status)
             evaluated_items = len([ev for ev in evaluations if ev.get('status') != 'na'])
-            total_items = len(round_item_ids)
+            total_items = len(evaluations)
             
             if total_items > 0:
                 completion_percentage = round((evaluated_items / total_items) * 100)
@@ -1509,18 +1566,10 @@ def create_evaluation_results(db: Session, round_id: int, evaluations: list, eva
             # Set status based on finalize parameter
             if finalize:
                 # If finalizing, mark as completed
-                try:
-                    db_round.status = RoundStatus.COMPLETED
-                except Exception:
-                    # Fallback to string
-                    db_round.status = 'completed'
+                db_round.status = RoundStatus.COMPLETED if hasattr(RoundStatus, 'COMPLETED') else 'completed'
             else:
                 # If saving as draft, set to in_progress
-                try:
-                    db_round.status = RoundStatus.IN_PROGRESS
-                except Exception:
-                    # Fallback to string
-                    db_round.status = 'in_progress'
+                db_round.status = RoundStatus.IN_PROGRESS if hasattr(RoundStatus, 'IN_PROGRESS') else 'in_progress'
 
             db.commit()
             db.refresh(db_round)

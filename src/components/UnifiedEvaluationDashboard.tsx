@@ -14,7 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { useEvaluation } from '../context/EvaluationContext'
+import { useEvaluationApi } from '../hooks/useEvaluationApi'
 import { cn } from '@/lib/utils'
 
 interface QuickStats {
@@ -25,14 +25,39 @@ interface QuickStats {
   averageWeight: number
 }
 
-const UnifiedEvaluationDashboard: React.FC = () => {
-  const { categories, items } = useEvaluation()
+interface UnifiedEvaluationDashboardProps {
+  round?: {
+    score_details?: string | any[];
+    [key: string]: any;
+  };
+}
+
+const UnifiedEvaluationDashboard: React.FC<UnifiedEvaluationDashboardProps> = ({ round }) => {
+  const { categories, items, loading } = useEvaluationApi()
   const [activeView, setActiveView] = useState<'overview' | 'builder' | 'analytics' | 'relationships'>('overview')
+
+  React.useEffect(() => {
+    console.log('📦 UnifiedEvaluationDashboard - Categories:', categories)
+    console.log('📦 UnifiedEvaluationDashboard - Items:', items)
+  }, [categories, items])
+
+  // Parse score_details if stringified
+  const scoreDetails = useMemo(() => {
+    if (!round?.score_details) return null;
+    try {
+      return typeof round.score_details === 'string'
+        ? JSON.parse(round.score_details)
+        : round.score_details;
+    } catch (e) {
+      console.error('Error parsing score_details:', e);
+      return null;
+    }
+  }, [round?.score_details]);
 
   // حساب الإحصائيات السريعة
   const quickStats: QuickStats = useMemo(() => {
-    const activeItems = items.filter(item => item.isActive).length
-    const totalWeight = items.reduce((sum, item) => sum + item.weight, 0)
+    const activeItems = items.filter(item => item.is_active || (item as any).isActive).length
+    const totalWeight = items.reduce((sum, item) => sum + (item.weight || 0), 0)
 
     return {
       totalCategories: categories.length,
@@ -102,16 +127,16 @@ const UnifiedEvaluationDashboard: React.FC = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg font-bold text-slate-800">{category.name}</CardTitle>
-                  <p className="text-xs text-slate-500 font-medium">إجمالي العناصر: {items.filter(i => i.categoryId === category.id).length}</p>
+                  <p className="text-xs text-slate-500 font-medium">إجمالي العناصر: {items.filter(i => (i.category_id === category.id || (i as any).categoryId === category.id)).length}</p>
                 </div>
               </div>
               <Badge variant="outline" className={cn("px-3 py-1 font-semibold", getColorClasses(category.color))}>
-                وزن: {category.weight}%
+                وزن: {category.weight_percent}%
               </Badge>
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-3">
-                {items.filter(i => i.categoryId === category.id).slice(0, 4).map(item => (
+                {items.filter(i => (i.category_id === category.id || (i as any).categoryId === category.id)).slice(0, 4).map(item => (
                   <div key={item.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-200 hover:bg-white hover:shadow-sm transition-all duration-200 group/item">
                     <div className="flex items-center gap-3">
                       <div className={cn("w-2 h-2 rounded-full", `bg-${category.color}-500 shadow-sm`)} />
@@ -198,22 +223,51 @@ const UnifiedEvaluationDashboard: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-8 space-y-8">
-          {categories.map(cat => (
-            <div key={cat.id} className="space-y-3 group">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">{cat.name}</span>
-                <span className="text-sm font-bold text-blue-600">{cat.weight}%</span>
-              </div>
-              <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden p-0.5">
-                <div
-                  className={cn("h-full rounded-full transition-all duration-1000 flex items-center justify-end px-1", `bg-${cat.color}-500`)}
-                  style={{ width: `${cat.weight}%` }}
-                >
-                  <div className="w-1 h-1 bg-white/50 rounded-full" />
+          {categories.map(category => {
+            // Find score in details if available
+            const categoryDetail = Array.isArray(scoreDetails)
+              ? scoreDetails.find((d: any) => d.category_id === category.id)
+              : null;
+
+            const displayScore = categoryDetail ? categoryDetail.score : null;
+
+            // Calculate percentage based on weights for visual fallback
+            const totalWeight = categories.reduce((sum, c) => sum + (c.weight_percent || 0), 0)
+            const weightPercentage = totalWeight > 0 ? ((category.weight_percent || 0) / totalWeight) * 100 : 0
+
+            const finalDisplayPercentage = displayScore !== null ? displayScore : weightPercentage;
+
+            return (
+              <div key={category.id} className="space-y-3">
+                <div className="flex justify-between text-sm font-semibold">
+                  <span className="flex items-center gap-2">
+                    <span className={cn("w-3 h-3 rounded-full", `bg-${category.color}-500`)} />
+                    {category.name}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-600 font-bold">{finalDisplayPercentage.toFixed(1)}%</span>
+                    {displayScore !== null && (
+                      <Badge variant="outline" className="text-[10px] py-0 h-4 bg-green-50 text-green-700 border-green-200">
+                        نتيجة فعلية
+                      </Badge>
+                    )}
+                  </div>
                 </div>
+                <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className={cn("h-full transition-all duration-1000 ease-out shadow-sm", `bg-${category.color}-500`)}
+                    style={{ width: `${finalDisplayPercentage}%` }}
+                  />
+                </div>
+                <p className="text-xs text-slate-400">
+                  {displayScore !== null
+                    ? `المساهمة الموزونة: ${categoryDetail.weighted_contribution}%`
+                    : `الوزن المقترح: ${weightPercentage.toFixed(1)}% (${category.weight_percent} نقطة)`
+                  }
+                </p>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </CardContent>
       </Card>
 
@@ -284,61 +338,48 @@ const UnifiedEvaluationDashboard: React.FC = () => {
   )
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-0 space-y-0">
-      {/* Dynamic Header Background */}
-      <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-br from-[#f0f4ff] via-[#f8fafc] to-[#f5f3ff] z-0" />
-
-      <div className="relative z-10 space-y-8 p-8 max-w-[1600px] mx-auto">
-        {/* Modern Header Section */}
-        <Card className="border-none shadow-xl shadow-blue-500/5 bg-white/80 backdrop-blur-xl overflow-hidden rounded-3xl">
-          <CardContent className="p-10">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-              <div className="flex items-center gap-8">
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-600/30 transform transition-transform hover:scale-105 duration-300">
-                  <Target className="w-12 h-12 text-white" />
-                </div>
-                <div className="space-y-3">
-                  <h1 className="text-4xl font-black text-slate-900 tracking-tight">نظام التقييم الموحد</h1>
-                  <p className="text-slate-500 font-bold text-lg max-w-xl">
-                    إدارة وتحليل معايير التقييم لجولات السلامة والجودة بمنظور عصري وتفاعلي
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4 bg-slate-100/50 p-2 rounded-2xl border border-slate-200/50">
-                {[
-                  { id: 'overview', label: 'نظرة عامة', icon: Eye },
-                  { id: 'builder', label: 'المنشئ الذكي', icon: Plus },
-                  { id: 'analytics', label: 'التحليلات', icon: BarChart3 },
-                  { id: 'relationships', label: 'شبكة العلاقات', icon: Network }
-                ].map((view) => (
-                  <Button
-                    key={view.id}
-                    onClick={() => setActiveView(view.id as any)}
-                    className={cn(
-                      "flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-300",
-                      activeView === view.id
-                        ? "bg-white text-blue-600 shadow-lg shadow-blue-500/10 scale-105"
-                        : "bg-transparent text-slate-500 hover:text-slate-900 hover:bg-white/50"
-                    )}
-                  >
-                    <view.icon className={cn("w-5 h-5", activeView === view.id ? "text-blue-600" : "text-slate-400")} />
-                    {view.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* View Content Area */}
-        <div className="min-h-[600px]">
-          {activeView === 'overview' && renderOverview()}
-          {activeView === 'builder' && renderBuilder()}
-          {activeView === 'analytics' && renderAnalytics()}
-          {activeView === 'relationships' && renderRelationships()}
+    <div className="bg-transparent text-right" dir="rtl">
+      {loading && categories.length === 0 ? (
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-slate-500 font-medium animate-pulse">جاري تحميل بيانات التقييم...</p>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Simple View Switcher */}
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            {[
+              { id: 'overview', label: 'نظرة عامة', icon: Eye },
+              { id: 'builder', label: 'المنشئ الذكي', icon: Plus },
+              { id: 'analytics', label: 'التحليلات', icon: BarChart3 },
+              { id: 'relationships', label: 'شبكة العلاقات', icon: Network }
+            ].map((view) => (
+              <Button
+                key={view.id}
+                onClick={() => setActiveView(view.id as any)}
+                variant={activeView === view.id ? "default" : "ghost"}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200",
+                  activeView === view.id
+                    ? "bg-blue-600 text-white shadow-md hover:bg-blue-700"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                )}
+              >
+                <view.icon className="w-4 h-4" />
+                {view.label}
+              </Button>
+            ))}
+          </div>
+
+          {/* View Content Area */}
+          <div className="min-h-[600px]">
+            {activeView === 'overview' && renderOverview()}
+            {activeView === 'builder' && renderBuilder()}
+            {activeView === 'analytics' && renderAnalytics()}
+            {activeView === 'relationships' && renderRelationships()}
+          </div>
+        </>
+      )}
     </div>
   )
 }

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey, Enum as SQLEnum, SmallInteger, Numeric
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey, Enum as SQLEnum, SmallInteger, Numeric, Float
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -117,6 +117,7 @@ class Round(Base):
     notes = Column(Text)
     evaluation_items = Column(JSONB, default='[]', nullable=False)  # JSONB array of evaluation item IDs
     selected_categories = Column(JSONB, default='[]', nullable=False)  # JSONB array of selected category IDs
+    score_details = Column(JSONB, default='[]')  # Stores the breakdown of scores per category at time of evaluation
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
@@ -229,6 +230,7 @@ class EvaluationCategory(Base):
     description = Column(Text)
     color = Column(String, default="blue")
     icon = Column(String, default="shield")
+    weight_percent = Column(Float, default=10.0)  # Weight of this category in total score calculation
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now())

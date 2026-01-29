@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { Search, Filter, Calendar, Clock, CheckCircle2, AlertTriangle, Play, Users, Building2 } from 'lucide-react'
+import {
+  Search,
+  Filter,
+  Calendar,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  Play,
+  Users,
+  Building2,
+  Target
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
 import { useAuth } from '@/context/AuthContext'
 import { useMyRounds } from '@/hooks/useRounds'
 import { apiClient } from '@/lib/api'
@@ -12,6 +21,8 @@ import CapaForm from '@/components/forms/CapaForm'
 import { CapaCreateForm } from '@/lib/validations'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { isCapaEnabled } from '@/lib/features'
+import { cn } from '@/lib/utils'
+import StatsChart from '@/components/ui/StatsChart'
 
 interface RoundStats {
   total: number
@@ -43,11 +54,6 @@ const MyRoundsPage: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Helper to handle CAPA round ID
-  const setSelectedRoundId = (id: number | null) => {
-    // This is used in handleCapaSubmit
-  }
-
   // Fetch statistics
   useEffect(() => {
     const fetchStats = async () => {
@@ -63,19 +69,16 @@ const MyRoundsPage: React.FC = () => {
     }
 
     fetchStats()
-  }, [myRounds]) // Re-fetch when rounds change
+  }, [myRounds])
 
-  // Handle success messages from evaluation page
+  // Handle success messages
   useEffect(() => {
     if (location.state) {
       const state = location.state as any
       if (state.message) {
         setSuccessMessage(state.message)
-
-        // Clear message after 5 seconds
         setTimeout(() => {
           setSuccessMessage(null)
-          // Clear location state to prevent message from showing again on refresh
           navigate(location.pathname, { replace: true, state: {} })
         }, 5000)
       }
@@ -83,16 +86,12 @@ const MyRoundsPage: React.FC = () => {
   }, [location.state, navigate, location.pathname])
 
   const handleStartRound = (roundId: number) => {
-    // Navigate to evaluation page instead of opening modal
-    navigate(`/rounds/evaluate/${roundId}`)
+    navigate(`/evaluate/${roundId}`)
   }
-
-  // Evaluation is now handled in EvaluateRoundPage
 
   const handleCapaSubmit = async (data: any) => {
     try {
       if (!data) return
-      // Map frontend keys to backend expected keys
       const payload = {
         title: data.title,
         description: data.description,
@@ -105,7 +104,6 @@ const MyRoundsPage: React.FC = () => {
       }
       await apiClient.createCapa(payload)
       setShowCapaForm(false)
-      setSelectedRoundId(null)
       setCapaInitialData(null)
       alert('تم إنشاء الخطة التصحيحية وحفظها في النظام')
     } catch (err) {
@@ -114,587 +112,421 @@ const MyRoundsPage: React.FC = () => {
     }
   }
 
-  const handleCompleteRound = (roundId: number) => {
-    // Open the evaluation page so the user can complete all items and then finalize
-    navigate(`/rounds/evaluate/${roundId}`, { state: { from: location.pathname } })
-  }
-
   const getStatusColor = (status: string) => {
     const colors = {
-      'completed': 'bg-green-100 text-green-800',
-      'in_progress': 'bg-blue-100 text-blue-800',
-      'scheduled': 'bg-yellow-100 text-yellow-800',
-      'overdue': 'bg-red-100 text-red-800',
-      'cancelled': 'bg-gray-100 text-gray-800',
+      'scheduled': 'bg-blue-50 text-blue-600 border-blue-100',
+      'in_progress': 'bg-amber-50 text-amber-600 border-amber-100',
+      'completed': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+      'cancelled': 'bg-red-50 text-red-600 border-red-100',
+      'overdue': 'bg-rose-50 text-rose-600 border-rose-100',
     }
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+    return colors[status as keyof typeof colors] || 'bg-slate-50 text-slate-600 border-slate-100'
   }
 
   const getStatusText = (status: string) => {
-    const texts: Record<string, { ar: string; en: string }> = {
-      completed: { ar: 'مكتملة', en: 'COMPLETED' },
-      in_progress: { ar: 'قيد التنفيذ', en: 'IN_PROGRESS' },
-      scheduled: { ar: 'مجدولة', en: 'SCHEDULED' },
-      overdue: { ar: 'متأخرة', en: 'OVERDUE' },
-      cancelled: { ar: 'ملغية', en: 'CANCELLED' },
-    }
-    const t = texts[(status || '').toLowerCase()] || { ar: status || '', en: '' }
-    return (
-      <span className="inline-flex items-center gap-2">
-        <span>{t.ar}</span>
-        {t.en && <span className="text-xs text-gray-400 font-mono">{t.en}</span>}
-      </span>
-    )
-  }
-
-  const getPriorityText = (priority: string) => {
     const texts = {
-      'low': 'منخفضة',
-      'medium': 'متوسطة',
-      'high': 'عالية',
-      'urgent': 'عاجلة',
+      'completed': 'مكتملة',
+      'in_progress': 'قيد التنفيذ',
+      'scheduled': 'مجدولة',
+      'overdue': 'متأخرة',
+      'cancelled': 'ملغاة',
     }
-    return texts[priority as keyof typeof texts] || priority
+    return texts[status as keyof typeof texts] || status
   }
 
   const getPriorityColor = (priority: string) => {
     const colors = {
-      'low': 'bg-green-100 text-green-800',
-      'medium': 'bg-yellow-100 text-yellow-800',
-      'high': 'bg-orange-100 text-orange-800',
-      'urgent': 'bg-red-100 text-red-800',
+      'low': 'bg-slate-50 text-slate-600 border-slate-100',
+      'medium': 'bg-blue-50 text-blue-600 border-blue-100',
+      'high': 'bg-orange-50 text-orange-600 border-orange-100',
+      'urgent': 'bg-red-50 text-red-600 border-red-100',
     }
-    return colors[priority as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+    return colors[priority as keyof typeof colors] || 'bg-slate-50 text-slate-600 border-slate-100'
   }
 
-  const getRoundTypeText = (type: string) => {
+  const getPriorityText = (priority: string) => {
     const texts = {
-      'patient_safety': 'سلامة المرضى',
-      'infection_control': 'مكافحة العدوى',
-      'hygiene': 'النظافة',
-      'medication_safety': 'سلامة الأدوية',
-      'equipment_safety': 'سلامة المعدات',
-      'environmental': 'البيئة',
-      'general': 'عام',
+      'urgent': 'عاجلة جداً',
+      'high': 'عالية',
+      'medium': 'متوسطة',
+      'low': 'منخفضة',
     }
-    return texts[type as keyof typeof texts] || type
+    return texts[priority as keyof typeof texts] || priority
   }
 
-  const filteredRounds = myRounds?.filter(round => {
-    const matchesSearch = (round.department || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const getProgressPercentage = (round: any) => {
+    return round.compliancePercentage || round.completionPercentage || 0
+  }
+
+  const getDaysRemaining = (date: string | undefined) => {
+    if (!date) return null
+    const diff = new Date(date).getTime() - new Date().getTime()
+    return Math.max(0, Math.ceil(diff / (1000 * 3600 * 24)))
+  }
+
+  const getDaysOverdue = (date: string | undefined) => {
+    if (!date) return null
+    const diff = new Date().getTime() - new Date(date).getTime()
+    return Math.max(0, Math.ceil(diff / (1000 * 3600 * 24)))
+  }
+
+  const filteredRounds = (myRounds || []).filter(round => {
+    const matchesSearch =
+      (round.department || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (round.roundCode || '').toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = filterStatus === 'all' || round.status === filterStatus
     const matchesPriority = filterPriority === 'all' || round.priority === filterPriority
     return matchesSearch && matchesStatus && matchesPriority
-  }) || []
-
-  const getProgressPercentage = (round: any) => {
-    // Use completion_percentage if available, otherwise use status-based estimation
-    if (round.completionPercentage !== undefined && round.completionPercentage !== null) {
-      return round.completionPercentage
-    }
-
-    const progress = {
-      'scheduled': 0,
-      'in_progress': 50,
-      'completed': 100,
-      'overdue': 0,
-      'cancelled': 0,
-    }
-    return progress[round.status as keyof typeof progress] || 0
-  }
-
-  const getDaysRemaining = (endDate: string | null | undefined) => {
-    if (!endDate) return null
-    const now = new Date()
-    const deadline = new Date(endDate)
-    const diffTime = deadline.getTime() - now.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays
-  }
-
-  const getDaysOverdue = (endDate: string | null | undefined) => {
-    if (!endDate) return null
-    const days = getDaysRemaining(endDate)
-    return days !== null && days < 0 ? Math.abs(days) : null
-  }
-
-  if (loading) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">جاري تحميل الجولات...</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <p className="text-red-600 text-lg mb-4">خطأ في تحميل البيانات</p>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={refetch} className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              إعادة المحاولة
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4 bg-white p-2 rounded shadow">تخطي إلى المحتوى</a>
-      <div id="main-content" className="p-6 space-y-8">
-
-        {/* Success Message Banner */}
-        {successMessage && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 text-green-600" />
-            <p className="text-green-800 font-medium">{successMessage}</p>
+    <div className="space-y-10 pb-12">
+      {successMessage && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-3xl p-5 flex items-center gap-4 animate-in fade-in slide-in-from-top-4 duration-500 shadow-lg shadow-emerald-500/5">
+          <div className="p-2 bg-emerald-500 rounded-full">
+            <CheckCircle2 className="w-5 h-5 text-white" />
           </div>
-        )}
-        {/* Enhanced Header */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <div className="p-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl">
-                <Users className="w-8 h-8 text-white" />
+          <p className="text-emerald-800 font-bold">{successMessage}</p>
+        </div>
+      )}
+
+      <div className="relative overflow-hidden bg-white border border-slate-100 rounded-[2.5rem] p-10 shadow-2xl shadow-indigo-500/5">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="flex items-center gap-8">
+            <div className="p-6 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-[2rem] shadow-xl shadow-indigo-200">
+              <Users className="w-10 h-10 text-white" />
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-black uppercase tracking-wider mb-3">
+                <Building2 className="w-3 h-3" />
+                المكلف بها حالياً
               </div>
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">جولاتي</h1>
-                <p className="text-lg text-gray-600">الجولات المكلف بها {user?.first_name} {user?.last_name}</p>
-              </div>
+              <h1 className="text-4xl font-black text-slate-900 tracking-tight">جولاتي <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">الشخصية</span></h1>
+              <p className="text-lg text-slate-500 font-medium">أهلاً بك، {user?.first_name || 'زميلنا'}. لديك {myRounds?.filter(r => r.status !== 'completed').length || 0} جولات نشطة.</p>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Enhanced Stats Cards - Using API Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Total Rounds */}
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm font-medium">إجمالي الجولات</p>
-                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.total || 0)}</p>
-                </div>
-                <Users className="w-12 h-12 text-purple-200" />
-              </div>
-            </CardContent>
-          </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatsChart title="إجمالي الجولات" value={stats?.total || 0} icon={<Users className="w-6 h-6" />} color="text-purple-600" bgColor="bg-purple-50" />
+        <StatsChart title="المكتملة" value={stats?.completed || 0} icon={<CheckCircle2 className="w-6 h-6" />} color="text-emerald-600" bgColor="bg-emerald-50" trend="up" />
+        <StatsChart title="قيد التنفيذ" value={stats?.in_progress || 0} icon={<Clock className="w-6 h-6" />} color="text-blue-600" bgColor="bg-blue-50" />
+        <StatsChart title="المتأخرة" value={stats?.overdue || 0} icon={<AlertTriangle className="w-6 h-6" />} color="text-rose-600" bgColor="bg-rose-50" trend="down" />
+      </div>
 
-          {/* Completed */}
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm font-medium">مكتملة</p>
-                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.completed || 0)}</p>
-                </div>
-                <CheckCircle2 className="w-12 h-12 text-green-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* In Progress */}
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm font-medium">قيد التنفيذ</p>
-                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.in_progress || 0)}</p>
-                </div>
-                <Play className="w-12 h-12 text-blue-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Overdue */}
-          <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-100 text-sm font-medium">متأخرة</p>
-                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.overdue || 0)}</p>
-                </div>
-                <AlertTriangle className="w-12 h-12 text-red-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Scheduled - NEW */}
-          <Card className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-indigo-100 text-sm font-medium">مجدولة</p>
-                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.scheduled || 0)}</p>
-                </div>
-                <Calendar className="w-12 h-12 text-indigo-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Average Completion - NEW */}
-          <Card className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-cyan-100 text-sm font-medium">معدل الإنجاز</p>
-                  <p className="text-3xl font-bold">{statsLoading ? '...' : `${stats?.avg_completion || 0}%`}</p>
-                </div>
-                <div className="relative w-12 h-12">
-                  <svg className="transform -rotate-90 w-12 h-12">
-                    <circle
-                      cx="24"
-                      cy="24"
-                      r="20"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="transparent"
-                      className="text-cyan-200 opacity-30"
-                    />
-                    <circle
-                      cx="24"
-                      cy="24"
-                      r="20"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="transparent"
-                      strokeDasharray={`${2 * Math.PI * 20}`}
-                      strokeDashoffset={`${2 * Math.PI * 20 * (1 - (stats?.avg_completion || 0) / 100)}`}
-                      className="text-white"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* High Priority - NEW */}
-          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-orange-100 text-sm font-medium">أولوية عالية</p>
-                  <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.high_priority || 0)}</p>
-                </div>
-                <AlertTriangle className="w-12 h-12 text-orange-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Average Compliance - NEW */}
-          <Card className="bg-gradient-to-r from-teal-500 to-teal-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-teal-100 text-sm font-medium">معدل الامتثال</p>
-                  <p className="text-3xl font-bold">{statsLoading ? '...' : `${stats?.avg_compliance || 0}%`}</p>
-                  <p className="text-teal-100 text-xs mt-1">للجولات المكتملة</p>
-                </div>
-                <CheckCircle2 className="w-12 h-12 text-teal-200" />
-              </div>
-            </CardContent>
-          </Card>
-          {/* CAPA Indicators - NEW */}
-          {isCapaEnabled() && (
-            <>
-              <Card className="bg-gradient-to-r from-rose-500 to-rose-600 text-white border-0 shadow-xl">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-rose-100 text-sm font-medium">عناصر تحتاج CAPA</p>
-                      <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.needs_capa_count || 0)}</p>
-                    </div>
-                    <AlertTriangle className="w-12 h-12 text-rose-200" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-r from-slate-500 to-slate-600 text-white border-0 shadow-xl">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-100 text-sm font-medium">خطط تصحيحية مفتوحة</p>
-                      <p className="text-3xl font-bold">{statsLoading ? '...' : (stats?.open_capa_count || 0)}</p>
-                    </div>
-                    <Users className="w-12 h-12 text-slate-200" />
-                  </div>
-                </CardContent>
-              </Card>
-            </>
-          )}
-        </div>
-
-        {/* Enhanced Filters */}
-        <Card className="bg-white rounded-2xl shadow-xl border border-gray-100">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <Filter className="w-6 h-6 text-purple-600" />
-              <h3 className="text-xl font-semibold text-gray-900">فلاتر البحث</h3>
+      <Card className="bg-white/50 backdrop-blur-sm rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 p-2">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="relative flex-1 group w-full">
+              <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 group-focus-within:text-purple-600 transition-colors" />
+              <Input
+                placeholder="البحث في جولاتي برمز الجولة أو القسم..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pr-12 h-14 text-lg border-slate-200 focus:border-purple-500 focus:ring-purple-500 rounded-2xl bg-white shadow-sm transition-all"
+              />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="relative">
-                <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  placeholder="البحث في الجولات..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-12 h-14 text-lg border-2 border-gray-200 focus:border-purple-500 rounded-xl"
-                />
-              </div>
+
+            <div className="flex items-center gap-3 w-full md:w-auto">
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 h-14 text-lg"
+                className="h-14 px-6 rounded-2xl border-slate-200 text-slate-700 font-bold focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white shadow-sm outline-none"
               >
-                <option value="all">جميع الحالات</option>
-                <option value="scheduled">مجدولة — SCHEDULED</option>
-                <option value="in_progress">قيد التنفيذ — IN_PROGRESS</option>
-                <option value="completed">مكتملة — COMPLETED</option>
-                <option value="overdue">متأخرة — OVERDUE</option>
+                <option value="all">الحالة: الكل</option>
+                <option value="scheduled">مجدولة</option>
+                <option value="in_progress">قيد التنفيذ</option>
+                <option value="completed">مكتملة</option>
+                <option value="overdue">متأخرة</option>
               </select>
+
               <select
                 value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
-                className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 h-14 text-lg"
+                className="h-14 px-6 rounded-2xl border-slate-200 text-slate-700 font-bold focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white shadow-sm outline-none"
               >
-                <option value="all">جميع الأولويات</option>
-                <option value="urgent">عاجلة</option>
+                <option value="all">الأولوية: الكل</option>
+                <option value="urgent">عاجلة جداً</option>
                 <option value="high">عالية</option>
                 <option value="medium">متوسطة</option>
                 <option value="low">منخفضة</option>
               </select>
+
+              <Button variant="ghost" className="h-14 w-14 rounded-2xl bg-white border border-slate-100 shadow-sm hover:bg-slate-50" onClick={() => { setSearchTerm(''); setFilterStatus('all'); setFilterPriority('all') }}>
+                <Filter className="w-5 h-5 text-slate-400" />
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Rounds Grid - Ticket Style */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredRounds.map((round) => (
-            <div key={round.id} className="bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden">
-              {/* Ticket Header */}
-              <div className={`text-white p-3 ${round.status === 'completed'
-                ? 'bg-gradient-to-r from-green-600 to-green-700'
-                : round.status === 'in_progress'
-                  ? 'bg-gradient-to-r from-blue-600 to-blue-700'
-                  : round.status === 'scheduled'
-                    ? 'bg-gradient-to-r from-purple-600 to-purple-700'
-                    : 'bg-gradient-to-r from-red-600 to-red-700'
-                }`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-white/20 rounded-lg">
-                      <Building2 className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-bold">{round.department}</h3>
-                      <p className="text-blue-100 text-xs">{round.roundCode}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(round.status)}`}>
-                      {getStatusText(round.status)}
-                    </div>
-                  </div>
-                </div>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {filteredRounds.length > 0 ? (
+          filteredRounds.map((round) => {
+            const daysRemaining = getDaysRemaining(round.endDate)
+            const daysOverdue = getDaysOverdue(round.endDate)
+            const isOverdue = round.status === 'overdue' || (daysRemaining !== null && daysRemaining < 0)
 
-              {/* Unified header strip */}
-              <div className="px-4 py-2 border-b border-gray-100 bg-white flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(round.status)}`}>
-                    {getStatusText(round.status)}
-                  </div>
-                  <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(round.priority)}`}>
-                    {getPriorityText(round.priority)}
-                  </div>
-                </div>
-                <div className="text-sm text-gray-600">{round.scheduledDate ? new Date(round.scheduledDate).toLocaleDateString() : 'غير محدد'}</div>
-              </div>
+            // Get total items from evaluation_items array
+            const totalItems = Array.isArray(round.evaluation_items)
+              ? round.evaluation_items.length
+              : (round as any).totalItems || 0
 
-              {/* Ticket Content */}
-              <div className="p-4">
-                {/* Removed title/description per requirements */}
+            // Calculate progress based on status and compliance
+            const complianceScore = round.compliancePercentage || (round as any).completionPercentage || 0
+            const progress = round.status === 'completed' ? 100
+              : round.status === 'scheduled' ? 0
+                : complianceScore > 0 ? complianceScore
+                  : round.status === 'in_progress' ? 50
+                    : 0
 
-                {/* Flight Details Style */}
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-gray-900">
-                      {new Date(round.scheduledDate).toLocaleDateString('en-US', {
-                        day: '2-digit',
-                        month: 'short'
-                      })}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {new Date(round.scheduledDate).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">تاريخ الجولة</div>
-                  </div>
+            // Determine progress ring color based on status
+            const ringColor = round.status === 'completed' ? 'green'
+              : isOverdue ? 'red'
+                : round.status === 'in_progress' ? 'purple'
+                  : 'blue'
 
-                  <div className="text-center">
-                    <div className={`text-lg font-bold px-3 py-2 rounded-lg ${round.priority === 'urgent'
-                      ? 'bg-red-100 text-red-800'
-                      : round.priority === 'high'
-                        ? 'bg-orange-100 text-orange-800'
-                        : round.priority === 'medium'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                      {getRoundTypeText(round.roundType)}
-                    </div>
-                    <div className={`text-xs px-2 py-1 rounded-full mt-2 inline-block ${round.priority === 'urgent'
-                      ? 'bg-red-200 text-red-700'
-                      : round.priority === 'high'
-                        ? 'bg-orange-200 text-orange-700'
-                        : round.priority === 'medium'
-                          ? 'bg-yellow-200 text-yellow-700'
-                          : 'bg-green-200 text-green-700'
-                      }`}>
-                      {getPriorityText(round.priority)}
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">نوع الجولة</div>
-                  </div>
-                </div>
+            // Get round type label
+            const getRoundTypeLabel = (type: string) => {
+              const types: Record<string, { label: string, color: string, icon: string }> = {
+                'internal': { label: 'داخلية', color: 'bg-blue-100 text-blue-700 border-blue-200', icon: '🏢' },
+                'external': { label: 'خارجية', color: 'bg-purple-100 text-purple-700 border-purple-200', icon: '🌐' },
+                'audit': { label: 'تدقيق', color: 'bg-amber-100 text-amber-700 border-amber-200', icon: '📋' },
+                'inspection': { label: 'تفتيش', color: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: '🔍' },
+                'patient_safety': { label: 'سلامة المرضى', color: 'bg-rose-100 text-rose-700 border-rose-200', icon: '🏥' },
+              }
+              return types[type?.toLowerCase()] || { label: type || 'عامة', color: 'bg-slate-100 text-slate-700 border-slate-200', icon: '📌' }
+            }
 
-                {/* Progress Bar */}
-                <div className="mb-3">
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="text-gray-600 font-medium">التقدم</span>
-                    <span className="font-bold text-blue-600">{getProgressPercentage(round)}%</span>
-                  </div>
-                  <Progress value={getProgressPercentage(round)} className="h-2" />
-                </div>
+            const roundType = getRoundTypeLabel(round.roundType)
 
-                {/* Time Badges */}
-                <div className="mb-3">
-                  {round.status === 'in_progress' && getDaysRemaining(round.endDate) !== null && getDaysRemaining(round.endDate)! > 0 && (
-                    <Badge variant="outline" className="text-blue-600 border-blue-300 bg-blue-50">
-                      <Clock className="w-3 h-3 ml-1" />
-                      {getDaysRemaining(round.endDate)} يوم متبقي
-                    </Badge>
-                  )}
-                  {round.status === 'overdue' && getDaysOverdue(round.endDate) !== null && (
-                    <Badge className="bg-red-500 text-white">
-                      <AlertTriangle className="w-3 h-3 ml-1" />
-                      متأخرة {getDaysOverdue(round.endDate)} يوم
-                    </Badge>
-                  )}
-                  {round.status === 'scheduled' && getDaysRemaining(round.scheduledDate) !== null && getDaysRemaining(round.scheduledDate)! > 0 && getDaysRemaining(round.scheduledDate)! <= 3 && (
-                    <Badge variant="outline" className="text-purple-600 border-purple-300 bg-purple-50">
-                      <Calendar className="w-3 h-3 ml-1" />
-                      تبدأ خلال {getDaysRemaining(round.scheduledDate)} يوم
-                    </Badge>
-                  )}
-                </div>
-
-                {/* Compliance */}
-                {round.compliancePercentage > 0 && (
-                  <div className="mb-3 p-2 bg-green-50 rounded-lg border border-green-200">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-600" />
-                      <span className="text-green-800 font-medium text-sm">الامتثال: {round.compliancePercentage}%</span>
-                    </div>
-                  </div>
+            return (
+              <Card
+                key={round.id}
+                className={cn(
+                  "group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1",
+                  "border-r-4",
+                  round.status === 'completed' ? 'border-r-emerald-500' :
+                    isOverdue ? 'border-r-rose-500' :
+                      round.status === 'in_progress' ? 'border-r-purple-500' :
+                        'border-r-blue-500'
                 )}
+              >
+                <CardContent className="p-0">
+                  {/* Header */}
+                  <div className="p-5 pb-4 border-b border-slate-100">
+                    <div className="flex items-start justify-between gap-3">
+                      {/* Round Type Badge */}
+                      <div className={cn(
+                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border",
+                        roundType.color
+                      )}>
+                        <span>{roundType.icon}</span>
+                        {roundType.label}
+                      </div>
 
-                {/* Action Button */}
-                <div className="pt-3 border-t border-gray-200">
-                  {round.status === 'scheduled' && (
+                      {/* Status & Priority */}
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border",
+                          getStatusColor(round.status)
+                        )}>
+                          {getStatusText(round.status)}
+                        </span>
+                        <span className={cn(
+                          "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border",
+                          getPriorityColor(round.priority)
+                        )}>
+                          {getPriorityText(round.priority)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Main Content */}
+                  <div className="p-5">
+                    <div className="flex items-start gap-4">
+                      {/* Progress Ring */}
+                      <div className="flex-shrink-0">
+                        <div className="relative">
+                          <svg width="72" height="72" className="transform -rotate-90">
+                            <circle
+                              cx="36"
+                              cy="36"
+                              r="30"
+                              fill="none"
+                              strokeWidth="6"
+                              className="stroke-slate-100"
+                            />
+                            <circle
+                              cx="36"
+                              cy="36"
+                              r="30"
+                              fill="none"
+                              strokeWidth="6"
+                              strokeDasharray={188.5}
+                              strokeDashoffset={188.5 - (progress / 100) * 188.5}
+                              strokeLinecap="round"
+                              className={cn(
+                                "transition-all duration-1000 ease-out",
+                                ringColor === 'green' ? 'stroke-emerald-500' :
+                                  ringColor === 'red' ? 'stroke-rose-500' :
+                                    ringColor === 'purple' ? 'stroke-purple-500' :
+                                      'stroke-blue-500'
+                              )}
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-base font-black text-slate-900">{progress}%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                          {round.roundCode || 'NO-CODE'}
+                        </div>
+                        <h3 className="text-lg font-black text-slate-900 leading-tight truncate mb-2">
+                          {round.department || 'القسم العام'}
+                        </h3>
+
+                        {/* Items Count */}
+                        {totalItems > 0 && (
+                          <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-purple-50 rounded-lg text-sm">
+                            <span className="text-purple-500">📋</span>
+                            <span className="font-bold text-purple-700">{totalItems}</span>
+                            <span className="text-purple-600 text-xs">بند تقييم</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Date & Time Info */}
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                      {/* Date Range */}
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 text-xs">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="font-medium text-slate-600">
+                          {new Date(round.scheduledDate).toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' })}
+                          {round.endDate && (
+                            <>
+                              <span className="mx-1 text-slate-400">←</span>
+                              {new Date(round.endDate).toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' })}
+                            </>
+                          )}
+                        </span>
+                      </div>
+
+                      {/* Time Indicator */}
+                      {round.status !== 'completed' && (
+                        <>
+                          {isOverdue && daysOverdue !== null && daysOverdue > 0 ? (
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold">
+                              <AlertTriangle className="w-3.5 h-3.5" />
+                              متأخر {daysOverdue} يوم
+                            </div>
+                          ) : daysRemaining !== null && daysRemaining >= 0 ? (
+                            <div className={cn(
+                              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold",
+                              daysRemaining <= 2 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
+                            )}>
+                              <Clock className="w-3.5 h-3.5" />
+                              {daysRemaining === 0 ? 'اليوم آخر يوم' : `متبقي ${daysRemaining} يوم`}
+                            </div>
+                          ) : null}
+                        </>
+                      )}
+
+                      {/* Compliance Badge */}
+                      {round.compliancePercentage > 0 && (
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-bold">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          امتثال {round.compliancePercentage}%
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="p-4 pt-0">
                     <Button
-                      onClick={() => handleStartRound(round.id)}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg flex items-center justify-center gap-2 text-sm"
+                      onClick={() => {
+                        if (round.status === 'scheduled') handleStartRound(round.id)
+                        else navigate(`/evaluate/${round.id}`)
+                      }}
+                      className={cn(
+                        "w-full h-12 rounded-xl text-sm font-black transition-all duration-300 border-none",
+                        round.status === 'completed'
+                          ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                          : round.status === 'scheduled'
+                            ? "bg-slate-900 hover:bg-slate-800 text-white shadow-lg shadow-slate-200"
+                            : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg shadow-purple-200"
+                      )}
+                      disabled={round.status === 'completed'}
                     >
-                      <Play className="w-4 h-4" />
-                      بدء الجولة
+                      {round.status === 'scheduled' ? (
+                        <>
+                          <Play className="w-4 h-4 ml-2" />
+                          بدء الجولة
+                        </>
+                      ) : round.status === 'completed' ? (
+                        <>
+                          <CheckCircle2 className="w-4 h-4 ml-2" />
+                          مكتملة
+                        </>
+                      ) : (
+                        <>
+                          <Target className="w-4 h-4 ml-2" />
+                          مواصلة التقييم
+                        </>
+                      )}
                     </Button>
-                  )}
-                  {round.status === 'in_progress' && (
-                    <Button
-                      onClick={() => handleCompleteRound(round.id)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg flex items-center justify-center gap-2 text-sm"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      إكمال الجولة
-                    </Button>
-                  )}
-                  {round.status === 'completed' && (
-                    <Button
-                      variant="outline"
-                      className="w-full border-green-200 text-green-700 hover:bg-green-50 font-medium py-2 rounded-lg flex items-center justify-center gap-2 text-sm"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      مكتملة
-                    </Button>
-                  )}
-                </div>
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })
+        ) : (
+          <div className="col-span-full py-16 bg-white/50 backdrop-blur-sm rounded-2xl border border-slate-100 border-dashed text-center">
+            <div className="p-8 bg-slate-50 rounded-full w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+              <Users className="w-16 h-16 text-slate-200" />
             </div>
-          ))}
-        </div>
-
-        {/* Evaluation form is now a separate page */}
-
-        {/* Notification banner for created CAPA */}
-        {isCapaEnabled() && createdCapaInfo && (
-          <div className="fixed top-6 right-6 z-50">
-            <div className="bg-white shadow-lg rounded-lg p-4 flex items-center gap-4">
-              <div className="text-sm">
-                <div className="font-medium">تم إنشاء خطة تصحيحية تلقائياً</div>
-                <div className="text-xs text-gray-600">CAPA ID: {createdCapaInfo.id || '—'}</div>
-              </div>
-              <div className="flex gap-2">
-                <button className="px-3 py-2 bg-blue-600 text-white rounded" onClick={() => navigate(`/capa?roundId=${createdCapaInfo.roundId || ''}`)}>عرض الخطة</button>
-                <button className="px-3 py-2 border rounded" onClick={() => setCreatedCapaInfo(null)}>إغلاق</button>
-              </div>
-            </div>
+            <h3 className="text-2xl font-black text-slate-900 mb-3">لا توجد جولات حالياً</h3>
+            <p className="text-lg text-slate-500 font-medium max-w-md mx-auto">لم يتم العثور على أي جولات تطابق معايير البحث الحالية.</p>
           </div>
-        )}
-
-        {isCapaEnabled() && showCapaForm && capaInitialData && (
-          <div className="fixed inset-0 bg-black/40 flex items-start justify-center p-6 z-50">
-            <div className="w-full max-w-4xl">
-              <CapaForm
-                initialData={capaInitialData}
-                onCancel={() => { setShowCapaForm(false); setCapaInitialData(null); setSelectedRoundId(null) }}
-                onSubmit={handleCapaSubmit}
-              />
-            </div>
-          </div>
-        )}
-
-        {filteredRounds.length === 0 && (
-          <Card className="bg-white rounded-2xl shadow-xl border border-gray-100">
-            <CardContent className="p-16 text-center">
-              <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center">
-                <Users className="w-16 h-16 text-purple-400" />
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">
-                {searchTerm || filterStatus !== 'all' || filterPriority !== 'all' ? 'لا توجد نتائج' : 'لا توجد جولات مكلف بها'}
-              </h3>
-              <p className="text-xl text-gray-500 mb-8 max-w-md mx-auto">
-                {searchTerm || filterStatus !== 'all' || filterPriority !== 'all'
-                  ? 'جرب تغيير معايير البحث أو الفلترة للعثور على الجولات المطلوبة'
-                  : 'لم يتم تكليفك بأي جولات تقييم حالياً'
-                }
-              </p>
-            </CardContent>
-          </Card>
         )}
       </div>
+
+      {isCapaEnabled() && createdCapaInfo && (
+        <div className="fixed bottom-10 right-10 z-50 animate-in slide-in-from-bottom-10 duration-500">
+          <div className="bg-slate-900 text-white shadow-2xl rounded-[1.5rem] p-6 flex items-center gap-6 border border-white/10 backdrop-blur-xl">
+            <div>
+              <div className="font-black text-lg mb-1">تم إنشاء خطة تصحيحية (CAPA)</div>
+              <div className="text-slate-400 text-xs font-bold uppercase tracking-widest">ID: {createdCapaInfo.id}</div>
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 rounded-xl px-5 font-bold" onClick={() => navigate(`/capa?roundId=${createdCapaInfo.roundId || ''}`)}>عرض</Button>
+              <Button size="sm" variant="ghost" className="text-slate-400 hover:text-white" onClick={() => setCreatedCapaInfo(null)}>إغلاق</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isCapaEnabled() && showCapaForm && capaInitialData && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 z-50 animate-in fade-in duration-300">
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-auto rounded-[2.5rem] shadow-2xl">
+            <CapaForm
+              initialData={capaInitialData}
+              onCancel={() => { setShowCapaForm(false); setCapaInitialData(null) }}
+              onSubmit={handleCapaSubmit}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

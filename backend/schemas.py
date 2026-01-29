@@ -146,6 +146,8 @@ class VerificationStep(BaseModel):
     completed: bool = False
     completed_at: Optional[datetime] = None
     completed_by_id: Optional[int] = None
+    completion_percentage: Optional[int] = 0
+    score_details: Optional[List[dict]] = None
     notes: Optional[str] = None
 
 class StatusHistoryItem(BaseModel):
@@ -247,6 +249,7 @@ class EvaluationCategoryBase(BaseModel):
     description: Optional[str] = None
     color: str = "blue"
     icon: str = "shield"
+    weight_percent: float = 10.0
 
 class EvaluationCategoryCreate(EvaluationCategoryBase):
     pass

@@ -8,6 +8,7 @@ export interface EvaluationCategory {
   description?: string
   color: string
   icon: string
+  weight_percent: number
   is_active: boolean
   created_at: string
   updated_at: string
@@ -45,6 +46,7 @@ const mockCategories: EvaluationCategory[] = [
     description: 'تصنيف معايير الجودة والتحسين المستمر',
     color: 'green',
     icon: 'check-circle',
+    weight_percent: 40.0,
     is_active: true,
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-15T10:30:00Z'
@@ -56,6 +58,7 @@ const mockCategories: EvaluationCategory[] = [
     description: 'تصنيف معايير مكافحة العدوى والوقاية منها',
     color: 'red',
     icon: 'shield',
+    weight_percent: 30.0,
     is_active: true,
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-15T10:30:00Z'
@@ -67,6 +70,7 @@ const mockCategories: EvaluationCategory[] = [
     description: 'تصنيف معايير سلامة المرضى والرعاية الآمنة',
     color: 'blue',
     icon: 'heart',
+    weight_percent: 30.0,
     is_active: true,
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-15T10:30:00Z'

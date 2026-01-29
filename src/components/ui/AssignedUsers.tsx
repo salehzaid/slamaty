@@ -6,7 +6,10 @@ interface Props {
   maxVisible?: number
 }
 
-const isNumeric = (s: string) => /^\d+$/.test(s.trim())
+const isNumeric = (s: any) => {
+  if (typeof s !== 'string') return typeof s === 'number';
+  return /^\d+$/.test(s.trim());
+}
 
 const AssignedUsers: React.FC<Props> = ({ users = [], maxVisible = 3 }) => {
   const [open, setOpen] = useState(false)

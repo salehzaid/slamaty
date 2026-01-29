@@ -203,7 +203,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
     const fetchData = async () => {
       try {
         const [usersData, categoriesData, itemsData] = await Promise.all([
-          apiClient.getAssessors(),
+          apiClient.get('/api/users/assessors'),
           apiClient.getEvaluationCategories(),
           apiClient.getEvaluationItems()
         ])
@@ -262,8 +262,8 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
         return []
       }
       return evaluationItems.filter((item: EvaluationItem) =>
-        formData.selected_categories.some(catId =>
-          (item.category_ids && item.category_ids.includes(catId)) || item.category_id === catId
+        formData.selected_categories.some((catId: number) =>
+          item.category_ids?.includes(catId)
         )
       )
     } catch (error) {

@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { 
-  FileText, 
-  Calendar as CalendarIcon, 
-  Layout, 
+import {
+  FileText,
+  Calendar as CalendarIcon,
+  Layout,
   User,
   Plus
 } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/context/AuthContext'
 
 // Import the sub-components
 import RoundsManagement from './RoundsManagement'
@@ -18,6 +18,7 @@ import RoundsCalendarView from './RoundsCalendarView'
 import MyRoundsPage from './MyRoundsPage'
 
 const UnifiedRoundsPage: React.FC = () => {
+  const { hasPermission } = useAuth() as any
   const [searchParams, setSearchParams] = useSearchParams()
   const tabParam = searchParams.get('tab')
   const [activeTab, setActiveTab] = useState<string>(tabParam || 'management')
@@ -56,21 +57,40 @@ const UnifiedRoundsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 p-6 space-y-6">
-      {/* Header & Tabs */}
-      <div className="flex flex-col space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">نظام إدارة الجولات</h1>
-            <p className="text-slate-500">إدارة وشاملة لجميع جولات الجودة والتقويم والمهام</p>
+    <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 space-y-8 pb-20">
+      {/* Premium Header Section */}
+      <div className="relative overflow-hidden bg-white/40 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-8 shadow-2xl shadow-blue-500/5">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+
+        <div className="relative flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider mb-2">
+              <Layout className="w-3 h-3" />
+              منصة الإدارة
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+              إدارة <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">الجولات</span>
+            </h1>
+            <p className="text-lg text-slate-500 max-w-lg leading-relaxed">
+              نظام متكامل لإدارة جولات الجودة، التقويم المستمر، ومتابعة المهام بكفاءة عالية.
+            </p>
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg border-none h-11 px-6">
-            <Plus className="w-4 h-4 ml-2" />
-            إنشاء جولة جديدة
-          </Button>
+
+          {hasPermission(['super_admin', 'quality_manager']) && (
+            <Button
+              onClick={() => setSearchParams({ tab: 'list', create: 'true' })}
+              className="group relative bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-14 px-8 text-lg font-bold shadow-xl shadow-slate-200 transition-all active:scale-95 border-none overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Plus className="w-5 h-5 ml-2 relative z-10" />
+              <span className="relative z-10">إنشاء جولة جديدة</span>
+            </Button>
+          )}
         </div>
 
-        <div className="flex items-center space-x-1 space-x-reverse bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200/60 w-fit">
+        {/* Segmented Control Tabs */}
+        <div className="mt-10 flex flex-wrap items-center gap-2 p-1.5 bg-slate-100/50 backdrop-blur-sm rounded-[1.25rem] w-fit border border-slate-200/50">
           {tabs.map((tab) => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id
@@ -79,23 +99,28 @@ const UnifiedRoundsPage: React.FC = () => {
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
                 className={cn(
-                  "flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
-                  isActive 
-                    ? "bg-blue-600 text-white shadow-md shadow-blue-200" 
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  "relative flex items-center gap-3 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300",
+                  isActive
+                    ? "text-white"
+                    : "text-slate-500 hover:text-slate-900 hover:bg-white/50"
                 )}
               >
-                <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-slate-400")} />
-                {tab.label}
+                {isActive && (
+                  <div className="absolute inset-0 bg-slate-900 rounded-xl shadow-lg shadow-slate-200" />
+                )}
+                <Icon className={cn("w-4 h-4 relative z-10", isActive ? "text-white" : "text-slate-400")} />
+                <span className="relative z-10">{tab.label}</span>
               </button>
             )
           })}
         </div>
       </div>
 
-      {/* Content Area */}
-      <div className="animate-in fade-in duration-500">
-        {renderContent()}
+      {/* Content Area with smooth transitions */}
+      <div className="relative">
+        <div className="transition-all duration-500 ease-in-out">
+          {renderContent()}
+        </div>
       </div>
     </div>
   )

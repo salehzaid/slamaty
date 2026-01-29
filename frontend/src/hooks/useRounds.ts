@@ -20,10 +20,10 @@ export function useRounds(params?: { skip?: number; limit?: number }) {
     setState(prev => ({ ...prev, loading: true }))
     try {
       const response = await apiClient.getRounds(params)
-      
+
       // Backend returns data directly as array, not wrapped in response object
       const data = Array.isArray(response) ? response : (response?.data || response || [])
-      
+
       // Transform API data to match frontend interface
       const transformedData = Array.isArray(data) ? data.map((round: any) => {
         // Safely parse assigned_to
@@ -77,15 +77,16 @@ export function useRounds(params?: { skip?: number; limit?: number }) {
           roundCode: round.round_code || round.roundCode,
           title: round.title || '',
           description: round.description || '',
-          roundType: round.round_type || round.roundType || '',
+          roundType: (round.round_type || round.roundType || '').toLowerCase(),
           department: round.department || '',
           assignedTo: assignedTo,
           scheduledDate: round.scheduled_date || round.scheduledDate || null,
           deadline: round.deadline || null,
           endDate: round.end_date || round.endDate || null,
-          status: round.status || 'scheduled',
-          priority: round.priority || 'medium',
+          status: (round.status || 'scheduled').toLowerCase(),
+          priority: (round.priority || 'medium').toLowerCase(),
           compliancePercentage: round.compliance_percentage || round.compliancePercentage || 0,
+          completionPercentage: round.completion_percentage || round.completionPercentage || 0,
           notes: round.notes || '',
           evaluation_items: evaluationItems,
           selected_categories: selectedCategories,
@@ -93,7 +94,7 @@ export function useRounds(params?: { skip?: number; limit?: number }) {
           createdAt: round.created_at || round.createdAt || new Date().toISOString()
         }
       }) : []
-      
+
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
         console.debug('Rounds data loaded:', transformedData.length, 'rounds')
@@ -115,7 +116,7 @@ export function useRounds(params?: { skip?: number; limit?: number }) {
         try {
           localStorage.removeItem('access_token')
           localStorage.removeItem('sallamaty_user')
-        } catch {}
+        } catch { }
         // Surface a clear error to the UI so it can show login prompt instead of forcing redirect
         setState(prev => ({ ...prev, data: [], loading: false, error: 'غير مسموح — يرجى تسجيل الدخول' }))
         return
@@ -159,13 +160,13 @@ export function useMyRounds(params?: { skip?: number; limit?: number }) {
         // eslint-disable-next-line no-console
         console.debug('📥 My rounds response:', response)
       }
-      
+
       const data = Array.isArray(response) ? response : (response.data || [])
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
         console.debug('📊 My rounds data:', data)
       }
-      
+
       // Transform API data to match frontend interface
       const transformedData = Array.isArray(data) ? data.map((round: any) => {
         // Safely parse assigned_to
@@ -219,15 +220,16 @@ export function useMyRounds(params?: { skip?: number; limit?: number }) {
           roundCode: round.round_code || round.roundCode,
           title: round.title || '',
           description: round.description || '',
-          roundType: round.round_type || round.roundType || '',
+          roundType: (round.round_type || round.roundType || '').toLowerCase(),
           department: round.department || '',
           assignedTo: assignedTo,
           scheduledDate: round.scheduled_date || round.scheduledDate || null,
           deadline: round.deadline || null,
           endDate: round.end_date || round.endDate || null,
-          status: round.status || 'scheduled',
-          priority: round.priority || 'medium',
+          status: (round.status || 'scheduled').toLowerCase(),
+          priority: (round.priority || 'medium').toLowerCase(),
           compliancePercentage: round.compliance_percentage || round.compliancePercentage || 0,
+          completionPercentage: round.completion_percentage || round.completionPercentage || 0,
           notes: round.notes || '',
           evaluation_items: evaluationItems,
           selected_categories: selectedCategories,
@@ -235,7 +237,7 @@ export function useMyRounds(params?: { skip?: number; limit?: number }) {
           createdAt: round.created_at || round.createdAt || new Date().toISOString()
         }
       }) : []
-      
+
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
         console.debug('✅ Transformed my rounds data:', transformedData)

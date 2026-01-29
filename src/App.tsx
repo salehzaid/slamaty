@@ -31,13 +31,20 @@ import CategoryItemMappingPage from './components/pages/CategoryItemMappingPage'
 
 const AppContent: React.FC = () => {
   const auth = useAuth();
+  console.log('📱 AppContent: auth state:', {
+    exists: !!auth,
+    isLoading: auth?.isLoading,
+    isAuthenticated: auth?.isAuthenticated
+  });
 
   if (!auth) {
+    console.error('❌ AppContent: auth context is UNDEFINED. Check AuthProvider wrapping.');
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">جاري التحميل...</p>
+      <div className="flex items-center justify-center h-screen bg-red-900 text-white">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          <p className="font-bold">خطأ في تهيئة النظام: AuthContext مفقود</p>
+          <p className="text-xs">يرجى التأكد من أن AuthProvider يغلف تطبيق AppContent</p>
         </div>
       </div>
     );
@@ -47,10 +54,23 @@ const AppContent: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">جاري التحميل...</p>
+      <div className="flex items-center justify-center h-screen bg-slate-900 text-white">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mx-auto"></div>
+          <p className="text-xl font-bold">جاري تحميل نظام سلامتي...</p>
+          <div className="text-xs text-slate-500 font-mono bg-slate-800 p-4 rounded-lg text-left">
+            DEBUG INFO:
+            - auth exists: {String(!!auth)}
+            - isAuthenticated: {String(auth?.isAuthenticated)}
+            - isLoading: {String(auth?.isLoading)}
+            - user exists: {String(!!auth?.user)}
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            إعادة تحميل الصفحة
+          </button>
         </div>
       </div>
     );
@@ -68,6 +88,8 @@ const AppContent: React.FC = () => {
       </div>
     );
   }
+
+  console.log('🏁 AppContent: rendering routes. isAuthenticated:', isAuthenticated);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900" dir="rtl">
@@ -92,7 +114,6 @@ const AppContent: React.FC = () => {
           <Route path="/evaluation" element={<UnifiedEvaluationPage />} />
           <Route path="/unified-evaluation" element={<Navigate to="/evaluation?tab=dashboard" replace />} />
           <Route path="/evaluation-categories" element={<Navigate to="/evaluation?tab=categories" replace />} />
-          <Route path="/evaluation-items" element={<Navigate to="/evaluation?tab=items" replace />} />
 
           <Route path="/evaluation-items" element={<Navigate to="/evaluation?tab=items" replace />} />
 
@@ -106,7 +127,6 @@ const AppContent: React.FC = () => {
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/departments" element={<DepartmentsManagement />} />
           <Route path="/gamified-system" element={<GamifiedEvaluationSystem />} />
-          <Route path="/gamified-system" element={<GamifiedEvaluationSystem />} />
           <Route path="/evaluate/:roundId" element={<EvaluateRoundPage />} />
           <Route path="/category-mapping" element={<CategoryItemMappingPage />} />
 
@@ -117,7 +137,7 @@ const AppContent: React.FC = () => {
       </MainContent>
     </div>
   );
-};
+}
 
 const App: React.FC = () => {
   return (

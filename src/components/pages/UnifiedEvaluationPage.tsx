@@ -13,6 +13,37 @@ import { cn } from '@/lib/utils'
 import UnifiedEvaluationDashboard from '../UnifiedEvaluationDashboard'
 import EvaluationCategoriesPage from './EvaluationCategoriesPage'
 import EvaluationItemsPage from './EvaluationItemsPage'
+import { AlertCircle } from 'lucide-react'
+
+// Local Error Boundary to catch sub-component render errors
+class UnifiedErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
+    constructor(props: any) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+    static getDerivedStateFromError(error: any) {
+        return { hasError: true, error };
+    }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="p-8 bg-red-50 border-2 border-red-200 text-red-900 rounded-3xl m-6 shadow-2xl">
+                    <div className="flex items-center gap-4 mb-4">
+                        <AlertCircle className="w-10 h-10 text-red-600" />
+                        <h2 className="text-2xl font-bold">Render Error Captured</h2>
+                    </div>
+                    <div className="bg-white/80 p-6 rounded-2xl border border-red-100 overflow-auto max-h-[400px]">
+                        <p className="font-mono text-sm font-bold text-red-800 mb-2">{String(this.state.error)}</p>
+                        <pre className="text-[10px] leading-relaxed text-slate-500 font-mono">
+                            {this.state.error?.stack}
+                        </pre>
+                    </div>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 
 const UnifiedEvaluationPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams()
@@ -25,9 +56,11 @@ const UnifiedEvaluationPage: React.FC = () => {
         }
     }, [tabParam])
 
-    const handleTabChange = (tabId: string) => {
+    const handleTabChange = (tabId: string, action?: string) => {
         setActiveTab(tabId)
-        setSearchParams({ tab: tabId })
+        const params: Record<string, string> = { tab: tabId }
+        if (action) params.action = action
+        setSearchParams(params)
     }
 
     const tabs = [
@@ -50,15 +83,18 @@ const UnifiedEvaluationPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50/50 p-6 space-y-6">
+        <div className="bg-slate-50/50 p-4 md:p-6 space-y-6">
             {/* Header & Tabs */}
-            <div className="flex flex-col space-y-6">
+            <div className="flex flex-col space-y-4">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900">نظام إدارة التقييمات</h1>
                         <p className="text-slate-500">إدارة المعايير، التصنيفات، وتحليل النتائج</p>
                     </div>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg border-none h-11 px-6">
+                    <Button
+                        onClick={() => handleTabChange('items', 'new')}
+                        className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg border-none h-11 px-6 transition-all transform hover:scale-105"
+                    >
                         <Plus className="w-4 h-4 ml-2" />
                         إنشاء عنصر تقييم
                     </Button>
@@ -88,9 +124,11 @@ const UnifiedEvaluationPage: React.FC = () => {
             </div>
 
             {/* Content Area */}
-            <div className="animate-in fade-in duration-500">
-                {renderContent()}
-            </div>
+            <UnifiedErrorBoundary>
+                <div className="animate-in fade-in duration-500">
+                    {renderContent()}
+                </div>
+            </UnifiedErrorBoundary>
         </div>
     )
 }

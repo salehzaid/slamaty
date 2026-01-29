@@ -2,30 +2,28 @@ import React, { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import AssignedUsers from '@/components/ui/AssignedUsers'
+import { cn } from '@/lib/utils'
 import { useRounds, useDeleteRound } from '@/hooks/useRounds'
 import CompleteRoundForm from '@/components/forms/CompleteRoundForm'
 import StatsChart from '@/components/ui/StatsChart'
 import { apiClient } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
-import { useNavigate } from 'react-router-dom'
-import { 
-  Plus, 
-  Search, 
-  User, 
-  BarChart3, 
-  CheckCircle2, 
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import {
+  Plus,
+  Search,
+  Calendar,
+  CheckCircle2,
   AlertTriangle,
+  Play,
   Target,
-  Filter,
+  ExternalLink,
+  List,
+  Grid,
+  BarChart3,
   Eye,
   Edit,
-  Play,
-  MoreHorizontal,
-  Trash2,
-  List,
-  Grid
+  Clock
 } from 'lucide-react'
 import RoundsTable from '@/components/ui/RoundsTable'
 
@@ -36,629 +34,475 @@ const RoundsListView: React.FC = () => {
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [showEditForm, setShowEditForm] = useState(false)
   const [selectedRound, setSelectedRound] = useState<any>(null)
-  
+
   const { data: rounds, loading, error, refetch } = useRounds()
-  const { hasPermission } = useAuth()
+  const auth = useAuth()
+  const hasPermission = auth?.hasPermission || (() => false)
   const navigate = useNavigate()
   const deleteRoundMutation = useDeleteRound()
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  // Debug logging (dev only)
-  if (import.meta.env.DEV) {
-    // eslint-disable-next-line no-console
-    console.debug('RoundsListView - rounds data:', rounds)
-    // eslint-disable-next-line no-console
-    console.debug('RoundsListView - loading:', loading)
-    // eslint-disable-next-line no-console
-    console.debug('RoundsListView - error:', error)
+  // Handle opening create form from URL
+  React.useEffect(() => {
+    if (searchParams.get('create') === 'true') {
+      setShowCreateForm(true)
+      // Cleanup the search param
+      const newParams = new URLSearchParams(searchParams)
+      newParams.delete('create')
+      setSearchParams(newParams, { replace: true })
+    }
+  }, [searchParams, setSearchParams])
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-20 bg-white/50 backdrop-blur-sm rounded-[3rem] border border-slate-100">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 mb-6"></div>
+        <h3 className="text-2xl font-bold text-slate-900">جاري تحميل الجولات...</h3>
+      </div>
+    )
   }
 
-  // Handle create round
-  const handleCreateRound = () => {
-    setShowCreateForm(true)
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center p-20 bg-white/50 backdrop-blur-sm rounded-[3rem] border border-red-100">
+        <AlertTriangle className="w-16 h-16 text-red-500 mb-6" />
+        <h3 className="text-2xl font-bold text-slate-900 mb-2">تعذر تحميل الجولات</h3>
+        <p className="text-slate-500 mb-8">{error}</p>
+        <Button onClick={() => refetch()} className="bg-red-600 hover:bg-red-700 text-white rounded-xl h-12 px-8">إعادة المحاولة</Button>
+      </div>
+    )
   }
 
-  // Handle form submission
+  const handleCreateRound = () => setShowCreateForm(true)
+
   const handleFormSubmit = async (data: any) => {
     try {
-      console.log('Creating round:', data)
-      
-      // Prepare data for backend
-      const roundData = {
-        round_type: data.round_type,
-        department: data.department || 'عام', // Use department from form or default
-        assigned_to: data.assigned_to || data.assigned_users, // Array of user IDs
-        scheduled_date: data.scheduled_date,
-        priority: data.priority,
-        notes: data.notes,
-        evaluation_items: data.evaluation_items || data.selected_items, // Array of evaluation item IDs
-        round_code: data.round_code
-      }
-      
-      // Call API to create round
-      await apiClient.createRound(roundData)
-      
-      console.log('Round created successfully')
+      console.log('Creating round with data:', data)
+      await apiClient.createRound(data)
       setShowCreateForm(false)
       refetch()
     } catch (error) {
       console.error('Error creating round:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      alert('حدث خطأ في إنشاء الجولة: ' + errorMessage)
+      alert('حدث خطأ في إنشاء الجولة')
     }
   }
 
-  // Handle form cancel
   const handleFormCancel = () => {
     setShowCreateForm(false)
     setShowEditForm(false)
     setSelectedRound(null)
   }
 
-  // Handle edit round
   const handleEditRound = (round: any) => {
     setSelectedRound(round)
     setShowEditForm(true)
   }
 
-  // Handle edit form submission
-  const handleEditSubmit = async (data: any) => {
-    try {
-      console.log('Updating round:', selectedRound.id, data)
-      
-      // Prepare data for backend
-      const updateData = {
-        round_type: data.round_type,
-        department: data.department || 'عام',
-        assigned_to: data.assigned_to || data.assigned_users,
-        // Convert date to datetime, but avoid appending time twice if already present
-        scheduled_date: data.scheduled_date
-          ? (String(data.scheduled_date).includes('T') ? data.scheduled_date : `${data.scheduled_date}T10:00:00`)
-          : null,
-        priority: data.priority,
-        notes: data.notes,
-        evaluation_items: data.evaluation_items || data.selected_items,
-        selected_categories: data.selected_categories,  // إرسال التصنيفات المحددة
-        round_code: data.round_code
+  const handleDeleteRound = async (id: number, code: string) => {
+    if (window.confirm(`هل أنت متأكد من حذف الجولة ${code}؟`)) {
+      try {
+        await deleteRoundMutation.mutateAsync(id)
+        refetch()
+      } catch (error) {
+        console.error('Error deleting round:', error)
       }
-      
-      console.log('Update payload:', updateData)
-      
-      // Call API to update round
-      await apiClient.updateRound(selectedRound.id, updateData)
-      
-      console.log('Round updated successfully')
-      setShowEditForm(false)
-      setSelectedRound(null)
-      refetch()
-    } catch (error) {
-      console.error('Error updating round:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      alert('حدث خطأ في تحديث الجولة: ' + errorMessage)
     }
   }
 
-  // Handle delete round
-  const handleDeleteRound = async (roundId: number, roundTitle: string) => {
-    // Check permissions - allow super_admin and quality_manager
-    if (!hasPermission(['super_admin', 'quality_manager'])) {
-      alert('ليس لديك صلاحية لحذف الجولات. هذه الصلاحية مخصصة لمدير النظام ومدير الجودة فقط.')
-      return
-    }
-
-    const confirmed = window.confirm(`هل أنت متأكد من حذف الجولة "${roundTitle}"؟\n\nهذا الإجراء لا يمكن التراجع عنه.`)
-    if (!confirmed) return
-
-    console.log('🗑️ Attempting to delete round:', roundId)
-    
-    try {
-      const result = await deleteRoundMutation.mutate(roundId)
-      console.log('✅ Round deleted successfully:', result)
-      alert('تم حذف الجولة بنجاح')
-      refetch()
-    } catch (error) {
-      console.error('❌ Error deleting round:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      alert('حدث خطأ في حذف الجولة: ' + errorMessage)
-    }
-  }
-
-  // Get status color
   const getStatusColor = (status: string) => {
-    const colors = {
-      'scheduled': 'bg-blue-100 text-blue-800',
-      'in_progress': 'bg-yellow-100 text-yellow-800',
-      'completed': 'bg-green-100 text-green-800',
-      'cancelled': 'bg-red-100 text-red-800',
+    const colors: Record<string, string> = {
+      'scheduled': 'bg-blue-50 text-blue-600 border-blue-100',
+      'in_progress': 'bg-amber-50 text-amber-600 border-amber-100',
+      'completed': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+      'cancelled': 'bg-red-50 text-red-600 border-red-100',
+      'overdue': 'bg-rose-50 text-rose-600 border-rose-100',
     }
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+    return colors[(status || '').toLowerCase()] || 'bg-slate-50 text-slate-600 border-slate-100'
   }
 
-  // Get status text
   const getStatusText = (status: string) => {
-    const texts: Record<string, { ar: string; en: string }> = {
-      scheduled: { ar: 'مجدولة', en: 'SCHEDULED' },
-      in_progress: { ar: 'قيد التنفيذ', en: 'IN_PROGRESS' },
-      completed: { ar: 'مكتملة', en: 'COMPLETED' },
-      cancelled: { ar: 'ملغاة', en: 'CANCELLED' },
-      overdue: { ar: 'متأخرة', en: 'OVERDUE' },
+    const texts: Record<string, string> = {
+      'completed': 'مكتملة',
+      'in_progress': 'قيد التنفيذ',
+      'scheduled': 'مجدولة',
+      'overdue': 'متأخرة',
+      'cancelled': 'ملغاة',
     }
-    const t = texts[(status || '').toLowerCase()] || { ar: status || '', en: '' }
-    return (
-      <span className="inline-flex items-center gap-2" aria-hidden={false}>
-        <span>{t.ar}</span>
-        {t.en && <span className="text-xs text-gray-400 font-mono">{t.en}</span>}
-      </span>
-    )
+    return texts[(status || '').toLowerCase()] || status
   }
 
-  // Get priority color
   const getPriorityColor = (priority: string) => {
-    const colors = {
-      'low': 'bg-green-100 text-green-800',
-      'medium': 'bg-yellow-100 text-yellow-800',
-      'high': 'bg-orange-100 text-orange-800',
-      'urgent': 'bg-red-100 text-red-800',
+    const colors: Record<string, string> = {
+      'low': 'bg-slate-50 text-slate-600 border-slate-100',
+      'medium': 'bg-blue-50 text-blue-600 border-blue-100',
+      'high': 'bg-orange-50 text-orange-600 border-orange-100',
+      'urgent': 'bg-red-50 text-red-600 border-red-100',
     }
-    return colors[priority as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+    return colors[(priority || '').toLowerCase()] || 'bg-slate-50 text-slate-600 border-slate-100'
   }
 
-  // Get priority text
   const getPriorityText = (priority: string) => {
-    const texts = {
-      'low': 'منخفضة',
-      'medium': 'متوسطة',
+    const texts: Record<string, string> = {
+      'urgent': 'عاجلة جداً',
       'high': 'عالية',
-      'urgent': 'عاجلة',
+      'medium': 'متوسطة',
+      'low': 'منخفضة',
     }
-    return texts[priority as keyof typeof texts] || priority
+    return texts[(priority || '').toLowerCase()] || priority
   }
 
-  // Filter rounds based on search and status (memoized)
-  const filteredRounds = React.useMemo(() => {
-    if (!Array.isArray(rounds)) return []
-    const q = searchTerm.toLowerCase()
-    return rounds.filter((round: any) => {
-      const matchesSearch =
-        (round.department?.toLowerCase().includes(q)) ||
-        (round.roundCode?.toLowerCase().includes(q)) ||
-        (round.roundType?.toLowerCase().includes(q))
-      const matchesStatus = filterStatus === 'all' || round.status === filterStatus
-      return matchesSearch && matchesStatus
-    })
-  }, [rounds, searchTerm, filterStatus])
+  const filteredRounds = (rounds || []).filter((round: any) => {
+    const matchesSearch =
+      (round.department || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (round.roundCode || '').toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = filterStatus === 'all' || (round.status || '').toLowerCase() === filterStatus.toLowerCase()
+    return matchesSearch && matchesStatus
+  })
 
-  // Show create form
-  if (showCreateForm) {
-    return <CompleteRoundForm onSubmit={handleFormSubmit} onCancel={handleFormCancel} />
-  }
-
-  // Show edit form
-  if (showEditForm && selectedRound) {
-    return <CompleteRoundForm onSubmit={handleEditSubmit} onCancel={handleFormCancel} initialData={selectedRound} isEdit={true} />
-  }
-
-  // Loading state
-  if (loading) {
+  if (showCreateForm || (showEditForm && selectedRound)) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">جاري تحميل الجولات</h3>
-          <p className="text-lg text-gray-600">يرجى الانتظار...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <div className="p-6 bg-gradient-to-r from-red-50 to-red-100 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-            <AlertTriangle className="w-12 h-12 text-red-500" />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">خطأ في تحميل الجولات</h3>
-          <p className="text-lg text-gray-600 mb-8">{error}</p>
-          <Button 
-            onClick={refetch} 
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            إعادة المحاولة
-          </Button>
-        </div>
-      </div>
+      <CompleteRoundForm
+        onSubmit={handleFormSubmit}
+        onCancel={handleFormCancel}
+        initialData={selectedRound}
+      />
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Skip link for keyboard users */}
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4 bg-white p-2 rounded shadow">تخطي إلى المحتوى</a>
-      <div id="main-content" className="p-6 space-y-8">
-        {/* Enhanced Header */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 sticky top-6 z-30">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <div className="p-3 bg-gray-100 rounded-lg">
-                <BarChart3 className="w-7 h-7 text-gray-700" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">عرض الجولات</h1>
-                <p className="text-lg text-gray-600">عرض وإدارة جميع الجولات في شكل قائمة</p>
-              </div>
+    <div className="space-y-10 pb-12">
+      <div className="relative overflow-hidden bg-white border border-slate-100 rounded-[2.5rem] p-10 shadow-2xl shadow-blue-500/5">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="flex items-center gap-8">
+            <div className="p-6 bg-slate-900 rounded-[2rem] shadow-xl shadow-slate-200">
+              <BarChart3 className="w-10 h-10 text-white" />
             </div>
-            <div className="flex items-center gap-4">
-              <Button 
-                onClick={handleCreateRound}
-                className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white flex items-center gap-3 px-5 py-3 text-base font-bold rounded-full shadow-2xl hover:shadow-2xl transform hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                aria-label="إنشاء جولة جديدة"
-              >
-                <Plus className="w-5 h-5" />
-                إنشاء جولة جديدة
-              </Button>
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-black uppercase tracking-wider mb-3">
+                <Target className="w-3 h-3" />
+                نظرة شاملة
+              </div>
+              <h1 className="text-4xl font-black text-slate-900 tracking-tight">عرض <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">الجولات</span></h1>
+              <p className="text-lg text-slate-500 font-medium">تم العثور على {filteredRounds.length} جولة تقييم بنظام الجودة.</p>
             </div>
           </div>
-        </div>
-
-        {/* Floating CTA for small screens */}
-        <div className="sm:hidden fixed bottom-6 right-6 z-40">
-          <Button
-            onClick={handleCreateRound}
-            className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-4 rounded-full shadow-2xl flex items-center justify-center"
-            aria-label="إنشاء جولة جديدة - متحرك"
-          >
-            <Plus className="w-5 h-5" />
+          <Button onClick={handleCreateRound} className="group relative bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-16 px-10 text-lg font-bold shadow-xl transition-all active:scale-95 border-none overflow-hidden">
+            <Plus className="w-6 h-6 ml-3" />
+            <span>إنشاء جولة جديدة</span>
           </Button>
         </div>
+      </div>
 
-        {/* Enhanced Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm font-medium">إجمالي الجولات</p>
-                  <p className="text-3xl font-bold">{filteredRounds.length}</p>
-                </div>
-                <Target className="w-12 h-12 text-blue-200" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatsChart title="إجمالي الجولات" value={filteredRounds.length} icon={<Target className="w-6 h-6" />} color="text-blue-600" bgColor="bg-blue-50" />
+        <StatsChart title="المكتملة" value={filteredRounds.filter((r: any) => (r.status || '').toLowerCase() === 'completed').length} icon={<CheckCircle2 className="w-6 h-6" />} color="text-emerald-600" bgColor="bg-emerald-50" maxValue={filteredRounds.length || 1} />
+        <StatsChart title="قيد التنفيذ" value={filteredRounds.filter((r: any) => (r.status || '').toLowerCase() === 'in_progress').length} icon={<Play className="w-6 h-6" />} color="text-amber-600" bgColor="bg-amber-50" maxValue={filteredRounds.length || 1} />
+        <StatsChart
+          title="كفاءة الإنجاز"
+          value={filteredRounds.length > 0 ? Math.round((filteredRounds.filter((r: any) => (r.status || '').toLowerCase() === 'completed').length / filteredRounds.length) * 100) : 0}
+          icon={<BarChart3 className="w-6 h-6" />}
+          color="text-purple-600"
+          bgColor="bg-purple-50"
+          isPercentage={true}
+        />
+      </div>
+
+      <Card className="bg-white/50 backdrop-blur-sm rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 p-2">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4 flex-1 w-full">
+              <div className="relative flex-1 group">
+                <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 group-focus-within:text-blue-600 transition-colors" />
+                <Input
+                  placeholder="البحث في جميع الجولات..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pr-12 h-14 text-lg border-slate-200 focus:border-blue-500 focus:ring-blue-500 rounded-2xl bg-white shadow-sm transition-all"
+                />
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm font-medium">مكتملة</p>
-                  <p className="text-3xl font-bold">
-                    {filteredRounds.filter((r: any) => {
-                      const status = (r.status || '').toLowerCase();
-                      return status === 'completed';
-                    }).length}
-                  </p>
+              <div className="flex items-center gap-3">
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="h-14 px-6 rounded-2xl border-slate-200 text-slate-700 font-bold focus:ring-2 focus:ring-blue-500 transition-all bg-white shadow-sm outline-none"
+                >
+                  <option value="all">جميع الحالات</option>
+                  <option value="scheduled">مجدولة</option>
+                  <option value="in_progress">قيد التنفيذ</option>
+                  <option value="completed">مكتملة</option>
+                  <option value="overdue">متأخرة</option>
+                </select>
+                <div className="flex bg-slate-100 p-1.5 rounded-[1.25rem]">
+                  <button onClick={() => setViewMode('cards')} className={cn("p-2.5 rounded-xl transition-all", viewMode === 'cards' ? "bg-white text-blue-600 shadow-sm" : "text-slate-400 hover:text-slate-600")}><Grid className="w-5 h-5" /></button>
+                  <button onClick={() => setViewMode('table')} className={cn("p-2.5 rounded-xl transition-all", viewMode === 'table' ? "bg-white text-blue-600 shadow-sm" : "text-slate-400 hover:text-slate-600")}><List className="w-5 h-5" /></button>
                 </div>
-                <CheckCircle2 className="w-12 h-12 text-green-200" />
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-yellow-100 text-sm font-medium">قيد التنفيذ</p>
-                  <p className="text-3xl font-bold">
-                    {filteredRounds.filter((r: any) => {
-                      const status = (r.status || '').toLowerCase();
-                      return status === 'in_progress';
-                    }).length}
-                  </p>
-                </div>
-                <Play className="w-12 h-12 text-yellow-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-100 text-sm font-medium">متأخرة</p>
-                  <p className="text-3xl font-bold">
-                    {filteredRounds.filter((r: any) => {
-                      const status = (r.status || '').toLowerCase();
-                      // Check if round is overdue based on deadline
-                      if (status === 'overdue') return true;
-                      // Also check if deadline has passed but status is not completed
-                      if (r.deadline) {
-                        const deadline = new Date(r.deadline);
-                        const now = new Date();
-                        const isCompleted = status === 'completed';
-                        return deadline < now && !isCompleted;
-                      }
-                      return false;
-                    }).length}
-                  </p>
-                </div>
-                <AlertTriangle className="w-12 h-12 text-red-200" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Advanced Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsChart
-            title="معدل الإنجاز"
-            value={(() => {
-              if (filteredRounds.length === 0) return 0;
-              // Calculate average completion percentage from individual rounds
-              const totalCompletion = filteredRounds.reduce((acc: number, round: any) => {
-                const completion = round.compliancePercentage || round.completionPercentage || 0;
-                return acc + (typeof completion === 'number' ? completion : 0);
-              }, 0);
-              return Math.round(totalCompletion / filteredRounds.length);
-            })()}
-            previousValue={85}
-            icon={<CheckCircle2 className="w-6 h-6 text-green-600" />}
-            color="text-green-600"
-            bgColor="bg-green-100"
-            trend="up"
-            trendValue={5}
-          />
-          
-          <StatsChart
-            title="الجولات النشطة"
-            value={filteredRounds.filter((r: any) => {
-              const status = (r.status || '').toLowerCase();
-              return status === 'in_progress';
-            }).length}
-            previousValue={3}
-            icon={<Play className="w-6 h-6 text-blue-600" />}
-            color="text-blue-600"
-            bgColor="bg-blue-100"
-            trend="up"
-            trendValue={2}
-          />
-          
-          <StatsChart
-            title="متوسط الأولوية"
-            value={(() => {
-              if (filteredRounds.length === 0) return 0;
-              const priorityValues: { [key: string]: number } = { low: 1, medium: 2, high: 3, urgent: 4 };
-              const totalPriority = filteredRounds.reduce((acc: number, round: any) => {
-                const priority = (round.priority || 'medium').toLowerCase();
-                return acc + (priorityValues[priority] || 2);
-              }, 0);
-              return Math.round(totalPriority / filteredRounds.length);
-            })()}
-            previousValue={2}
-            icon={<Target className="w-6 h-6 text-orange-600" />}
-            color="text-orange-600"
-            bgColor="bg-orange-100"
-            trend="stable"
-            trendValue={0}
-          />
-          
-          <StatsChart
-            title="كفاءة الفريق"
-            value={(() => {
-              if (filteredRounds.length === 0) return 0;
-              // Calculate team efficiency based on completion rate and on-time performance
-              const completedRounds = filteredRounds.filter((r: any) => {
-                const status = (r.status || '').toLowerCase();
-                return status === 'completed';
-              }).length;
-              const completionRate = (completedRounds / filteredRounds.length) * 100;
-              
-              // Factor in average completion percentage for more accurate efficiency
-              const avgCompletion = filteredRounds.reduce((acc: number, round: any) => {
-                const completion = round.compliancePercentage || round.completionPercentage || 0;
-                return acc + (typeof completion === 'number' ? completion : 0);
-              }, 0) / filteredRounds.length;
-              
-              // Weighted efficiency calculation
-              const efficiency = (completionRate * 0.6 + avgCompletion * 0.4);
-              return Math.round(efficiency);
-            })()}
-            previousValue={88}
-            icon={<User className="w-6 h-6 text-purple-600" />}
-            color="text-purple-600"
-            bgColor="bg-purple-100"
-            trend="up"
-            trendValue={4}
-          />
-        </div>
-
-        {/* View toggle: Cards / Table */}
-        <div className="flex items-center justify-end gap-2">
-          <button
-            className={`p-2 rounded-md ${viewMode === 'table' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
-            aria-pressed={viewMode === 'table'}
-            title="عرض كجدول"
-            onClick={() => setViewMode('table')}
-          >
-            <List className="w-5 h-5" />
-          </button>
-          <button
-            className={`p-2 rounded-md ${viewMode === 'cards' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
-            aria-pressed={viewMode === 'cards'}
-            title="عرض كبطاقات"
-            onClick={() => setViewMode('cards')}
-          >
-            <Grid className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Filters - compact row: Search — Status — Apply — Export */}
-        <div className="bg-white border border-gray-200 rounded-md p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <Filter className="w-5 h-5 text-gray-600" />
-              <h3 className="text-lg font-medium text-gray-800">فلاتر البحث</h3>
             </div>
+            <Button variant="outline" className="h-14 px-6 rounded-2xl font-bold border-slate-200" onClick={() => refetch()}>تحديث</Button>
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <div className="relative flex-1 w-full sm:w-auto">
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="بحث..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10 h-10 text-sm border border-gray-200 rounded-md w-full"
-                aria-label="بحث في الجولات"
-              />
-            </div>
-
-            <div className="w-full sm:w-56">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-md text-sm w-full"
-                aria-label="حالة الجولة"
-              >
-                <option value="all">جميع الحالات</option>
-                <option value="scheduled">مجدولة</option>
-                <option value="in_progress">قيد التنفيذ</option>
-                <option value="completed">مكتملة</option>
-                <option value="cancelled">ملغاة</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2 ml-auto">
-              <Button onClick={() => refetch()} variant="outline" className="text-sm px-3 py-2" aria-label="تطبيق الفلاتر">
-                تطبيق
-              </Button>
-              <Button onClick={() => { console.log('Export rounds') }} variant="outline" className="text-sm px-3 py-2" aria-label="تصدير الجولات">
-                تصدير
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Enhanced Rounds List - two cards per row */}
-        <div>
-          {/* Table view */}
-          <div className={viewMode === 'table' ? '' : 'hidden'}>
+      <div className="transition-all duration-500">
+        {viewMode === 'table' ? (
+          <div className="bg-white rounded-[2rem] overflow-hidden border border-slate-100 shadow-xl">
             <RoundsTable
               rounds={filteredRounds}
-              onView={(id) => navigate(`/rounds/evaluate/${id}`, { state: { from: '/rounds/list' } })}
+              onView={(id) => navigate(`/evaluate/${id}`, { state: { from: '/rounds/list' } })}
               onEdit={(r) => handleEditRound(r)}
               onDelete={(id, code) => handleDeleteRound(id, code || String(id))}
             />
           </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filteredRounds.length > 0 ? (
+              filteredRounds.map((round: any) => {
+                // Calculate days remaining/overdue
+                const getDaysRemaining = (date: string | undefined) => {
+                  if (!date) return null
+                  const diff = new Date(date).getTime() - new Date().getTime()
+                  return Math.ceil(diff / (1000 * 3600 * 24))
+                }
 
-          {/* Cards view */}
-          <div className={viewMode === 'cards' ? 'grid grid-cols-1 sm:grid-cols-2 gap-6' : 'hidden'}>
-          {filteredRounds.length > 0 ? (
-            filteredRounds.map((round: any) => (
-              <Card key={round.id} className="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden h-full">
-                <CardContent className="p-4 flex flex-col justify-between h-full">
-                  <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-4">
-                        <div className="p-2 bg-gray-100 rounded-md">
-                          <Target className="w-6 h-6 text-gray-600" />
-                        </div>
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-3">
-                            <h3 className="text-lg font-semibold text-gray-900">{round.department || '—'}</h3>
-                            <p className="text-sm text-gray-600 mt-1">{round.roundCode || '—'}</p>
+                const daysRemaining = getDaysRemaining(round.endDate)
+                const isOverdue = round.status === 'overdue' || (daysRemaining !== null && daysRemaining < 0)
+
+                // Get total items
+                const totalItems = Array.isArray(round.evaluation_items)
+                  ? round.evaluation_items.length
+                  : 0
+
+                // Calculate progress
+                const complianceScore = round.compliancePercentage || 0
+                const progress = round.status === 'completed' ? 100
+                  : round.status === 'scheduled' ? 0
+                    : complianceScore > 0 ? complianceScore
+                      : round.status === 'in_progress' ? 50
+                        : 0
+
+                // Determine progress ring color
+                const ringColor = round.status === 'completed' ? 'stroke-emerald-500'
+                  : isOverdue ? 'stroke-rose-500'
+                    : round.status === 'in_progress' ? 'stroke-blue-500'
+                      : 'stroke-slate-300'
+
+                // Get round type label
+                const getRoundTypeLabel = (type: string) => {
+                  const types: Record<string, { label: string, color: string, icon: string }> = {
+                    'internal': { label: 'داخلية', color: 'bg-blue-100 text-blue-700 border-blue-200', icon: '🏢' },
+                    'external': { label: 'خارجية', color: 'bg-purple-100 text-purple-700 border-purple-200', icon: '🌐' },
+                    'audit': { label: 'تدقيق', color: 'bg-amber-100 text-amber-700 border-amber-200', icon: '📋' },
+                    'inspection': { label: 'تفتيش', color: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: '🔍' },
+                    'patient_safety': { label: 'سلامة المرضى', color: 'bg-rose-100 text-rose-700 border-rose-200', icon: '🏥' },
+                  }
+                  return types[type?.toLowerCase()] || { label: type || 'عامة', color: 'bg-slate-100 text-slate-700 border-slate-200', icon: '📌' }
+                }
+
+                const roundType = getRoundTypeLabel(round.roundType)
+
+                return (
+                  <Card
+                    key={round.id}
+                    className={cn(
+                      "group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1",
+                      "border-r-4",
+                      round.status === 'completed' ? 'border-r-emerald-500' :
+                        isOverdue ? 'border-r-rose-500' :
+                          round.status === 'in_progress' ? 'border-r-blue-500' :
+                            'border-r-slate-300'
+                    )}
+                  >
+                    <CardContent className="p-0">
+                      {/* Header */}
+                      <div className="p-5 pb-4 border-b border-slate-100">
+                        <div className="flex items-start justify-between gap-3">
+                          {/* Round Type Badge */}
+                          <div className={cn(
+                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border",
+                            roundType.color
+                          )}>
+                            <span>{roundType.icon}</span>
+                            {roundType.label}
                           </div>
 
-                          {/* Unified header strip: status, priority, scheduled date */}
-                          <div className="mt-2 flex items-center gap-2">
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(round.status)}`}>
+                          {/* Status & Priority */}
+                          <div className="flex items-center gap-2">
+                            <span className={cn(
+                              "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border",
+                              getStatusColor(round.status)
+                            )}>
                               {getStatusText(round.status)}
                             </span>
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(round.priority)}`}>
+                            <span className={cn(
+                              "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border",
+                              getPriorityColor(round.priority)
+                            )}>
                               {getPriorityText(round.priority)}
                             </span>
-                            <span className="text-xs text-gray-500 ml-2"> {round.scheduledDate ? new Date(round.scheduledDate).toLocaleDateString() : 'غير محدد'}</span>
                           </div>
                         </div>
                       </div>
 
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" className="text-sm px-3 py-1" onClick={() => navigate(`/rounds/evaluate/${round.id}`, { state: { from: '/rounds/list' } })}>
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      {hasPermission(['super_admin', 'quality_manager', 'department_head']) && (
-                        <Button variant="ghost" className="text-sm px-3 py-1" onClick={() => handleEditRound(round)}>
+                      {/* Main Content */}
+                      <div className="p-5">
+                        <div className="flex items-start gap-4">
+                          {/* Progress Ring */}
+                          <div className="flex-shrink-0">
+                            <div className="relative">
+                              <svg width="64" height="64" className="transform -rotate-90">
+                                <circle
+                                  cx="32"
+                                  cy="32"
+                                  r="26"
+                                  fill="none"
+                                  strokeWidth="5"
+                                  className="stroke-slate-100"
+                                />
+                                <circle
+                                  cx="32"
+                                  cy="32"
+                                  r="26"
+                                  fill="none"
+                                  strokeWidth="5"
+                                  strokeDasharray={163.4}
+                                  strokeDashoffset={163.4 - (progress / 100) * 163.4}
+                                  strokeLinecap="round"
+                                  className={cn("transition-all duration-1000 ease-out", ringColor)}
+                                />
+                              </svg>
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-sm font-black text-slate-900">{progress}%</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                              {round.roundCode || 'NO-CODE'}
+                            </div>
+                            <h3 className="text-lg font-black text-slate-900 leading-tight truncate mb-2">
+                              {round.department || 'القسم العام'}
+                            </h3>
+
+                            {/* Items Count */}
+                            {totalItems > 0 && (
+                              <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-50 rounded-lg text-sm">
+                                <span className="text-blue-500">📋</span>
+                                <span className="font-bold text-blue-700">{totalItems}</span>
+                                <span className="text-blue-600 text-xs">بند</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Date & Time Info */}
+                        <div className="mt-4 flex flex-wrap items-center gap-2">
+                          {/* Date Range */}
+                          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 text-xs">
+                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                            <span className="font-medium text-slate-600">
+                              {round.scheduledDate ? new Date(round.scheduledDate).toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' }) : '—'}
+                              {round.endDate && (
+                                <>
+                                  <span className="mx-1 text-slate-400">←</span>
+                                  {new Date(round.endDate).toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' })}
+                                </>
+                              )}
+                            </span>
+                          </div>
+
+                          {/* Time Indicator */}
+                          {round.status !== 'completed' && daysRemaining !== null && (
+                            <>
+                              {daysRemaining < 0 ? (
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold">
+                                  <AlertTriangle className="w-3.5 h-3.5" />
+                                  متأخر {Math.abs(daysRemaining)} يوم
+                                </div>
+                              ) : daysRemaining >= 0 ? (
+                                <div className={cn(
+                                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold",
+                                  daysRemaining <= 2 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
+                                )}>
+                                  <Clock className="w-3.5 h-3.5" />
+                                  {daysRemaining === 0 ? 'آخر يوم' : `متبقي ${daysRemaining} يوم`}
+                                </div>
+                              ) : null}
+                            </>
+                          )}
+                        </div>
+
+                        {/* Assigned Users - Avatar Style */}
+                        {round.assignedTo && round.assignedTo.length > 0 && (
+                          <div className="mt-3 flex items-center gap-2 overflow-hidden">
+                            <div className="flex -space-x-2 space-x-reverse flex-shrink-0">
+                              {(round.assignedTo as string[]).slice(0, 3).map((user: string, idx: number) => (
+                                <div
+                                  key={idx}
+                                  className="w-6 h-6 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center text-[9px] font-bold text-white border-2 border-white"
+                                  title={user}
+                                >
+                                  {user?.charAt(0)?.toUpperCase() || '?'}
+                                </div>
+                              ))}
+                              {(round.assignedTo as string[]).length > 3 && (
+                                <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-600 border-2 border-white">
+                                  +{(round.assignedTo as string[]).length - 3}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="p-4 pt-0 flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-600"
+                          onClick={() => navigate(`/evaluate/${round.id}`, { state: { from: '/rounds/list' } })}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 rounded-xl bg-slate-50 hover:bg-amber-50 hover:text-amber-600"
+                          onClick={() => handleEditRound(round)}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
-                      )}
-                      {hasPermission(['super_admin']) && (
-                        <Button variant="ghost" className="text-sm px-3 py-1 text-red-600" onClick={() => handleDeleteRound(round.id, round.roundCode || String(round.id))} disabled={deleteRoundMutation.loading}>
-                          <Trash2 className="w-4 h-4" />
+                        <Button
+                          onClick={() => navigate(`/evaluate/${round.id}`, { state: { from: '/rounds/list' } })}
+                          className="flex-1 h-10 rounded-xl text-sm font-bold bg-slate-900 hover:bg-slate-800 text-white border-none"
+                        >
+                          <ExternalLink className="w-4 h-4 ml-2" />
+                          استعراض الجولة
                         </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
-                    <div>
-                      <div className="text-xs text-gray-500">التاريخ المجدول</div>
-                      <div className="font-medium text-gray-800">{round.scheduledDate ? new Date(round.scheduledDate).toLocaleDateString('en-US') : 'غير محدد'}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-500">المسؤول</div>
-                      <div className="font-medium text-gray-800">
-                        {/* AssignedUsers component hides numeric IDs and shows +N */}
-                        { /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */ }
-                        {/* @ts-ignore */}
-                        <AssignedUsers users={round.assignedTo} />
                       </div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-500">القسم</div>
-                      <div className="font-medium text-gray-800">{round.department || '—'}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-500">كود الجولة</div>
-                      <div className="font-medium text-gray-800 font-mono">{round.roundCode || 'غير محدد'}</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <Card className="bg-white rounded-3xl shadow-xl border-0 overflow-hidden">
-                <CardContent className="p-20 text-center relative">
-                {/* Background Pattern */}
-                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-100/20 to-transparent rounded-full -translate-y-20 translate-x-20"></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-100/20 to-transparent rounded-full translate-y-16 -translate-x-16"></div>
-                
-                <div className="relative">
-                  <div className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-full w-40 h-40 mx-auto mb-10 flex items-center justify-center shadow-lg">
-                    <Target className="w-20 h-20 text-blue-500" />
-                  </div>
-                  <h3 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
-                    {searchTerm || filterStatus !== 'all' ? 'لا توجد نتائج' : 'لا توجد جولات'}
-                  </h3>
-                  <p className="text-xl text-gray-600 mb-12 max-w-lg mx-auto leading-relaxed font-medium">
-                    {searchTerm || filterStatus !== 'all' 
-                      ? 'جرب تغيير معايير البحث أو الفلترة للعثور على الجولات المطلوبة'
-                      : 'ابدأ بإنشاء أول جولة تقييم لإدارة عمليات الجودة'
-                    }
-                  </p>
-                  <Button 
-                    onClick={handleCreateRound}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-12 py-5 text-xl font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-                  >
-                    <Plus className="w-7 h-7 ml-3" />
-                    إنشاء جولة جديدة
-                  </Button>
+                    </CardContent>
+                  </Card>
+                )
+              })
+            ) : (
+              <div className="col-span-full py-16 bg-white rounded-2xl border border-slate-100 border-dashed text-center">
+                <div className="p-8 bg-blue-50 rounded-full w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+                  <Target className="w-16 h-16 text-blue-300" />
                 </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+                <h3 className="text-2xl font-black text-slate-900 mb-3">لا توجد جولات حالياً</h3>
+                <p className="text-lg text-slate-500 font-medium max-w-md mx-auto mb-6">ابدأ بإنشاء أول جولة تقييم لإدارة عمليات الجودة.</p>
+                <Button onClick={handleCreateRound} className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 text-lg font-bold rounded-xl">
+                  <Plus className="w-5 h-5 ml-2" />
+                  إنشاء جولة جديدة
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </div>
     </div>
   )
 }
