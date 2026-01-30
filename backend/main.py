@@ -64,10 +64,20 @@ except Exception as e:
 app = FastAPI(
     title="نظام سلامتي",
     description="نظام إدارة جولات الجودة وسلامة المرضى",
-    version="1.0.0",
+    version="1.1.0",  # Updated to support dynamic round types
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+# Start background automation tasks (Syncing, Reminders, etc.)
+try:
+    from automation import start_automation
+    start_automation()
+    print("🚀 Background automation started")
+except ImportError:
+    print("⚠️ automation.py not found, background tasks skipped")
+except Exception as e:
+    print(f"❌ Failed to start background automation: {e}")
 
 # CORS middleware - Must be added immediately after creating the app
 # Allow localhost origins for development AND Vercel/Render for production
@@ -656,6 +666,7 @@ async def signin(login_request: dict = Body(...), db: Session = Depends(get_db))
         username = login_request.get("username")
         email = login_request.get("email")
         password = login_request.get("password")
+        print(f"🔒 [DEBUG] Signin attempt: username={username}, email={email}, password_len={len(password) if password else 0}")
 
         # Ensure search_path to public (defensive - some deployments may not set it)
         try:
@@ -3472,7 +3483,7 @@ if os.path.exists(DIST_DIR):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 
 # Development-only helper endpoints (enabled via environment variable)
 if os.getenv('ALLOW_DEV_TOKEN_ENDPOINT', '0') == '1':
