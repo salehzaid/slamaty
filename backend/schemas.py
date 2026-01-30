@@ -48,7 +48,7 @@ class UserResponse(UserBase):
 class RoundBase(BaseModel):
     title: str
     description: Optional[str] = None
-    round_type: RoundType
+    round_type: str
     department: str
     assigned_to: List[int] = []  # List of user IDs
     selected_categories: List[int] = []  # Selected evaluation category IDs (required, defaults to empty)

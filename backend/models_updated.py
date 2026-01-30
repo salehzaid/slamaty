@@ -103,7 +103,7 @@ class Round(Base):
     round_code = Column(String, unique=True, index=True, nullable=False)
     title = Column(String, nullable=False)
     description = Column(Text)
-    round_type = Column(SQLEnum(RoundType), nullable=False)
+    round_type = Column(String, nullable=False)
     department = Column(String, nullable=False)
     assigned_to = Column(Text, default='[]')  # JSON string of user IDs (kept as Text for display)
     assigned_to_ids = Column(JSONB, default='[]', nullable=False)  # JSONB array of user IDs (numeric) for programmatic usage
