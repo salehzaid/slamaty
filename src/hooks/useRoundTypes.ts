@@ -49,9 +49,15 @@ export const useRoundTypes = (): UseRoundTypesReturn => {
     try {
       setError(null)
       const response = await apiClient.createRoundType(data)
-      
-      if (response.success && response.data) {
-        setRoundTypes(prev => [...prev, response.data])
+
+      // The API client returns raw data if not wrapped in { data: ... }
+      // If response has an id, it's a success
+      const newRoundType = response.data || response
+
+      if (newRoundType && newRoundType.id) {
+        setRoundTypes(prev => [...prev, newRoundType])
+        // Refetch to ensure everything is in sync and ordered correctly
+        fetchRoundTypes()
       } else {
         throw new Error('فشل في إنشاء نوع الجولة')
       }
@@ -66,11 +72,15 @@ export const useRoundTypes = (): UseRoundTypesReturn => {
     try {
       setError(null)
       const response = await apiClient.updateRoundType(id, data)
-      
-      if (response.success && response.data) {
-        setRoundTypes(prev => 
-          prev.map(rt => rt.id === id ? { ...rt, ...response.data } : rt)
+
+      const updatedData = response.data || response
+
+      if (updatedData && (updatedData.id || response.message)) {
+        setRoundTypes(prev =>
+          prev.map(rt => rt.id === id ? { ...rt, ...updatedData } : rt)
         )
+        // Refetch to ensure everything is in sync
+        fetchRoundTypes()
       } else {
         throw new Error('فشل في تحديث نوع الجولة')
       }
@@ -85,8 +95,9 @@ export const useRoundTypes = (): UseRoundTypesReturn => {
     try {
       setError(null)
       const response = await apiClient.deleteRoundType(id)
-      
-      if (response.success) {
+
+      // Backend returns { message: "..." } or success object
+      if (response && (response.message || response.success !== false)) {
         setRoundTypes(prev => prev.filter(rt => rt.id !== id))
       } else {
         throw new Error('فشل في حذف نوع الجولة')

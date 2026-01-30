@@ -7,19 +7,19 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Save, 
-  X, 
-  Shield, 
-  AlertTriangle, 
-  Heart, 
-  Droplets, 
-  Pill, 
-  Wrench, 
-  Leaf, 
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  Shield,
+  AlertTriangle,
+  Heart,
+  Droplets,
+  Pill,
+  Wrench,
+  Leaf,
   Settings,
   GripVertical
 } from 'lucide-react'
@@ -32,12 +32,12 @@ const RoundTypesSettingsPage: React.FC = () => {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [formData, setFormData] = useState({
     name: '',
-    nameEn: '',
+    name_en: '',
     description: '',
     color: 'blue',
     icon: 'shield',
-    isActive: true,
-    sortOrder: 0
+    is_active: true,
+    sort_order: 0
   })
 
   const colorOptions = [
@@ -65,12 +65,12 @@ const RoundTypesSettingsPage: React.FC = () => {
   const resetForm = () => {
     setFormData({
       name: '',
-      nameEn: '',
+      name_en: '',
       description: '',
       color: 'blue',
       icon: 'shield',
-      isActive: true,
-      sortOrder: 0
+      is_active: true,
+      sort_order: 0
     })
     setIsCreating(false)
     setEditingId(null)
@@ -78,7 +78,7 @@ const RoundTypesSettingsPage: React.FC = () => {
 
   const handleCreate = async () => {
     try {
-      await createRoundType(formData)
+      await createRoundType(formData as any)
       resetForm()
     } catch (error) {
       console.error('Error creating round type:', error)
@@ -88,12 +88,12 @@ const RoundTypesSettingsPage: React.FC = () => {
   const handleEdit = (roundType: RoundTypeSettings) => {
     setFormData({
       name: roundType.name,
-      nameEn: roundType.nameEn || '',
+      name_en: roundType.nameEn || (roundType as any).name_en || '',
       description: roundType.description || '',
       color: roundType.color,
       icon: roundType.icon,
-      isActive: roundType.isActive,
-      sortOrder: roundType.sortOrder
+      is_active: roundType.isActive !== undefined ? roundType.isActive : (roundType as any).is_active,
+      sort_order: roundType.sortOrder !== undefined ? roundType.sortOrder : (roundType as any).sort_order
     })
     setEditingId(roundType.id)
     setIsCreating(false)
@@ -101,9 +101,9 @@ const RoundTypesSettingsPage: React.FC = () => {
 
   const handleUpdate = async () => {
     if (!editingId) return
-    
+
     try {
-      await updateRoundType(editingId, formData)
+      await updateRoundType(editingId, formData as any)
       resetForm()
     } catch (error) {
       console.error('Error updating round type:', error)
@@ -140,7 +140,7 @@ const RoundTypesSettingsPage: React.FC = () => {
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">إعدادات أنواع الجولات</h1>
-        <Button 
+        <Button
           onClick={() => setIsCreating(true)}
           className="bg-blue-600 hover:bg-blue-700"
         >
@@ -175,13 +175,13 @@ const RoundTypesSettingsPage: React.FC = () => {
                   placeholder="مثال: سلامة المرضى"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="nameEn">الاسم بالإنجليزية</Label>
                 <Input
                   id="nameEn"
-                  value={formData.nameEn}
-                  onChange={(e) => setFormData(prev => ({ ...prev, nameEn: e.target.value }))}
+                  value={formData.name_en}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
                   placeholder="Example: Patient Safety"
                 />
               </div>
@@ -245,8 +245,8 @@ const RoundTypesSettingsPage: React.FC = () => {
                 <Input
                   id="sortOrder"
                   type="number"
-                  value={formData.sortOrder}
-                  onChange={(e) => setFormData(prev => ({ ...prev, sortOrder: parseInt(e.target.value) || 0 }))}
+                  value={formData.sort_order}
+                  onChange={(e) => setFormData(prev => ({ ...prev, sort_order: parseInt(e.target.value) || 0 }))}
                   placeholder="0"
                 />
               </div>
@@ -256,15 +256,15 @@ const RoundTypesSettingsPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Switch
                   id="isActive"
-                  checked={formData.isActive}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isActive: checked }))}
+                  checked={formData.is_active}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
                 />
                 <Label htmlFor="isActive">نشط</Label>
               </div>
             </div>
 
             <div className="flex gap-2 pt-4">
-              <Button 
+              <Button
                 onClick={isCreating ? handleCreate : handleUpdate}
                 disabled={!formData.name.trim()}
                 className="bg-blue-600 hover:bg-blue-700"
@@ -300,7 +300,7 @@ const RoundTypesSettingsPage: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-1">
                     <Button
                       size="sm"
@@ -327,7 +327,7 @@ const RoundTypesSettingsPage: React.FC = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Badge 
+                    <Badge
                       variant={roundType.isActive ? "default" : "secondary"}
                       className={roundType.isActive ? `bg-${roundType.color}-100 text-${roundType.color}-800` : ''}
                     >
@@ -335,7 +335,7 @@ const RoundTypesSettingsPage: React.FC = () => {
                     </Badge>
                     <span className="text-xs text-gray-500">ترتيب: {roundType.sortOrder}</span>
                   </div>
-                  
+
                   <div className="flex items-center gap-1 text-gray-400">
                     <GripVertical className="w-4 h-4" />
                   </div>

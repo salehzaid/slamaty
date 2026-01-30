@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserRole } from '../types';
-import { apiClient } from '../lib/api';
+import { apiClient, API_BASE_URL } from '../lib/api';
 
 interface AuthContextType {
   user: User | null;
@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           apiClient.setToken(storedToken);
           // Validate token by fetching current user from API
           try {
-            const current = await apiClient.getCurrentUser();
+            const current = await apiClient.getCurrentUser({ timeout: 2000 });
             // Normalize response: some backends return { user: { ... } }
             const validatedUser = current?.user || current || userData;
             setUser(validatedUser);
@@ -50,9 +50,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return;
           } catch (validationError: any) {
             // Check if it's a network error (backend unavailable)
-            const isNetworkError = validationError?.message?.includes('Failed to fetch') ||
+            // Support both standard English and our Arabic error messages
+            const isNetworkError =
+              validationError?.message?.includes('Failed to fetch') ||
               validationError?.message?.includes('NetworkError') ||
               validationError?.message?.includes('abort') ||
+              validationError?.message?.includes('الاتصال بالخادم') || // Arabic connection error
               validationError?.name === 'AbortError';
 
             if (isNetworkError) {
@@ -85,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // 🔄 تسجيل دخول عبر API للحصول على JWT صحيح
           console.log('🔄 Auto-login: Attempting to login via API...');
           try {
-            const response = await fetch('http://localhost:8000/api/auth/signin', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -176,7 +179,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('🎯 AuthContext: Calling initializeAuth...');
     initializeAuth();
 
-    // Safety timeout: ensure loading screen disappears after 10 seconds regardless of API status
+    // Safety timeout: ensure loading screen disappears after 4 seconds regardless of API status
     const safetyTimeout = setTimeout(() => {
       setIsLoading(prev => {
         if (prev) {
@@ -185,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         return prev;
       });
-    }, 10000);
+    }, 4000);
 
     return () => clearTimeout(safetyTimeout);
   }, []);

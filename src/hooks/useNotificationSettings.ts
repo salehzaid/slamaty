@@ -26,7 +26,7 @@ export function useNotificationSettings() {
     try {
       setIsLoading(true)
       setError(null)
-      const response = await apiClient.get('/notification-settings')
+      const response = await apiClient.get('/api/notification-settings')
       setSettings(response.data)
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load notification settings')
@@ -40,7 +40,7 @@ export function useNotificationSettings() {
     try {
       setIsLoading(true)
       setError(null)
-      const response = await apiClient.put('/notification-settings', updates)
+      const response = await apiClient.put('/api/notification-settings', updates)
       setSettings(response.data)
       return response.data
     } catch (err: any) {

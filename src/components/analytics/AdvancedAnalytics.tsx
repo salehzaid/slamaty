@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Target, 
-  AlertTriangle, 
+import {
+  TrendingUp,
+  TrendingDown,
+  Target,
+  AlertTriangle,
   Clock,
   BarChart3,
   PieChart,
@@ -18,7 +18,7 @@ import {
   Download,
   RefreshCw
 } from 'lucide-react'
-import { apiClient } from '@/lib/api'
+import { apiClient, API_BASE_URL } from '@/lib/api'
 
 interface AnalyticsData {
   trends: {
@@ -93,7 +93,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({
         endpoint += `?${params.toString()}`
       }
 
-      const response = await apiClient.request(endpoint)
+      const response = await apiClient.get(endpoint)
       const data = response.data || response
       setAnalyticsData(data)
     } catch (err) {
@@ -157,9 +157,9 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({
         endpoint += `?${params.toString()}`
       }
 
-      const response = await fetch(endpoint)
+      const response = await fetch(`${API_BASE_URL}${endpoint}`)
       const blob = await response.blob()
-      
+
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -347,7 +347,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({
                 </p>
                 <p className="text-sm text-gray-600">متوقع إنجاز الخطط</p>
               </div>
-              
+
               <div className="p-4 bg-green-50 rounded-lg">
                 <h4 className="font-medium text-gray-900 mb-2">التكلفة المتوقعة</h4>
                 <p className="text-2xl font-bold text-green-600">
@@ -404,7 +404,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({
                     {dept.efficiency_score}% كفاءة
                   </Badge>
                 </div>
-                
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
                     <p className="text-gray-600">معدل الإنجاز</p>
@@ -423,18 +423,17 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({
                     <p className="font-medium">{dept.efficiency_score}/100</p>
                   </div>
                 </div>
-                
+
                 <div className="mt-3">
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
                     <span>مؤشر الكفاءة</span>
                     <span>{dept.efficiency_score}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className={`h-2 rounded-full ${
-                        dept.efficiency_score >= 80 ? 'bg-green-500' :
-                        dept.efficiency_score >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}
+                    <div
+                      className={`h-2 rounded-full ${dept.efficiency_score >= 80 ? 'bg-green-500' :
+                          dept.efficiency_score >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                        }`}
                       style={{ width: `${dept.efficiency_score}%` }}
                     ></div>
                   </div>
@@ -466,7 +465,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({
                     {getRiskText(risk.risk_level)}
                   </Badge>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-gray-600">احتمالية الحدوث</p>
@@ -477,19 +476,18 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({
                     <p className="font-medium">{risk.impact}/10</p>
                   </div>
                 </div>
-                
+
                 <div className="mt-3">
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
                     <span>مؤشر المخاطر</span>
                     <span>{Math.round(risk.probability * risk.impact / 10)}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className={`h-2 rounded-full ${
-                        risk.risk_level === 'critical' ? 'bg-red-500' :
-                        risk.risk_level === 'high' ? 'bg-orange-500' :
-                        risk.risk_level === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                      }`}
+                    <div
+                      className={`h-2 rounded-full ${risk.risk_level === 'critical' ? 'bg-red-500' :
+                          risk.risk_level === 'high' ? 'bg-orange-500' :
+                            risk.risk_level === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                        }`}
                       style={{ width: `${Math.round(risk.probability * risk.impact / 10)}%` }}
                     ></div>
                   </div>

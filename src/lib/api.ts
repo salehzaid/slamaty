@@ -1,23 +1,21 @@
-// Use VITE_API_URL if provided at build time; otherwise default to same-origin in production
-const API_BASE_URL = (() => {
+export const API_BASE_URL = (() => {
   // Prefer explicit env var at build time
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL
+
+  // If we are on localhost/127.0.0.1, always favor the local backend
+  if (typeof window !== 'undefined' && (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname.startsWith('192.168.')
+  )) {
+    return 'http://127.0.0.1:8000'
+  }
 
   // Production: Use Render backend
   if (import.meta.env.PROD) {
     return 'https://salamaty-5fw9.onrender.com'
   }
 
-  // At runtime (dev server) if the frontend is served from vite (ports 5173/5174)
-  // default backend to 127.0.0.1:8000 (preferred) or localhost:8000 (fallback)
-  if (typeof window !== 'undefined') {
-    const port = window.location.port
-    if (port === '5173' || port === '5174') {
-      // Always use 127.0.0.1 for consistency and to avoid CORS issues
-      return 'http://127.0.0.1:8000'
-    }
-    return window.location.origin
-  }
   return 'http://127.0.0.1:8000'
 })()
 
@@ -81,19 +79,15 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit & { timeout?: number } = {}
   ): Promise<any> {
     // Ensure we use 127.0.0.1 instead of localhost to avoid CORS issues
     let baseURL = this.baseURL
     if (baseURL.includes('localhost:8000')) {
       baseURL = baseURL.replace('localhost:8000', '127.0.0.1:8000')
-      console.log('🔄 Switched from localhost to 127.0.0.1')
     }
 
     const url = `${baseURL}${endpoint}`
-
-    // تم إزالة فحص التوكن القديم لاستخدام البيانات الحقيقية من قاعدة البيانات
-    // الآن سيتم استخدام البيانات الحقيقية دائماً من قاعدة البيانات salamaty_db
 
     const config: RequestInit = {
       headers: {
@@ -105,11 +99,15 @@ class ApiClient {
     }
 
     try {
-      // Use AbortController to enforce a request timeout to avoid hanging requests
+      // Use AbortController to enforce a request timeout
       const controller = new AbortController()
-      const timeoutMs = 8000 // 8s timeout for dev responsiveness
+      const timeoutMs = options.timeout || 5000 // 5s timeout default
       const timeout = setTimeout(() => controller.abort(), timeoutMs)
-      const response = await fetch(url, { signal: controller.signal, ...config })
+
+      const response = await fetch(url, {
+        signal: controller.signal,
+        ...config
+      })
       clearTimeout(timeout)
 
       // التعامل مع 401 و 403 (غير مصادق أو غير مصرح)
@@ -289,8 +287,8 @@ class ApiClient {
     })
   }
 
-  async getCurrentUser() {
-    return this.request('/api/auth/me')
+  async getCurrentUser(options: any = {}) {
+    return this.request('/api/auth/me', options)
   }
 
   // Rounds endpoints - استخدام البيانات الحقيقية من قاعدة البيانات

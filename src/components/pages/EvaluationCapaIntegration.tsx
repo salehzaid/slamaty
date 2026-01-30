@@ -14,6 +14,7 @@ import {
   Calendar,
   Edit
 } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/api';
 
 interface NonCompliantItem {
   evaluation_result_id: number;
@@ -61,12 +62,12 @@ const EvaluationCapaIntegration: React.FC = () => {
     setLoading(true);
     try {
       const [itemsResponse, summaryResponse] = await Promise.all([
-        fetch(`/api/rounds/${roundId}/non-compliant-items?threshold=${threshold}`, {
+        fetch(`${API_BASE_URL}/api/rounds/${roundId}/non-compliant-items?threshold=${threshold}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`
           }
         }),
-        fetch(`/api/rounds/${roundId}/capa-summary`, {
+        fetch(`${API_BASE_URL}/api/rounds/${roundId}/capa-summary`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`
           }
@@ -101,7 +102,7 @@ const EvaluationCapaIntegration: React.FC = () => {
       department: capaSummary?.round_department || '',
       status: item.score === 0 ? 'not_applied' : 'partial'
     });
-    
+
     navigate(`/capa/new?${params.toString()}`);
   };
 
@@ -274,21 +275,21 @@ const EvaluationCapaIntegration: React.FC = () => {
                           {item.score}/100
                         </Badge>
                       </div>
-                      
+
                       <p className="text-sm text-gray-600 mb-2">{item.item_description}</p>
-                      
+
                       <div className="flex items-center gap-4 text-xs text-gray-500">
                         <span>الفئة: {item.category_name}</span>
                         <span>تاريخ التقييم: {new Date(item.evaluated_at).toLocaleDateString('en-US')}</span>
                       </div>
-                      
+
                       {item.comments && (
                         <div className="mt-2 p-2 bg-yellow-50 rounded text-sm">
                           <strong>ملاحظات المقيم:</strong> {item.comments}
                         </div>
                       )}
                     </div>
-                    
+
                     <Button
                       onClick={() => createCapaForItem(item)}
                       size="sm"
@@ -333,7 +334,7 @@ const EvaluationCapaIntegration: React.FC = () => {
                       <div key={capa.id} className="text-sm text-gray-600 border-r-2 border-blue-200 pr-2">
                         <div className="font-medium">{capa.title}</div>
                         <div className="text-xs">
-                          أولوية: {capa.priority} | 
+                          أولوية: {capa.priority} |
                           تاريخ الهدف: {new Date(capa.target_date).toLocaleDateString('en-US')}
                         </div>
                       </div>
@@ -347,9 +348,9 @@ const EvaluationCapaIntegration: React.FC = () => {
                 </div>
               ))}
             </div>
-            
+
             <hr className="my-4 border-gray-200" />
-            
+
             <div className="flex justify-center">
               <Button
                 onClick={() => navigate('/capa')}

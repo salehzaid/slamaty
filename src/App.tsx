@@ -15,6 +15,7 @@ import RegisterPage from './components/RegisterPage';
 import TestRegisterPage from './components/TestRegisterPage';
 import EnhancedCapaDashboardMain from './components/dashboard/EnhancedCapaDashboardMain';
 import DepartmentsManagement from './components/pages/DepartmentsManagement';
+import DepartmentFormPage from './components/pages/DepartmentFormPage';
 import ReportsPage from './components/pages/ReportsPage';
 import TemplatesPage from './components/pages/TemplatesPage';
 import SettingsPage from './components/pages/SettingsPage';
@@ -28,6 +29,8 @@ import AdminModeNotification from './components/AdminModeNotification';
 import UnifiedRoundsPage from './components/pages/UnifiedRoundsPage';
 import UnifiedEvaluationPage from './components/pages/UnifiedEvaluationPage';
 import CategoryItemMappingPage from './components/pages/CategoryItemMappingPage';
+import EvaluationCapaIntegration from './components/pages/EvaluationCapaIntegration';
+import CapaIntegrationRoundSelector from './components/pages/CapaIntegrationRoundSelector';
 
 const AppContent: React.FC = () => {
   const auth = useAuth();
@@ -105,6 +108,8 @@ const AppContent: React.FC = () => {
           <Route path="/rounds/list" element={<Navigate to="/rounds?tab=list" replace />} />
           <Route path="/rounds/calendar" element={<Navigate to="/rounds?tab=calendar" replace />} />
           <Route path="/rounds/my-rounds" element={<Navigate to="/rounds?tab=my-rounds" replace />} />
+          <Route path="/rounds/capa-integration" element={<CapaIntegrationRoundSelector />} />
+          <Route path="/rounds/:roundId/capa-integration" element={<EvaluationCapaIntegration />} />
 
           <Route path="/users" element={<UsersManagement />} />
           <Route path="/templates" element={<TemplatesPage />} />
@@ -126,6 +131,8 @@ const AppContent: React.FC = () => {
 
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/departments" element={<DepartmentsManagement />} />
+          <Route path="/departments/new" element={<DepartmentFormPage />} />
+          <Route path="/departments/edit/:id" element={<DepartmentFormPage />} />
           <Route path="/gamified-system" element={<GamifiedEvaluationSystem />} />
           <Route path="/evaluate/:roundId" element={<EvaluateRoundPage />} />
           <Route path="/category-mapping" element={<CategoryItemMappingPage />} />

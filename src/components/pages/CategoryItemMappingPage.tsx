@@ -16,6 +16,7 @@ import {
     GripVertical
 } from 'lucide-react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { API_BASE_URL } from '@/lib/api'
 
 // Types
 interface Category {
@@ -65,7 +66,7 @@ const CategoryItemMappingPage: React.FC = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/evaluation-categories')
+            const response = await fetch(`${API_BASE_URL}/api/evaluation-categories`)
             if (response.ok) {
                 const data = await response.json()
                 setCategories(data)
@@ -78,7 +79,7 @@ const CategoryItemMappingPage: React.FC = () => {
 
     const fetchAllItems = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/evaluation-items')
+            const response = await fetch(`${API_BASE_URL}/api/evaluation-items`)
             if (response.ok) {
                 const data = await response.json()
                 setAvailableItems(data)
@@ -91,7 +92,7 @@ const CategoryItemMappingPage: React.FC = () => {
     const fetchAssignedItems = async (categoryId: number) => {
         setLoading(true)
         try {
-            const response = await fetch(`http://localhost:8000/api/mapping/${categoryId}/items`)
+            const response = await fetch(`${API_BASE_URL}/api/mapping/${categoryId}/items`)
             if (response.ok) {
                 const data = await response.json()
                 setAssignedItems(data)
@@ -109,7 +110,7 @@ const CategoryItemMappingPage: React.FC = () => {
 
         setSaving(true)
         try {
-            const response = await fetch('http://localhost:8000/api/mapping/bulk-assign', {
+            const response = await fetch(`${API_BASE_URL}/api/mapping/bulk-assign`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -135,7 +136,7 @@ const CategoryItemMappingPage: React.FC = () => {
 
         setSaving(true)
         try {
-            const response = await fetch('http://localhost:8000/api/mapping/bulk-unassign', {
+            const response = await fetch(`${API_BASE_URL}/api/mapping/bulk-unassign`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -169,7 +170,7 @@ const CategoryItemMappingPage: React.FC = () => {
         // Persist order
         const orderedIds = items.map(item => item.id)
         try {
-            await fetch('http://localhost:8000/api/mapping/reorder', {
+            await fetch(`${API_BASE_URL}/api/mapping/reorder`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
