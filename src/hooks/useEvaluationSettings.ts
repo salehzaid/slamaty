@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { apiClient } from '../lib/api'
 
 export interface ObjectiveOption {
@@ -15,7 +15,7 @@ export interface EvaluationSettings {
 }
 
 export const useEvaluationSettings = () => {
-  const [settings, setSettings] = useState<EvaluationSettings>({ objectiveOptions: [] })
+  const [objectiveOptions, setObjectiveOptions] = useState<ObjectiveOption[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
   // Load settings from API on mount
@@ -26,19 +26,21 @@ export const useEvaluationSettings = () => {
   const loadObjectiveOptions = async () => {
     try {
       setIsLoading(true)
-      const response = await apiClient.get('/api/objective-options?active_only=false')
-      setSettings({ objectiveOptions: response.data })
+      const response = await apiClient.get('/objective-options?active_only=false')
+      // Ensure we handle both { data: [...] } and [...] formats
+      const rawData = response?.data || response
+      // Normalizing data to ensure it's always an array before setting state
+      const normalizedData = Array.isArray(rawData) ? rawData : []
+      setObjectiveOptions(normalizedData)
     } catch (error) {
       console.error('Failed to load objective options:', error)
       // Fallback to default options if API fails
-      setSettings({
-        objectiveOptions: [
-          { id: 1, name: 'سباهي (CBAHI)', description: 'المعايير السعودية للرعاية الصحية', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-          { id: 2, name: 'JCI', description: 'المعايير الدولية المشتركة', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-          { id: 3, name: 'WHO Patient Safety Goals', description: 'أهداف السلامة للمرضى - منظمة الصحة العالمية', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-          { id: 4, name: 'هدف داخلي للمستشفى', description: 'معايير محلية خاصة بالمستشفى', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-        ]
-      })
+      setObjectiveOptions([
+        { id: 1, name: 'سباهي (CBAHI)', description: 'المعايير السعودية للرعاية الصحية', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { id: 2, name: 'JCI', description: 'المعايير الدولية المشتركة', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { id: 3, name: 'WHO Patient Safety Goals', description: 'أهداف السلامة للمرضى - منظمة الصحة العالمية', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { id: 4, name: 'هدف داخلي للمستشفى', description: 'معايير محلية خاصة بالمستشفى', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+      ])
     } finally {
       setIsLoading(false)
     }
@@ -53,11 +55,10 @@ export const useEvaluationSettings = () => {
         is_active: option.is_active
       })
 
-      setSettings(prev => ({
-        ...prev,
-        objectiveOptions: [...prev.objectiveOptions, response.data],
-      }))
-      return response.data
+      const newData = response?.data || response
+
+      setObjectiveOptions(prev => [...(Array.isArray(prev) ? prev : []), newData])
+      return newData
     } catch (error) {
       console.error('Failed to add objective option:', error)
       throw error
@@ -75,13 +76,14 @@ export const useEvaluationSettings = () => {
         is_active: updates.is_active
       })
 
-      setSettings(prev => ({
-        ...prev,
-        objectiveOptions: prev.objectiveOptions.map(option =>
-          option.id === id ? response.data : option
-        ),
-      }))
-      return response.data
+      const updatedData = response?.data || response
+
+      setObjectiveOptions(prev =>
+        (Array.isArray(prev) ? prev : []).map(option =>
+          option.id === id ? updatedData : option
+        )
+      )
+      return updatedData
     } catch (error) {
       console.error('Failed to update objective option:', error)
       throw error
@@ -93,12 +95,9 @@ export const useEvaluationSettings = () => {
   const deleteObjectiveOption = async (id: number) => {
     try {
       setIsLoading(true)
-      await apiClient.delete(`/api/objective-options/${id}`)
+      await apiClient.delete(`/objective-options/${id}`)
 
-      setSettings(prev => ({
-        ...prev,
-        objectiveOptions: prev.objectiveOptions.filter(option => option.id !== id),
-      }))
+      setObjectiveOptions(prev => (Array.isArray(prev) ? prev : []).filter(option => option.id !== id))
     } catch (error) {
       console.error('Failed to delete objective option:', error)
       throw error
@@ -107,30 +106,30 @@ export const useEvaluationSettings = () => {
     }
   }
 
-  const getActiveObjectiveOptions = () => {
-    return settings.objectiveOptions.filter(option => option.is_active)
-  }
+  const activeObjectiveOptions = useMemo(() => {
+    // Defensive check to ensure we always return an array
+    if (!Array.isArray(objectiveOptions)) return [];
 
-  const updateSettings = (newSettings: Partial<EvaluationSettings>) => {
-    setSettings(prev => ({
-      ...prev,
-      ...newSettings
-    }))
-  }
+    return objectiveOptions.filter(option => option?.is_active === true);
+  }, [objectiveOptions]);
 
-  const saveSettings = async () => {
-    // This function is now handled by individual CRUD operations
-    return true
+  const updateSettings = (newSettings: any) => {
+    // For backward compatibility if needed, but not really used
+    if (newSettings && newSettings.objectiveOptions) {
+      const options = Array.isArray(newSettings.objectiveOptions) ? newSettings.objectiveOptions : []
+      setObjectiveOptions(options)
+    }
   }
 
   return {
-    settings,
+    settings: { objectiveOptions }, // Backwards compatibility for the state object
+    objectiveOptions,
     isLoading,
     updateSettings,
     addObjectiveOption,
     updateObjectiveOption,
     deleteObjectiveOption,
-    getActiveObjectiveOptions,
-    saveSettings,
+    activeObjectiveOptions,
+    saveSettings: async () => true,
   }
 }

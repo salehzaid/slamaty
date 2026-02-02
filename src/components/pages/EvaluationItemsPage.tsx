@@ -20,7 +20,7 @@ const EvaluationItemsPage: React.FC = () => {
 
   const [searchParams, setSearchParams] = useSearchParams()
   const { categories, items, addItem, updateItem, deleteItem, reloadData, loading } = useEvaluationApi()
-  const { getActiveObjectiveOptions } = useEvaluationSettings()
+  const { activeObjectiveOptions } = useEvaluationSettings()
 
   useEffect(() => {
     console.log('📦 EvaluationItemsPage - Categories:', categories)
@@ -40,18 +40,22 @@ const EvaluationItemsPage: React.FC = () => {
 
   // تحديث selectedCategoryId عند فتح النموذج
   useEffect(() => {
+    const cats = Array.isArray(categories) ? categories : []
     if (showCreateForm && editingItem) {
       setSelectedCategoryId((editingItem as any).category_id || (editingItem as any).categoryId)
-    } else if (showCreateForm && categories.length > 0) {
-      setSelectedCategoryId(categories[0].id)
+    } else if (showCreateForm && cats.length > 0) {
+      setSelectedCategoryId(cats[0].id)
     }
   }, [showCreateForm, editingItem, categories])
 
   // دالة لتوليد كود العنصر تلقائياً
   const generateItemCode = (categoryId: number) => {
-    const category = categories.find(cat => cat.id === categoryId)
+    const cats = Array.isArray(categories) ? categories : []
+    const its = Array.isArray(items) ? items : []
+
+    const category = cats.find(cat => cat.id === categoryId)
     const categoryCode = category?.name.substring(0, 2).toUpperCase() || 'IT'
-    const categoryItems = items.filter(item => item.category_id === categoryId)
+    const categoryItems = its.filter(item => item && item.category_id === categoryId)
 
     // البحث عن أعلى رقم موجود في الكود
     let maxNumber = 0
@@ -71,7 +75,9 @@ const EvaluationItemsPage: React.FC = () => {
 
   const handleCreateItem = async (data: Partial<EvaluationItem>) => {
     try {
-      const selectedCategory = categories.find(cat => cat.id === Number(data.category_id))
+      const cats = Array.isArray(categories) ? categories : []
+      const its = Array.isArray(items) ? items : []
+      const selectedCategory = cats.find(cat => cat.id === Number(data.category_id))
 
       if (!selectedCategory) {
         alert('يرجى اختيار تصنيف صحيح')
@@ -85,7 +91,7 @@ const EvaluationItemsPage: React.FC = () => {
 
       // التأكد من عدم تكرار الكود
       while (attempts < maxAttempts) {
-        const existingItem = items.find(item => item.code === itemCode)
+        const existingItem = its.find(item => item && item.code === itemCode)
         if (!existingItem) {
           break
         }
@@ -139,7 +145,8 @@ const EvaluationItemsPage: React.FC = () => {
 
   const handleUpdateItem = async (data: Partial<EvaluationItem>) => {
     try {
-      const selectedCategory = categories.find(cat => cat.id === Number(data.category_id))
+      const cats = Array.isArray(categories) ? categories : []
+      const selectedCategory = cats.find(cat => cat.id === Number(data.category_id))
 
       if (!selectedCategory) {
         alert('يرجى اختيار تصنيف صحيح')
@@ -249,14 +256,13 @@ const EvaluationItemsPage: React.FC = () => {
     )
   }
 
-  const filteredItems = items.filter(item => {
+  const filteredItems = (Array.isArray(items) ? items : []).filter(item => {
+    if (!item || !item.title) return false;
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.title_en && item.title_en.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (item.objective && item.objective.toLowerCase().includes(searchTerm.toLowerCase()))
-    const matchesCategory = filterCategory === 'all' ||
-      item.category_id === Number(filterCategory) ||
-      (item.category_ids && item.category_ids.includes(Number(filterCategory)))
+    const matchesCategory = filterCategory === 'all' || item.category_id === Number(filterCategory)
     const matchesStatus = filterStatus === 'all' ||
       (filterStatus === 'active' && item.is_active) ||
       (filterStatus === 'inactive' && !item.is_active)
@@ -324,7 +330,7 @@ const EvaluationItemsPage: React.FC = () => {
                 onChange={(e) => setSelectedCategoryId(Number(e.target.value))}
               >
                 <option value="">اختر التصنيف</option>
-                {categories.map((category) => (
+                {(Array.isArray(categories) ? categories : []).map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
@@ -352,7 +358,7 @@ const EvaluationItemsPage: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">ارتباط العنصر *</label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 bg-gray-50 rounded-lg border">
-              {getActiveObjectiveOptions().map((option) => (
+              {activeObjectiveOptions.map((option) => (
                 <label key={option.id} className="flex items-center gap-3 p-3 bg-white rounded-md border hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
                   <input type="checkbox" name="objective" value={option.name} defaultChecked={editingItem?.objective?.includes(option.name) || false} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" />
                   <div className="flex-1">
@@ -490,7 +496,7 @@ const EvaluationItemsPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">إجمالي العناصر</p>
-                <p className="text-2xl font-bold text-gray-900">{items.length}</p>
+                <p className="text-2xl font-bold text-gray-900">{(Array.isArray(items) ? items : []).length}</p>
               </div>
               <CheckCircle className="w-8 h-8 text-gray-400" />
             </div>
@@ -502,7 +508,7 @@ const EvaluationItemsPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">نشط</p>
-                <p className="text-2xl font-bold text-green-600">{items.filter((i) => i.is_active).length}</p>
+                <p className="text-2xl font-bold text-green-600">{(Array.isArray(items) ? items : []).filter((i) => i && i.is_active).length}</p>
               </div>
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                 <div className="w-4 h-4 bg-green-600 rounded-full"></div>
@@ -516,7 +522,7 @@ const EvaluationItemsPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">مطلوب</p>
-                <p className="text-2xl font-bold text-red-600">{items.filter((i) => i.is_required).length}</p>
+                <p className="text-2xl font-bold text-red-600">{(Array.isArray(items) ? items : []).filter((i) => i && i.is_required).length}</p>
               </div>
               <AlertTriangle className="w-8 h-8 text-red-600" />
             </div>
@@ -529,7 +535,7 @@ const EvaluationItemsPage: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-gray-600">متوسط الوزن</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {items.length > 0 ? (items.reduce((sum, i) => sum + i.weight, 0) / items.length).toFixed(1) : '-'}
+                  {Array.isArray(items) && items.length > 0 ? (items.reduce((sum, i) => sum + (i?.weight || 0), 0) / items.length).toFixed(1) : '0'}
                 </p>
               </div>
               <Target className="w-8 h-8 text-blue-600" />
@@ -553,7 +559,7 @@ const EvaluationItemsPage: React.FC = () => {
               <div className="hidden md:flex gap-2 items-center flex-wrap">
                 {/* Category chips */}
                 <Button variant={filterCategory === 'all' ? 'default' : 'ghost'} size="sm" onClick={() => setFilterCategory('all')}>جميع التصنيفات</Button>
-                {categories.map((category) => (
+                {(Array.isArray(categories) ? categories : []).map((category) => (
                   <button
                     key={category.id}
                     onClick={() => setFilterCategory(String(category.id))}

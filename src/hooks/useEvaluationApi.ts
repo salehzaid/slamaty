@@ -37,90 +37,9 @@ export interface EvaluationItem {
   updated_at: string
 }
 
-// Mock data for development
-const mockCategories: EvaluationCategory[] = [
-  {
-    id: 1,
-    name: 'الجودة',
-    name_en: 'Quality',
-    description: 'تصنيف معايير الجودة والتحسين المستمر',
-    color: 'green',
-    icon: 'check-circle',
-    weight_percent: 40.0,
-    is_active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-15T10:30:00Z'
-  },
-  {
-    id: 2,
-    name: 'مكافحة العدوى',
-    name_en: 'Infection Control',
-    description: 'تصنيف معايير مكافحة العدوى والوقاية منها',
-    color: 'red',
-    icon: 'shield',
-    weight_percent: 30.0,
-    is_active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-15T10:30:00Z'
-  },
-  {
-    id: 3,
-    name: 'سلامة المرضى',
-    name_en: 'Patient Safety',
-    description: 'تصنيف معايير سلامة المرضى والرعاية الآمنة',
-    color: 'blue',
-    icon: 'heart',
-    weight_percent: 30.0,
-    is_active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-15T10:30:00Z'
-  }
-]
 
-const mockItems: EvaluationItem[] = [
-  {
-    id: 1,
-    code: 'Q001',
-    title: 'التحقق من هوية المريض',
-    title_en: 'Patient Identity Verification',
-    description: 'التأكد من التحقق من هوية المريض بشكل صحيح',
-    objective: 'منع الأخطاء الطبية',
-    category_id: 1,
-    category_name: 'الجودة',
-    category_color: 'green',
-    is_active: true,
-    is_required: true,
-    weight: 5,
-    risk_level: 'CRITICAL' as const,
-    evidence_type: 'OBSERVATION' as const,
-    guidance_ar: 'يجب التحقق من هوية المريض قبل أي إجراء طبي',
-    guidance_en: 'Patient identity must be verified before any medical procedure',
-    standard_version: '1.0',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-15T10:30:00Z'
-  },
-  {
-    id: 2,
-    code: 'IC001',
-    title: 'غسل اليدين',
-    title_en: 'Hand Hygiene',
-    description: 'التأكد من تطبيق معايير غسل اليدين',
-    objective: 'منع انتقال العدوى',
-    category_id: 2,
-    category_name: 'مكافحة العدوى',
-    category_color: 'red',
-    is_active: true,
-    is_required: true,
-    weight: 5,
-    risk_level: 'CRITICAL' as const,
-    evidence_type: 'OBSERVATION' as const,
-    guidance_ar: 'يجب غسل اليدين قبل وبعد التعامل مع المرضى',
-    guidance_en: 'Hands must be washed before and after patient contact',
-    standard_version: '1.0',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-15T10:30:00Z'
-  }
-]
+// Mock data removed in favor of real API data
+
 
 export const useEvaluationApi = () => {
   const [categories, setCategories] = useState<EvaluationCategory[]>([])
@@ -334,7 +253,7 @@ export const useEvaluationApi = () => {
 
   // Helper functions
   const getItemsByCategory = (categoryId: number) => {
-    return items.filter(item => item.category_id === categoryId)
+    return (Array.isArray(items) ? items : []).filter(item => item && item.category_id === categoryId)
   }
 
   const getCategoryById = (id: number) => {
