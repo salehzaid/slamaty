@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { Search, Filter, Edit, Trash2, CheckCircle, AlertTriangle, Target, Plus, RefreshCw } from 'lucide-react'
+import { Search, Filter, Edit, Trash2, CheckCircle, AlertTriangle, Target, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -18,44 +17,23 @@ const EvaluationItemsPage: React.FC = () => {
   const [editingItem, setEditingItem] = useState<EvaluationItem | null>(null)
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
 
-  const [searchParams, setSearchParams] = useSearchParams()
-  const { categories, items, addItem, updateItem, deleteItem, reloadData, loading } = useEvaluationApi()
-  const { activeObjectiveOptions } = useEvaluationSettings()
-
-  useEffect(() => {
-    console.log('📦 EvaluationItemsPage - Categories:', categories)
-    console.log('📦 EvaluationItemsPage - Items:', items)
-
-    // Check for action in URL
-    const action = searchParams.get('action')
-    if (action === 'new') {
-      setShowCreateForm(true)
-      setEditingItem(null)
-      // Remove action from URL after handling it
-      const newParams = new URLSearchParams(searchParams)
-      newParams.delete('action')
-      setSearchParams(newParams, { replace: true })
-    }
-  }, [categories, items, searchParams])
+  const { categories, items, addItem, updateItem, deleteItem } = useEvaluationApi()
+  const { getActiveObjectiveOptions } = useEvaluationSettings()
 
   // تحديث selectedCategoryId عند فتح النموذج
   useEffect(() => {
-    const cats = Array.isArray(categories) ? categories : []
     if (showCreateForm && editingItem) {
       setSelectedCategoryId((editingItem as any).category_id || (editingItem as any).categoryId)
-    } else if (showCreateForm && cats.length > 0) {
-      setSelectedCategoryId(cats[0].id)
+    } else if (showCreateForm && categories.length > 0) {
+      setSelectedCategoryId(categories[0].id)
     }
   }, [showCreateForm, editingItem, categories])
 
   // دالة لتوليد كود العنصر تلقائياً
   const generateItemCode = (categoryId: number) => {
-    const cats = Array.isArray(categories) ? categories : []
-    const its = Array.isArray(items) ? items : []
-
-    const category = cats.find(cat => cat.id === categoryId)
+    const category = categories.find(cat => cat.id === categoryId)
     const categoryCode = category?.name.substring(0, 2).toUpperCase() || 'IT'
-    const categoryItems = its.filter(item => item && item.category_id === categoryId)
+    const categoryItems = items.filter(item => item.category_id === categoryId)
 
     // البحث عن أعلى رقم موجود في الكود
     let maxNumber = 0
@@ -75,9 +53,7 @@ const EvaluationItemsPage: React.FC = () => {
 
   const handleCreateItem = async (data: Partial<EvaluationItem>) => {
     try {
-      const cats = Array.isArray(categories) ? categories : []
-      const its = Array.isArray(items) ? items : []
-      const selectedCategory = cats.find(cat => cat.id === Number(data.category_id))
+      const selectedCategory = categories.find(cat => cat.id === Number(data.category_id))
 
       if (!selectedCategory) {
         alert('يرجى اختيار تصنيف صحيح')
@@ -91,7 +67,7 @@ const EvaluationItemsPage: React.FC = () => {
 
       // التأكد من عدم تكرار الكود
       while (attempts < maxAttempts) {
-        const existingItem = its.find(item => item && item.code === itemCode)
+        const existingItem = items.find(item => item.code === itemCode)
         if (!existingItem) {
           break
         }
@@ -145,8 +121,7 @@ const EvaluationItemsPage: React.FC = () => {
 
   const handleUpdateItem = async (data: Partial<EvaluationItem>) => {
     try {
-      const cats = Array.isArray(categories) ? categories : []
-      const selectedCategory = cats.find(cat => cat.id === Number(data.category_id))
+      const selectedCategory = categories.find(cat => cat.id === Number(data.category_id))
 
       if (!selectedCategory) {
         alert('يرجى اختيار تصنيف صحيح')
@@ -257,8 +232,8 @@ const EvaluationItemsPage: React.FC = () => {
   }
 
   const filteredItems = (Array.isArray(items) ? items : []).filter(item => {
-    if (!item || !item.title) return false;
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    if (!item) return false;
+    const matchesSearch = (item.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.title_en && item.title_en.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (item.objective && item.objective.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -330,7 +305,7 @@ const EvaluationItemsPage: React.FC = () => {
                 onChange={(e) => setSelectedCategoryId(Number(e.target.value))}
               >
                 <option value="">اختر التصنيف</option>
-                {(Array.isArray(categories) ? categories : []).map((category) => (
+                {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
@@ -358,7 +333,7 @@ const EvaluationItemsPage: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">ارتباط العنصر *</label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 bg-gray-50 rounded-lg border">
-              {activeObjectiveOptions.map((option) => (
+              {(Array.isArray(getActiveObjectiveOptions()) ? getActiveObjectiveOptions() : []).map((option) => (
                 <label key={option.id} className="flex items-center gap-3 p-3 bg-white rounded-md border hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
                   <input type="checkbox" name="objective" value={option.name} defaultChecked={editingItem?.objective?.includes(option.name) || false} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" />
                   <div className="flex-1">
@@ -484,6 +459,10 @@ const EvaluationItemsPage: React.FC = () => {
           </h1>
           <p className="text-gray-600">إدارة عناصر التقييم وربطها بالتصنيفات</p>
         </div>
+        <Button onClick={() => setShowCreateForm(true)} className="flex items-center gap-2">
+          <Plus className="w-4 h-4" />
+          إضافة عنصر جديد
+        </Button>
       </div>
 
       {/* Inline Form for Create/Edit */}
@@ -496,7 +475,7 @@ const EvaluationItemsPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">إجمالي العناصر</p>
-                <p className="text-2xl font-bold text-gray-900">{(Array.isArray(items) ? items : []).length}</p>
+                <p className="text-2xl font-bold text-gray-900">{items.length}</p>
               </div>
               <CheckCircle className="w-8 h-8 text-gray-400" />
             </div>
@@ -535,7 +514,7 @@ const EvaluationItemsPage: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-gray-600">متوسط الوزن</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {Array.isArray(items) && items.length > 0 ? (items.reduce((sum, i) => sum + (i?.weight || 0), 0) / items.length).toFixed(1) : '0'}
+                  {Array.isArray(items) && items.length > 0 ? (items.reduce((sum, i) => sum + (i?.weight || 0), 0) / items.length).toFixed(1) : '-'}
                 </p>
               </div>
               <Target className="w-8 h-8 text-blue-600" />
@@ -559,7 +538,7 @@ const EvaluationItemsPage: React.FC = () => {
               <div className="hidden md:flex gap-2 items-center flex-wrap">
                 {/* Category chips */}
                 <Button variant={filterCategory === 'all' ? 'default' : 'ghost'} size="sm" onClick={() => setFilterCategory('all')}>جميع التصنيفات</Button>
-                {(Array.isArray(categories) ? categories : []).map((category) => (
+                {categories.map((category) => (
                   <button
                     key={category.id}
                     onClick={() => setFilterCategory(String(category.id))}
@@ -577,19 +556,13 @@ const EvaluationItemsPage: React.FC = () => {
               </select>
 
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={reloadData}
-                  disabled={loading}
-                  className={cn(loading && "animate-spin")}
-                  title="تحديث البيانات"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                </Button>
                 <Button variant="outline" className="flex items-center gap-2">
                   <Filter className="w-4 h-4" />
                   فلترة
+                </Button>
+                <Button onClick={() => { setShowCreateForm(true); setEditingItem(null); }} className="flex items-center gap-2 md:hidden">
+                  <Plus className="w-4 h-4" />
+                  إضافة
                 </Button>
               </div>
             </div>
@@ -659,19 +632,13 @@ const EvaluationItemsPage: React.FC = () => {
         ))}
       </div>
 
-      {
-        filteredItems.length === 0 && (
-          <div className="text-center py-12">
-            <CheckCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg mb-4">لا توجد عناصر مطابقة للبحث</p>
-            <Button onClick={() => setShowCreateForm(true)} variant="outline" className="mx-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              إضافة عنصر جديد
-            </Button>
-          </div>
-        )
-      }
-    </div >
+      {filteredItems.length === 0 && (
+        <div className="text-center py-12">
+          <CheckCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500 text-lg">لا توجد عناصر مطابقة للبحث</p>
+        </div>
+      )}
+    </div>
   )
 }
 

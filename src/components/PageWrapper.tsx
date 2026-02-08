@@ -21,22 +21,22 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
   return (
     <div className={cn("min-h-full", className)}>
       {showHeader && (title || description || headerActions) && (
-        <div className="mb-6 pb-4 border-b border-gray-200 dark:border-slate-700">
+        <div className="mb-8 pb-6 border-b border-slate-200/70 dark:border-slate-700/60">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
               {title && (
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white truncate">
+                <h1 className="text-3xl font-semibold text-slate-900 dark:text-slate-100 truncate">
                   {title}
                 </h1>
               )}
               {description && (
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                   {description}
                 </p>
               )}
             </div>
             {headerActions && (
-              <div className="flex items-center gap-3 ml-4">
+              <div className="flex items-center gap-4 ml-6">
                 {headerActions}
               </div>
             )}
@@ -44,7 +44,7 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
         </div>
       )}
       
-      <div className="space-y-6">
+      <div className="space-y-8">
         {children}
       </div>
     </div>

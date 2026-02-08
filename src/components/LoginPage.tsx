@@ -15,9 +15,9 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  const { login } = useAuth() as any
+  const { login } = useAuth()
   const navigate = useNavigate()
-
+  
   const {
     register,
     handleSubmit,
@@ -69,7 +69,7 @@ const LoginPage: React.FC = () => {
           try {
             const { apiClient } = await import('@/lib/api')
             apiClient.setToken('demo-token')
-          } catch { }
+          } catch {}
           setSuccess('تم تسجيل الدخول كعرض تجريبي')
           setTimeout(() => navigate('/dashboard'), 800)
           return
@@ -79,7 +79,7 @@ const LoginPage: React.FC = () => {
         }
       }
 
-      const success = await login('admin@salamaty.com', 'admin123')
+      const success = await login('testadmin@salamaty.com', 'test123')
       if (success) {
         setSuccess('تم تسجيل الدخول بنجاح!')
         setTimeout(() => {
@@ -120,7 +120,7 @@ const LoginPage: React.FC = () => {
               مرحباً بك في نظام سلامتي لإدارة جولات الجودة
             </CardDescription>
           </CardHeader>
-
+          
           <CardContent className="space-y-6">
             {/* Error/Success Messages */}
             {error && (
@@ -129,7 +129,7 @@ const LoginPage: React.FC = () => {
                 <p className="text-red-800 text-sm">{error}</p>
               </div>
             )}
-
+            
             {success && (
               <div className="flex items-center p-4 bg-green-50 border border-green-200 rounded-lg">
                 <AlertCircle className="h-4 w-4 text-green-600 ml-2" />
@@ -139,14 +139,14 @@ const LoginPage: React.FC = () => {
 
             {/* Login Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {/* Email Field */}
+              {/* Username / Email Field */}
               <div>
-                <Label htmlFor="email">البريد الإلكتروني</Label>
+                <Label htmlFor="email">اسم المستخدم أو البريد الإلكتروني</Label>
                 <Input
                   id="email"
-                  type="email"
+                  type="text"
                   {...register('email')}
-                  placeholder="أدخل بريدك الإلكتروني"
+                  placeholder="مثال: testuser أو testuser@salamaty.com"
                   className="mt-1"
                   disabled={isLoading}
                 />

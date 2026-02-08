@@ -12,14 +12,11 @@ export interface RoundTypeSettings {
   id: number;
   name: string;
   nameEn?: string;
-  name_en?: string;
   description?: string;
   color: string;
   icon: string;
   isActive: boolean;
-  is_active?: boolean;
   sortOrder: number;
-  sort_order?: number;
   createdAt: string;
   updatedAt: string;
 }

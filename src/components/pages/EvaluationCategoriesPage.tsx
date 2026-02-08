@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { useEvaluationApi, EvaluationCategory } from '../../hooks/useEvaluationApi'
+import { useEvaluationApi, EvaluationCategory, EvaluationItem } from '../../hooks/useEvaluationApi'
 
 // Extended interface for local use
 interface ExtendedEvaluationCategory extends EvaluationCategory {
@@ -35,10 +35,8 @@ const EvaluationCategoriesPage: React.FC = () => {
   console.log('EvaluationCategoriesPage - error:', error)
 
   // Transform base categories to extended categories with additional data
-  const categories: ExtendedEvaluationCategory[] = baseCategories.map(cat => {
-    const categoryItems = items.filter(item =>
-      (item.category_ids && item.category_ids.includes(cat.id)) || item.category_id === cat.id
-    )
+  const categories: ExtendedEvaluationCategory[] = (Array.isArray(baseCategories) ? baseCategories : []).map(cat => {
+    const categoryItems = (Array.isArray(items) ? items : []).filter(item => item && item.category_id === cat.id)
     console.log(`Category ${cat.name} (ID: ${cat.id}) has ${categoryItems.length} items:`, categoryItems)
 
     return {
@@ -58,13 +56,11 @@ const EvaluationCategoriesPage: React.FC = () => {
       console.log('Received data in handleCreateCategory:', data)
 
       const newCategoryData = {
-        name: data.name as string || '',
-        name_en: data.nameEn as string || '',
-        description: data.description as string || '',
-        color: data.color as string || 'blue',
-        icon: data.icon as string || 'shield',
-        weight_percent: Number(data.weight_percent) || 10.0,
-        is_active: true
+        name: data.name || '',
+        name_en: data.nameEn || '',
+        description: data.description || '',
+        color: data.color || 'blue',
+        icon: data.icon || 'shield'
       }
 
       console.log('Processed category data:', newCategoryData)
@@ -92,12 +88,11 @@ const EvaluationCategoriesPage: React.FC = () => {
       console.log('Current editingCategory:', editingCategory)
 
       const updatedCategoryData = {
-        name: (data.name as string) || editingCategory.name,
-        name_en: (data.nameEn as string) || editingCategory.name_en,
-        description: (data.description as string) || editingCategory.description,
-        color: (data.color as string) || editingCategory.color,
-        icon: (data.icon as string) || editingCategory.icon,
-        weight_percent: data.weight_percent !== undefined ? Number(data.weight_percent) : editingCategory.weight_percent
+        name: data.name || editingCategory.name,
+        name_en: data.nameEn || editingCategory.name_en,
+        description: data.description || editingCategory.description,
+        color: data.color || editingCategory.color,
+        icon: data.icon || editingCategory.icon
       }
 
       console.log('Processed update data:', updatedCategoryData)
@@ -211,13 +206,12 @@ const EvaluationCategoriesPage: React.FC = () => {
               const data = Object.fromEntries(formData.entries())
 
               // Ensure all form fields are properly captured
-              const formDataComplete: Partial<ExtendedEvaluationCategory> = {
-                name: String(data.name || ''),
-                nameEn: String(data.nameEn || ''),
-                description: String(data.description || ''),
-                color: String(data.color || 'blue'),
-                icon: String(data.icon || 'shield'),
-                weight_percent: Number(data.weight_percent) || 10.0
+              const formDataComplete = {
+                name: data.name || '',
+                nameEn: data.nameEn || '',
+                description: data.description || '',
+                color: data.color || 'blue',
+                icon: data.icon || 'shield'
               }
 
               console.log('Form data being submitted:', formDataComplete)
@@ -320,25 +314,6 @@ const EvaluationCategoriesPage: React.FC = () => {
                     <option value="file-text">ملف طبي</option>
                     <option value="alert-circle">تنبيه طبي</option>
                   </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  الوزن النسبي (%)
-                </label>
-                <div className="flex items-center gap-4">
-                  <Input
-                    type="number"
-                    name="weight_percent"
-                    defaultValue={editingCategory?.weight_percent || 10.0}
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    className="w-32"
-                    required
-                  />
-                  <span className="text-slate-500 text-sm">وزن التصنيف في المجموع الكلي للتقييم</span>
                 </div>
               </div>
 
@@ -523,16 +498,6 @@ const EvaluationCategoriesPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={reloadData}
-                    disabled={loading}
-                    className={cn(loading && "animate-spin")}
-                    title="تحديث البيانات"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                  </Button>
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
@@ -545,10 +510,6 @@ const EvaluationCategoriesPage: React.FC = () => {
                   <Button variant="outline" className="flex items-center gap-2">
                     <Filter className="w-4 h-4" />
                     فلترة
-                  </Button>
-                  <Button onClick={() => { setShowCreateForm(true); setEditingCategory(null); }} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-md">
-                    <Plus className="w-4 h-4" />
-                    إضافة تصنيف جديد
                   </Button>
                 </div>
               </div>
@@ -601,12 +562,8 @@ const EvaluationCategoriesPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Badge className={getColorClasses(category.color)}>
-                          <Link className="w-3 h-3 mr-1 ml-1" />
-                          {category.itemCount} عنصر
-                        </Badge>
-                        <Badge variant="outline" className="border-blue-200 text-blue-700 bg-blue-50">
-                          <Target className="w-3 h-3 mr-1 ml-1" />
-                          الوزن: {category.weight_percent}%
+                          <Link className="w-3 h-3 mr-1" />
+                          {category.itemCount} عنصر مرتبط
                         </Badge>
                         {category.itemCount > 0 && (
                           <Badge variant="outline" className="text-xs">
@@ -628,11 +585,11 @@ const EvaluationCategoriesPage: React.FC = () => {
                           </Badge>
                         </div>
                         <div className="space-y-1">
-                          {getItemsByCategory(category.id).slice(0, 3).map((item) => (
+                          {getItemsByCategory(category.id).slice(0, 3).map((item, index) => (
                             <div key={item.id} className="flex items-center justify-between text-xs group hover:bg-gray-100 dark:hover:bg-slate-700 p-1 rounded transition-colors">
                               <div className="flex items-center gap-2 flex-1 min-w-0">
                                 <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.risk_level === 'CRITICAL' ? 'bg-red-500' :
-                                  item.risk_level === 'MAJOR' ? 'bg-orange-500' : 'bg-blue-500'
+                                    item.risk_level === 'MAJOR' ? 'bg-orange-500' : 'bg-blue-500'
                                   }`}></div>
                                 <span className="text-gray-700 dark:text-gray-300 truncate" title={item.title}>
                                   {item.title}

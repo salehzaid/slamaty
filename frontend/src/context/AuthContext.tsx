@@ -22,7 +22,7 @@ const USE_DIRECT_ADMIN_LOGIN = false;
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   console.log('🔧 AuthProvider: Component initialized');
-  
+
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const storedUser = localStorage.getItem('sallamaty_user');
       const storedToken = localStorage.getItem('access_token');
       console.log('🔍 AuthContext: Stored user exists:', !!storedUser);
-      
+
       // If there is no stored session and auto-login is disabled, do NOT block the UI.
       if (!storedUser || !storedToken) {
         if (!AUTO_LOGIN_ENABLED) {
@@ -58,12 +58,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setIsLoading(false);
             console.log('✅ Token validated and user set from API');
             return;
-          } catch (validationError) {
-            console.warn('⚠️ Stored token invalid or expired, clearing stored auth', validationError);
-            localStorage.removeItem('sallamaty_user');
-            localStorage.removeItem('access_token');
-            apiClient.clearToken();
-            // continue to allow manual login flow
+          } catch (validationError: any) {
+            console.warn('⚠️ Token validation failed:', validationError);
+
+            // Only clear storage if explicitly unauthorized (401)
+            // If it's a network error (backend down), keep the session for offline/demo mode
+            const isUnauthorized = validationError.message?.includes('Authentication required') ||
+              validationError.status === 401;
+
+            if (isUnauthorized) {
+              console.warn('🔒 Token expired or invalid, clearing session');
+              localStorage.removeItem('sallamaty_user');
+              localStorage.removeItem('access_token');
+              apiClient.clearToken();
+            } else {
+              console.log('📡 Network error during validation, keeping unverified session');
+              setUser(userData);
+              setIsLoading(false);
+            }
           }
         } catch (error) {
           console.error('Error parsing stored user data:', error);
@@ -71,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           localStorage.removeItem('access_token');
         }
       }
-      
+
       // �� تسجيل الدخول التلقائي
       console.log('🔄 AuthContext: AUTO_LOGIN_ENABLED:', AUTO_LOGIN_ENABLED, 'storedUser:', !!storedUser);
       if (AUTO_LOGIN_ENABLED && !storedUser) {
@@ -90,11 +102,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 password: 'test123'
               })
             });
-            
+
             if (response.ok) {
               const data = await response.json();
               console.log('✅ API login successful!', data);
-              
+
               const user: User = {
                 id: data.user.id,
                 username: data.user.username,
@@ -108,7 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 is_active: data.user.is_active,
                 created_at: data.user.created_at
               };
-              
+
               setUser(user);
               localStorage.setItem('sallamaty_user', JSON.stringify(user));
               localStorage.setItem('access_token', data.access_token);
@@ -129,7 +141,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('🔄 Auto-login: Attempting to login via API...');
           try {
             const response = await apiClient.login('testqm@local', 'test123');
-            
+
             if (response.access_token) {
               const user: User = {
                 id: response.user.id,
@@ -144,7 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 is_active: response.user.is_active,
                 created_at: response.user.created_at
               };
-              
+
               setUser(user);
               localStorage.setItem('sallamaty_user', JSON.stringify(user));
               localStorage.setItem('access_token', response.access_token);
@@ -162,7 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
       }
-      
+
       setIsLoading(false);
       console.log('🏁 AuthContext: Authentication initialization completed');
     };
@@ -175,30 +187,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log('🔐 Attempting login for:', email);
       const response = await apiClient.login(email, password);
-      
+
       console.log('📥 AuthContext received response:', {
         hasResponse: !!response,
         hasAccessToken: !!response?.access_token,
         hasUser: !!response?.user,
         responseKeys: response ? Object.keys(response) : []
       });
-      
+
       if (response && response.access_token) {
         // Extract user data from response
         const userData = response.user || response;
-        
+
         console.log('👤 User data extracted:', {
           id: userData?.id,
           email: userData?.email,
           username: userData?.username,
           role: userData?.role
         });
-        
+
         if (!userData || !userData.email) {
           console.error('❌ Invalid user data in response:', userData);
           return false;
         }
-        
+
         const user: User = {
           id: userData.id,
           username: userData.username || userData.email,
@@ -212,7 +224,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           is_active: userData.is_active !== false,
           created_at: userData.created_at
         };
-        
+
         setUser(user);
         localStorage.setItem('sallamaty_user', JSON.stringify(user));
         localStorage.setItem('access_token', response.access_token);
@@ -220,7 +232,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('✅ Login successful for user:', user.email);
         return true;
       }
-      
+
       console.error('❌ Login failed: No access token in response. Response:', response);
       return false;
     } catch (error: any) {
@@ -242,7 +254,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           created_at: new Date().toISOString()
         }
         setUser(demoUser)
-        try { localStorage.setItem('sallamaty_user', JSON.stringify(demoUser)); localStorage.setItem('access_token','demo-token'); apiClient.setToken('demo-token') } catch {}
+        try { localStorage.setItem('sallamaty_user', JSON.stringify(demoUser)); localStorage.setItem('access_token', 'demo-token'); apiClient.setToken('demo-token') } catch { }
         return true
       }
       // Log detailed error information and re-throw so UI can show message

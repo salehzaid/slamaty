@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserRole } from '../types';
-import { apiClient, API_BASE_URL } from '../lib/api';
+import { apiClient } from '../lib/api';
 
 interface AuthContextType {
   user: User | null;
@@ -14,8 +14,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// 🔧 إعدادات تسجيل الدخول التلقائي (مفعل تلقائياً في بيئة التطوير لتسهيل التجربة)
-const AUTO_LOGIN_ENABLED = false;
+// 🔧 إعدادات تسجيل الدخول التلقائي (اختياري)
+// لتفعيلها: ضع VITE_AUTO_LOGIN=1 في بيئة Vite
+const AUTO_LOGIN_ENABLED = import.meta.env.VITE_AUTO_LOGIN === '1';
 // Use direct API login flag (keeps behavior explicit)
 const USE_DIRECT_ADMIN_LOGIN = false;
 
@@ -33,6 +34,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const storedToken = localStorage.getItem('access_token');
       console.log('🔍 AuthContext: Stored user exists:', !!storedUser);
 
+      // If there is no stored session and auto-login is disabled, do NOT block the UI.
+      if (!storedUser || !storedToken) {
+        if (!AUTO_LOGIN_ENABLED) {
+          setIsLoading(false);
+          console.log('✅ AuthContext: No stored session; showing login (no auto-login).');
+          return;
+        }
+      }
+
       if (storedUser && storedToken) {
         try {
           // Parse stored user and set token first
@@ -40,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           apiClient.setToken(storedToken);
           // Validate token by fetching current user from API
           try {
-            const current = await apiClient.getCurrentUser({ timeout: 2000 });
+            const current = await apiClient.getCurrentUser();
             // Normalize response: some backends return { user: { ... } }
             const validatedUser = current?.user || current || userData;
             setUser(validatedUser);
@@ -49,35 +59,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log('✅ Token validated and user set from API');
             return;
           } catch (validationError: any) {
-            // Check if it's a network error (backend unavailable)
-            // Support both standard English and our Arabic error messages
-            const isNetworkError =
-              validationError?.message?.includes('Failed to fetch') ||
-              validationError?.message?.includes('NetworkError') ||
-              validationError?.message?.includes('abort') ||
-              validationError?.message?.includes('الاتصال بالخادم') || // Arabic connection error
-              validationError?.name === 'AbortError';
+            console.warn('⚠️ Token validation failed:', validationError);
 
-            if (isNetworkError) {
-              console.warn('⚠️ Backend unavailable - using stored user data');
-              // Use stored data when backend is not available
+            // Only clear storage if explicitly unauthorized (401)
+            // If it's a network error (backend down), keep the session for offline/demo mode
+            const isUnauthorized = validationError.message?.includes('Authentication required') ||
+              validationError.status === 401;
+
+            if (isUnauthorized) {
+              console.warn('🔒 Token expired or invalid, clearing session');
+              localStorage.removeItem('sallamaty_user');
+              localStorage.removeItem('access_token');
+              apiClient.clearToken();
+            } else {
+              console.log('📡 Network error during validation, keeping unverified session');
               setUser(userData);
               setIsLoading(false);
-              return;
             }
-
-            console.warn('⚠️ Stored token invalid or expired, clearing stored auth', validationError);
-            localStorage.removeItem('sallamaty_user');
-            localStorage.removeItem('access_token');
-            apiClient.clearToken();
-            // continue to allow manual login flow - ensure loading is set to false
-            setIsLoading(false);
           }
         } catch (error) {
           console.error('Error parsing stored user data:', error);
           localStorage.removeItem('sallamaty_user');
           localStorage.removeItem('access_token');
-          setIsLoading(false);
         }
       }
 
@@ -88,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // 🔄 تسجيل دخول عبر API للحصول على JWT صحيح
           console.log('🔄 Auto-login: Attempting to login via API...');
           try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
+            const response = await fetch('http://localhost:8000/api/auth/signin', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -178,19 +181,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     console.log('🎯 AuthContext: Calling initializeAuth...');
     initializeAuth();
-
-    // Safety timeout: ensure loading screen disappears after 4 seconds regardless of API status
-    const safetyTimeout = setTimeout(() => {
-      setIsLoading(prev => {
-        if (prev) {
-          console.warn('⚠️ AuthContext: Safety timeout reached, forcing isLoading to false');
-          return false;
-        }
-        return prev;
-      });
-    }, 4000);
-
-    return () => clearTimeout(safetyTimeout);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {

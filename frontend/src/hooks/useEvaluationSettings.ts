@@ -26,8 +26,9 @@ export const useEvaluationSettings = () => {
   const loadObjectiveOptions = async () => {
     try {
       setIsLoading(true)
-      const response = await apiClient.request('/objective-options?active_only=false')
-      setSettings({ objectiveOptions: response.data })
+      const response = await apiClient.get('/objective-options?active_only=false')
+      const options = response?.data || response
+      setSettings({ objectiveOptions: Array.isArray(options) ? options : [] })
     } catch (error) {
       console.error('Failed to load objective options:', error)
       // Fallback to default options if API fails
@@ -47,15 +48,12 @@ export const useEvaluationSettings = () => {
   const addObjectiveOption = async (option: Omit<ObjectiveOption, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       setIsLoading(true)
-      const response = await apiClient.request('/objective-options', {
-        method: 'POST',
-        body: JSON.stringify({
-          name: option.name,
-          description: option.description,
-          is_active: option.is_active
-        })
+      const response = await apiClient.post('/objective-options', {
+        name: option.name,
+        description: option.description,
+        is_active: option.is_active
       })
-      
+
       setSettings(prev => ({
         ...prev,
         objectiveOptions: [...prev.objectiveOptions, response.data],
@@ -72,15 +70,12 @@ export const useEvaluationSettings = () => {
   const updateObjectiveOption = async (id: number, updates: Partial<ObjectiveOption>) => {
     try {
       setIsLoading(true)
-      const response = await apiClient.request(`/objective-options/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          name: updates.name,
-          description: updates.description,
-          is_active: updates.is_active
-        })
+      const response = await apiClient.put(`/objective-options/${id}`, {
+        name: updates.name,
+        description: updates.description,
+        is_active: updates.is_active
       })
-      
+
       setSettings(prev => ({
         ...prev,
         objectiveOptions: prev.objectiveOptions.map(option =>
@@ -99,8 +94,8 @@ export const useEvaluationSettings = () => {
   const deleteObjectiveOption = async (id: number) => {
     try {
       setIsLoading(true)
-      await apiClient.request(`/objective-options/${id}`, { method: 'DELETE' })
-      
+      await apiClient.delete(`/objective-options/${id}`)
+
       setSettings(prev => ({
         ...prev,
         objectiveOptions: prev.objectiveOptions.filter(option => option.id !== id),
@@ -114,7 +109,9 @@ export const useEvaluationSettings = () => {
   }
 
   const getActiveObjectiveOptions = () => {
-    return settings.objectiveOptions.filter(option => option.is_active)
+    const options = settings?.objectiveOptions || []
+    if (!Array.isArray(options)) return []
+    return options.filter(option => option?.is_active)
   }
 
   const updateSettings = (newSettings: Partial<EvaluationSettings>) => {

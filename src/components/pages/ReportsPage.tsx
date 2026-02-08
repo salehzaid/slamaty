@@ -21,14 +21,14 @@ import {
 import { apiClient } from '@/lib/api'
 
 const COLORS = {
-  primary: '#3b82f6',
-  success: '#10b981',
-  warning: '#f59e0b',
-  danger: '#ef4444',
-  purple: '#8b5cf6',
-  indigo: '#6366f1',
-  pink: '#ec4899',
-  teal: '#14b8a6'
+  primary: '#ad63f4',
+  success: '#3fc183',
+  warning: '#f6c45d',
+  danger: '#f43f5e',
+  purple: '#cfa1ff',
+  indigo: '#8cc8ff',
+  pink: '#f7b2d9',
+  teal: '#63d3c6'
 }
 
 const ReportsPage: React.FC = () => {
@@ -99,8 +99,8 @@ const ReportsPage: React.FC = () => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-          <p className="text-sm font-semibold text-gray-900 mb-1">{label}</p>
+        <div className="bg-white/90 p-3 rounded-lg shadow-lg border border-slate-200">
+          <p className="text-sm font-semibold text-slate-900 mb-1">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: <span className="font-bold">{entry.value}</span>
@@ -114,33 +114,33 @@ const ReportsPage: React.FC = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-6 bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+    <div className="p-4 md:p-6 space-y-6 bg-gradient-to-br from-[#f7f0ff] via-white to-[#ecf7ff] min-h-screen">
       {/* Header with Animation */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 animate-fade-in">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-2 rounded-xl shadow-lg">
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+            <div className="bg-gradient-to-br from-primary-400 to-primary-600 p-2 rounded-xl shadow-lg">
               <BarChart3 className="w-7 h-7 text-white" />
             </div>
             التقارير والتحليلات
           </h1>
-          <p className="text-gray-600 mr-14">تقارير شاملة وتحليلات أداء النظام في الوقت الفعلي</p>
+          <p className="text-slate-600 mr-14">تقارير شاملة وتحليلات أداء النظام في الوقت الفعلي</p>
         </div>
         <div className="flex gap-2">
           <Button 
             variant="outline" 
-            className="flex items-center gap-2 hover:bg-blue-50 transition-colors"
+            className="flex items-center gap-2 hover:bg-primary-50 transition-colors"
             onClick={loadReportsData}
             disabled={loading}
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
-          <Button variant="outline" className="flex items-center gap-2 hover:bg-blue-50 transition-colors">
+          <Button variant="outline" className="flex items-center gap-2 hover:bg-primary-50 transition-colors">
             <Filter className="w-4 h-4" />
             فلترة
           </Button>
-          <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all shadow-md">
+          <Button className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 transition-all shadow-md">
             <Download className="w-4 h-4" />
             تصدير
           </Button>
@@ -148,18 +148,18 @@ const ReportsPage: React.FC = () => {
       </div>
 
       {/* Filters Card */}
-      <Card className="shadow-md hover:shadow-lg transition-shadow border-0">
+      <Card className="shadow-md hover:shadow-lg transition-shadow">
         <CardContent className="p-4 md:p-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-blue-600" />
+              <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-primary-500" />
                 الفترة الزمنية
               </label>
               <select
                 value={selectedPeriod}
                 onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white hover:border-blue-300"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all bg-white hover:border-primary-200"
                 disabled={loading}
               >
                 <option value="1">الشهر الماضي</option>
@@ -169,14 +169,14 @@ const ReportsPage: React.FC = () => {
               </select>
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-blue-600" />
+              <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-primary-500" />
                 القسم
               </label>
               <select
                 value={selectedDepartment}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white hover:border-blue-300"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all bg-white hover:border-primary-200"
               >
                 <option value="all">جميع الأقسام</option>
                 <option value="emergency">قسم الطوارئ</option>
@@ -193,25 +193,25 @@ const ReportsPage: React.FC = () => {
       {loading && (
         <div className="flex flex-col items-center justify-center py-16 space-y-4">
           <div className="relative">
-            <div className="w-16 h-16 border-4 border-blue-200 rounded-full animate-pulse"></div>
-            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0"></div>
+            <div className="w-16 h-16 border-4 border-primary-200 rounded-full animate-pulse"></div>
+            <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin absolute top-0"></div>
           </div>
-          <p className="text-gray-600 font-medium animate-pulse">جاري تحميل البيانات...</p>
+          <p className="text-slate-600 font-medium animate-pulse">جاري تحميل البيانات...</p>
         </div>
       )}
 
       {/* Error State */}
       {error && (
-        <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50 to-white shadow-md">
+        <Card className="border-2 border-danger-200 bg-gradient-to-br from-danger-50 to-white shadow-md">
           <CardContent className="p-6">
             <div className="flex items-start gap-3">
-              <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-6 h-6 text-danger-600 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h3 className="font-semibold text-red-900 mb-1">حدث خطأ</h3>
-                <p className="text-red-700">{error}</p>
+                <h3 className="font-semibold text-danger-900 mb-1">حدث خطأ</h3>
+                <p className="text-danger-700">{error}</p>
                 <Button 
                   onClick={loadReportsData} 
-                  className="mt-3 bg-red-600 hover:bg-red-700 text-white"
+                  className="mt-3 bg-danger-500 hover:bg-danger-600 text-white"
                   size="sm"
                 >
                   <RefreshCw className="w-4 h-4 ml-2" />
@@ -227,18 +227,18 @@ const ReportsPage: React.FC = () => {
       {!loading && !error && dashboardStats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {/* Compliance Rate Card */}
-          <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+          <Card className="bg-gradient-to-br from-emerald-100 to-emerald-50 text-slate-900 border border-emerald-200 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
-                <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <div className="bg-white/70 p-3 rounded-xl backdrop-blur-sm">
                   <TrendingUp className="w-6 h-6" />
                 </div>
-                <Badge className="bg-white/20 text-white border-0">متوسط</Badge>
+                <Badge className="bg-white/70 text-emerald-700 border-0">متوسط</Badge>
               </div>
               <div>
-                <p className="text-sm font-medium text-green-100 mb-1">معدل الامتثال</p>
-                <p className="text-4xl font-bold mb-2">{dashboardStats.compliance_rate || 0}%</p>
-                <p className="text-xs text-green-100 flex items-center gap-1">
+                <p className="text-sm font-medium text-emerald-700 mb-1">معدل الامتثال</p>
+                <p className="text-4xl font-bold mb-2 text-slate-900">{dashboardStats.compliance_rate || 0}%</p>
+                <p className="text-xs text-emerald-700 flex items-center gap-1">
                   <CheckCircle className="w-3 h-3" />
                   من جميع الجولات المكتملة
                 </p>
@@ -247,20 +247,20 @@ const ReportsPage: React.FC = () => {
           </Card>
           
           {/* Total Rounds Card */}
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+          <Card className="bg-gradient-to-br from-primary-100 to-primary-50 text-slate-900 border border-primary-200 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
-                <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <div className="bg-white/70 p-3 rounded-xl backdrop-blur-sm">
                   <BarChart3 className="w-6 h-6" />
                 </div>
-                <Badge className="bg-white/20 text-white border-0">
+                <Badge className="bg-white/70 text-primary-700 border-0">
                   {dashboardStats.rounds?.completed || 0} مكتملة
                 </Badge>
               </div>
               <div>
-                <p className="text-sm font-medium text-blue-100 mb-1">إجمالي الجولات</p>
-                <p className="text-4xl font-bold mb-2">{dashboardStats.rounds?.total || 0}</p>
-                <p className="text-xs text-blue-100">
+                <p className="text-sm font-medium text-primary-700 mb-1">إجمالي الجولات</p>
+                <p className="text-4xl font-bold mb-2 text-slate-900">{dashboardStats.rounds?.total || 0}</p>
+                <p className="text-xs text-primary-700">
                   {dashboardStats.rounds?.overdue || 0} متأخرة • {dashboardStats.rounds?.in_progress || 0} قيد التنفيذ
                 </p>
               </div>
@@ -268,20 +268,20 @@ const ReportsPage: React.FC = () => {
           </Card>
           
           {/* CAPAs Card */}
-          <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+          <Card className="bg-gradient-to-br from-amber-100 to-amber-50 text-slate-900 border border-amber-200 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
-                <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <div className="bg-white/70 p-3 rounded-xl backdrop-blur-sm">
                   <FileText className="w-6 h-6" />
                 </div>
-                <Badge className="bg-white/20 text-white border-0">
+                <Badge className="bg-white/70 text-amber-700 border-0">
                   {dashboardStats.capas?.in_progress || 0} نشطة
                 </Badge>
               </div>
               <div>
-                <p className="text-sm font-medium text-orange-100 mb-1">الخطط التصحيحية</p>
-                <p className="text-4xl font-bold mb-2">{dashboardStats.capas?.total || 0}</p>
-                <p className="text-xs text-orange-100">
+                <p className="text-sm font-medium text-amber-700 mb-1">الخطط التصحيحية</p>
+                <p className="text-4xl font-bold mb-2 text-slate-900">{dashboardStats.capas?.total || 0}</p>
+                <p className="text-xs text-amber-700">
                   {dashboardStats.capas?.pending || 0} معلقة • {dashboardStats.capas?.implemented || 0} منفذة
                 </p>
               </div>
@@ -289,18 +289,18 @@ const ReportsPage: React.FC = () => {
           </Card>
           
           {/* Departments Card */}
-          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+          <Card className="bg-gradient-to-br from-fuchsia-100 to-fuchsia-50 text-slate-900 border border-fuchsia-200 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
-                <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <div className="bg-white/70 p-3 rounded-xl backdrop-blur-sm">
                   <Building2 className="w-6 h-6" />
                 </div>
-                <Badge className="bg-white/20 text-white border-0">نشطة</Badge>
+                <Badge className="bg-white/70 text-fuchsia-700 border-0">نشطة</Badge>
               </div>
               <div>
-                <p className="text-sm font-medium text-purple-100 mb-1">الأقسام</p>
-                <p className="text-4xl font-bold mb-2">{dashboardStats.departments?.active || 0}</p>
-                <p className="text-xs text-purple-100">
+                <p className="text-sm font-medium text-fuchsia-700 mb-1">الأقسام</p>
+                <p className="text-4xl font-bold mb-2 text-slate-900">{dashboardStats.departments?.active || 0}</p>
+                <p className="text-xs text-fuchsia-700">
                   من أصل {dashboardStats.departments?.total || 0} قسم
                 </p>
               </div>
@@ -313,11 +313,11 @@ const ReportsPage: React.FC = () => {
       {!loading && !error && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Compliance Trends */}
-          <Card className="shadow-lg hover:shadow-xl transition-shadow border-0">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b">
-              <CardTitle className="flex items-center gap-2 text-gray-900">
-                <div className="bg-green-100 p-2 rounded-lg">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
+          <Card className="shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-emerald-100 border-b">
+              <CardTitle className="flex items-center gap-2 text-slate-900">
+                <div className="bg-emerald-100 p-2 rounded-lg">
+                  <TrendingUp className="w-5 h-5 text-emerald-600" />
                 </div>
                 اتجاهات الامتثال
               </CardTitle>
@@ -356,7 +356,7 @@ const ReportsPage: React.FC = () => {
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                  <div className="flex flex-col items-center justify-center h-full text-slate-400">
                     <BarChart3 className="w-16 h-16 mb-3 opacity-50" />
                     <p className="font-medium">لا توجد بيانات متاحة</p>
                     <p className="text-sm text-center mt-1">لم يتم العثور على بيانات الامتثال للفترة المحددة</p>
@@ -367,11 +367,11 @@ const ReportsPage: React.FC = () => {
           </Card>
 
           {/* Rounds by Type */}
-          <Card className="shadow-lg hover:shadow-xl transition-shadow border-0">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-              <CardTitle className="flex items-center gap-2 text-gray-900">
-                <div className="bg-blue-100 p-2 rounded-lg">
-                  <PieChart className="w-5 h-5 text-blue-600" />
+          <Card className="shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-primary-50 to-accent-50 border-b">
+              <CardTitle className="flex items-center gap-2 text-slate-900">
+                <div className="bg-primary-100 p-2 rounded-lg">
+                  <PieChart className="w-5 h-5 text-primary-600" />
                 </div>
                 توزيع الجولات حسب النوع
               </CardTitle>
@@ -405,7 +405,7 @@ const ReportsPage: React.FC = () => {
                     </RechartsPieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                  <div className="flex flex-col items-center justify-center h-full text-slate-400">
                     <PieChart className="w-16 h-16 mb-3 opacity-50" />
                     <p className="font-medium">لا توجد بيانات متاحة</p>
                     <p className="text-sm text-center mt-1">لم يتم العثور على بيانات الجولات للفترة المحددة</p>
@@ -419,11 +419,11 @@ const ReportsPage: React.FC = () => {
 
       {/* Department Performance */}
       {!loading && !error && (
-        <Card className="shadow-lg hover:shadow-xl transition-shadow border-0">
-          <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
-            <CardTitle className="flex items-center gap-2 text-gray-900">
-              <div className="bg-purple-100 p-2 rounded-lg">
-                <Building2 className="w-5 h-5 text-purple-600" />
+        <Card className="shadow-lg hover:shadow-xl transition-shadow">
+          <CardHeader className="bg-gradient-to-r from-fuchsia-50 to-pink-50 border-b">
+            <CardTitle className="flex items-center gap-2 text-slate-900">
+              <div className="bg-fuchsia-100 p-2 rounded-lg">
+                <Building2 className="w-5 h-5 text-fuchsia-600" />
               </div>
               أداء الأقسام
             </CardTitle>
@@ -465,7 +465,7 @@ const ReportsPage: React.FC = () => {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                <div className="flex flex-col items-center justify-center h-full text-slate-400">
                   <Building2 className="w-16 h-16 mb-3 opacity-50" />
                   <p className="font-medium">لا توجد بيانات متاحة</p>
                   <p className="text-sm text-center mt-1">لم يتم العثور على بيانات أداء الأقسام</p>
@@ -478,11 +478,11 @@ const ReportsPage: React.FC = () => {
 
       {/* Monthly Rounds */}
       {!loading && !error && (
-        <Card className="shadow-lg hover:shadow-xl transition-shadow border-0">
-          <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b">
-            <CardTitle className="flex items-center gap-2 text-gray-900">
-              <div className="bg-orange-100 p-2 rounded-lg">
-                <Calendar className="w-5 h-5 text-orange-600" />
+        <Card className="shadow-lg hover:shadow-xl transition-shadow">
+          <CardHeader className="bg-gradient-to-r from-amber-50 to-yellow-50 border-b">
+            <CardTitle className="flex items-center gap-2 text-slate-900">
+              <div className="bg-amber-100 p-2 rounded-lg">
+                <Calendar className="w-5 h-5 text-amber-600" />
               </div>
               الجولات الشهرية
             </CardTitle>
@@ -515,7 +515,7 @@ const ReportsPage: React.FC = () => {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                <div className="flex flex-col items-center justify-center h-full text-slate-400">
                   <Calendar className="w-16 h-16 mb-3 opacity-50" />
                   <p className="font-medium">لا توجد بيانات متاحة</p>
                   <p className="text-sm text-center mt-1">لم يتم العثور على بيانات الجولات الشهرية</p>
@@ -528,11 +528,11 @@ const ReportsPage: React.FC = () => {
 
       {/* CAPA Status Distribution */}
       {!loading && !error && (
-        <Card className="shadow-lg hover:shadow-xl transition-shadow border-0">
-          <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50 border-b">
-            <CardTitle className="flex items-center gap-2 text-gray-900">
-              <div className="bg-red-100 p-2 rounded-lg">
-                <FileText className="w-5 h-5 text-red-600" />
+        <Card className="shadow-lg hover:shadow-xl transition-shadow">
+          <CardHeader className="bg-gradient-to-r from-rose-50 to-rose-100 border-b">
+            <CardTitle className="flex items-center gap-2 text-slate-900">
+              <div className="bg-rose-100 p-2 rounded-lg">
+                <FileText className="w-5 h-5 text-rose-600" />
               </div>
               توزيع الخطط التصحيحية
             </CardTitle>
@@ -566,7 +566,7 @@ const ReportsPage: React.FC = () => {
                   </RechartsPieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                <div className="flex flex-col items-center justify-center h-full text-slate-400">
                   <FileText className="w-16 h-16 mb-3 opacity-50" />
                   <p className="font-medium">لا توجد بيانات متاحة</p>
                   <p className="text-sm text-center mt-1">لم يتم العثور على بيانات الخطط التصحيحية</p>
@@ -578,10 +578,10 @@ const ReportsPage: React.FC = () => {
       )}
 
       {/* Export Options */}
-      <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-gray-50">
+      <Card className="shadow-lg bg-gradient-to-br from-white to-slate-50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Download className="w-5 h-5 text-blue-600" />
+            <Download className="w-5 h-5 text-primary-600" />
             تصدير التقارير
           </CardTitle>
           <CardDescription>قم بتصدير التقارير بصيغ مختلفة</CardDescription>
@@ -591,30 +591,30 @@ const ReportsPage: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => handleExportReport('compliance')}
-              className="flex items-center justify-center gap-2 h-20 hover:bg-green-50 hover:border-green-300 transition-all group"
+              className="flex items-center justify-center gap-2 h-20 hover:bg-emerald-50 hover:border-emerald-300 transition-all group"
             >
               <div className="text-center">
-                <TrendingUp className="w-6 h-6 mx-auto mb-1 text-green-600 group-hover:scale-110 transition-transform" />
+                <TrendingUp className="w-6 h-6 mx-auto mb-1 text-emerald-600 group-hover:scale-110 transition-transform" />
                 <span className="font-semibold">تقرير الامتثال</span>
               </div>
             </Button>
             <Button
               variant="outline"
               onClick={() => handleExportReport('rounds')}
-              className="flex items-center justify-center gap-2 h-20 hover:bg-blue-50 hover:border-blue-300 transition-all group"
+              className="flex items-center justify-center gap-2 h-20 hover:bg-primary-50 hover:border-primary-300 transition-all group"
             >
               <div className="text-center">
-                <BarChart3 className="w-6 h-6 mx-auto mb-1 text-blue-600 group-hover:scale-110 transition-transform" />
+                <BarChart3 className="w-6 h-6 mx-auto mb-1 text-primary-600 group-hover:scale-110 transition-transform" />
                 <span className="font-semibold">تقرير الجولات</span>
               </div>
             </Button>
             <Button
               variant="outline"
               onClick={() => handleExportReport('capa')}
-              className="flex items-center justify-center gap-2 h-20 hover:bg-orange-50 hover:border-orange-300 transition-all group"
+              className="flex items-center justify-center gap-2 h-20 hover:bg-amber-50 hover:border-amber-300 transition-all group"
             >
               <div className="text-center">
-                <FileText className="w-6 h-6 mx-auto mb-1 text-orange-600 group-hover:scale-110 transition-transform" />
+                <FileText className="w-6 h-6 mx-auto mb-1 text-amber-600 group-hover:scale-110 transition-transform" />
                 <span className="font-semibold">تقرير الخطط التصحيحية</span>
               </div>
             </Button>

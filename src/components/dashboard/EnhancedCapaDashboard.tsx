@@ -18,6 +18,7 @@ import {
   RefreshCw
 } from 'lucide-react'
 import { apiClient } from '@/lib/api'
+import { formatDDMMYYYY } from '@/lib/date'
 
 interface DashboardStats {
   total_capas: number
@@ -69,29 +70,45 @@ const EnhancedCapaDashboard: React.FC = () => {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   const fetchDashboardData = async () => {
-    try {
-      setLoading(true)
-      setError(null)
+    setLoading(true)
+    setError(null)
 
-      // Fetch dashboard stats
-      const statsResponse = await apiClient.request('/api/dashboard/stats/')
-      setStats(statsResponse.data || statsResponse)
+    const normalize = (v: any) => v?.data ?? v
 
-      // Fetch overdue actions
-      const overdueResponse = await apiClient.request('/api/dashboard/overdue/')
-      setOverdueActions(overdueResponse.data || overdueResponse)
+    const results = await Promise.allSettled([
+      apiClient.request('/api/dashboard/stats/'),
+      apiClient.request('/api/dashboard/overdue/'),
+      apiClient.request('/api/dashboard/upcoming/'),
+    ])
 
-      // Fetch upcoming deadlines
-      const upcomingResponse = await apiClient.request('/api/dashboard/upcoming/')
-      setUpcomingDeadlines(upcomingResponse.data || upcomingResponse)
+    const [statsRes, overdueRes, upcomingRes] = results
+    const errors: string[] = []
 
-      setLastUpdated(new Date())
-    } catch (err) {
-      console.error('Failed to fetch dashboard data:', err)
-      setError('فشل في تحميل بيانات الداشبورد')
-    } finally {
-      setLoading(false)
+    if (statsRes.status === 'fulfilled') {
+      setStats(normalize(statsRes.value))
+    } else {
+      setStats(null)
+      errors.push('تعذر تحميل مؤشرات الداشبورد')
     }
+
+    if (overdueRes.status === 'fulfilled') {
+      setOverdueActions(normalize(overdueRes.value))
+    } else {
+      setOverdueActions(null)
+      errors.push('تعذر تحميل الإجراءات المتأخرة')
+    }
+
+    if (upcomingRes.status === 'fulfilled') {
+      setUpcomingDeadlines(normalize(upcomingRes.value))
+    } else {
+      setUpcomingDeadlines(null)
+      errors.push('تعذر تحميل المواعيد القادمة')
+    }
+
+    if (errors.length) setError(errors.join(' • '))
+
+    setLastUpdated(new Date())
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -121,7 +138,7 @@ const EnhancedCapaDashboard: React.FC = () => {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US')
+    return formatDDMMYYYY(dateString as any)
   }
 
   const getDaysUntilDeadline = (dateString: string) => {
@@ -139,24 +156,6 @@ const EnhancedCapaDashboard: React.FC = () => {
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             <span className="text-gray-600">جاري تحميل الداشبورد...</span>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <AlertTriangle className="w-16 h-16 text-red-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">خطأ في تحميل البيانات</h3>
-            <p className="text-gray-600 mb-6">{error}</p>
-            <Button onClick={fetchDashboardData} className="flex items-center gap-2">
-              <RefreshCw className="w-4 h-4" />
-              إعادة المحاولة
-            </Button>
           </div>
         </div>
       </div>
@@ -187,66 +186,162 @@ const EnhancedCapaDashboard: React.FC = () => {
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">إجمالي الخطط</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total_capas}</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Target className="w-6 h-6 text-blue-600" />
-                </div>
+      {error && (
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-yellow-900">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="font-semibold mb-1">تنبيه</div>
+              <div className="text-sm">{error}</div>
+              <div className="text-xs text-yellow-800 mt-1">
+                سيتم عرض ما توفر من البيانات، ويمكنك إعادة المحاولة لاحقاً.
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">متأخرة</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.overdue_capas}</p>
-                </div>
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">مكتملة هذا الشهر</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.completed_this_month}</p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">حرجة معلقة</p>
-                  <p className="text-2xl font-bold text-orange-600">{stats.critical_pending}</p>
-                </div>
-                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-orange-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+            <Button onClick={fetchDashboardData} variant="outline" className="flex items-center gap-2">
+              <RefreshCw className="w-4 h-4" />
+              إعادة المحاولة
+            </Button>
+          </div>
         </div>
       )}
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">إجمالي الخطط</p>
+                {stats ? (
+                  <p className="text-2xl font-bold text-gray-900">{stats.total_capas}</p>
+                ) : (
+                  <div className="mt-2 h-8 w-16 rounded bg-gray-200 animate-pulse" />
+                )}
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <Target className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">متأخرة</p>
+                {stats ? (
+                  <p className="text-2xl font-bold text-red-600">{stats.overdue_capas}</p>
+                ) : (
+                  <div className="mt-2 h-8 w-16 rounded bg-gray-200 animate-pulse" />
+                )}
+              </div>
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">مكتملة هذا الشهر</p>
+                {stats ? (
+                  <p className="text-2xl font-bold text-green-600">{stats.completed_this_month}</p>
+                ) : (
+                  <div className="mt-2 h-8 w-16 rounded bg-gray-200 animate-pulse" />
+                )}
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">حرجة معلقة</p>
+                {stats ? (
+                  <p className="text-2xl font-bold text-orange-600">{stats.critical_pending}</p>
+                ) : (
+                  <div className="mt-2 h-8 w-16 rounded bg-gray-200 animate-pulse" />
+                )}
+              </div>
+              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                <Clock className="w-6 h-6 text-orange-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Priority Now */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-orange-600" />
+            الأولوية الآن
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {(() => {
+            const overdueList = overdueActions
+              ? [
+                  ...overdueActions.corrective_actions.map((a) => ({ ...a, bucket: 'متأخر' })),
+                  ...overdueActions.preventive_actions.map((a) => ({ ...a, bucket: 'متأخر' })),
+                  ...overdueActions.verification_steps.map((a) => ({ ...a, bucket: 'متأخر' })),
+                ]
+              : []
+            const upcomingList = upcomingDeadlines
+              ? [
+                  ...upcomingDeadlines.corrective_actions.map((a) => ({ ...a, bucket: 'قادم' })),
+                  ...upcomingDeadlines.preventive_actions.map((a) => ({ ...a, bucket: 'قادم' })),
+                  ...upcomingDeadlines.verification_steps.map((a) => ({ ...a, bucket: 'قادم' })),
+                ]
+              : []
+
+            const items = [...overdueList, ...upcomingList].slice(0, 3)
+
+            if (items.length === 0) {
+              return (
+                <div className="text-center py-6">
+                  <CheckCircle className="w-12 h-12 text-green-300 mx-auto mb-3" />
+                  <p className="text-gray-600">لا توجد عناصر عاجلة الآن</p>
+                  <p className="text-sm text-gray-400 mt-1">استمر في متابعة تقدم الخطط والإجراءات</p>
+                </div>
+              )
+            }
+
+            return (
+              <div className="space-y-3">
+                {items.map((it: any) => (
+                  <div key={`${it.bucket}-${it.id}`} className="rounded-lg border p-3 bg-white">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge className={it.bucket === 'متأخر' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}>
+                            {it.bucket}
+                          </Badge>
+                          <Badge className={getStatusColor(it.status)}>{getStatusText(it.status)}</Badge>
+                        </div>
+                        <p className="font-medium text-gray-900 mt-2 break-words">{it.task}</p>
+                        <p className="text-sm text-gray-600 mt-1 break-words">الخطة: {it.capa_title}</p>
+                        {it.due_date && (
+                          <p className="text-xs text-gray-500 mt-1">الموعد: {formatDate(it.due_date)}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
+        </CardContent>
+      </Card>
 
       {/* Performance Metrics */}
       {stats && (

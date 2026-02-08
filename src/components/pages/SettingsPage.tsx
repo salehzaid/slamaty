@@ -193,7 +193,8 @@ const SettingsPage: React.FC = () => {
   }
 
   const handleToggleObjective = async (id: number) => {
-    const option = evaluationSettings.objectiveOptions.find(o => o.id === id)
+    const options = Array.isArray(evaluationSettings?.objectiveOptions) ? evaluationSettings.objectiveOptions : []
+    const option = options.find(o => o.id === id)
     if (option) {
       try {
         await updateObjectiveOption(id, { is_active: !option.is_active })
@@ -247,11 +248,10 @@ const SettingsPage: React.FC = () => {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-right text-sm font-medium rounded-lg transition-colors ${
-                        activeTab === tab.id
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-right text-sm font-medium rounded-lg transition-colors ${activeTab === tab.id
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'text-gray-600 hover:bg-gray-100'
+                        }`}
                     >
                       <Icon className="w-4 h-4" />
                       {tab.name}
@@ -696,7 +696,7 @@ const SettingsPage: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 mb-4">خيارات ارتباط العنصر الحالية</h3>
                   <div className="space-y-3">
-                    {evaluationSettings.objectiveOptions.map((option) => (
+                    {(Array.isArray(evaluationSettings?.objectiveOptions) ? evaluationSettings.objectiveOptions : []).map((option) => (
                       <div key={option.id} className="flex items-center gap-4 p-4 border rounded-lg bg-white">
                         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
@@ -722,7 +722,7 @@ const SettingsPage: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <Switch
-                            checked={option.isActive}
+                            checked={option.is_active}
                             onCheckedChange={() => handleToggleObjective(option.id)}
                           />
                           <Button
@@ -776,7 +776,7 @@ const SettingsPage: React.FC = () => {
                       <p className="text-sm text-gray-600">تصدير جميع البيانات</p>
                     </div>
                   </Button>
-                  
+
                   <Button
                     variant="outline"
                     onClick={handleImportData}

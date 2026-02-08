@@ -1,24 +1,19 @@
-export const API_BASE_URL = (() => {
+// Use VITE_API_URL if provided at build time; otherwise default to same-origin in production
+const API_BASE_URL = (() => {
   // Prefer explicit env var at build time
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL
-
-  // If we are on localhost/127.0.0.1, always favor the local backend
-  if (typeof window !== 'undefined' && (
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1' ||
-    window.location.hostname.startsWith('192.168.')
-  )) {
-    return 'http://127.0.0.1:8000'
+  // At runtime (dev server) if the frontend is served from vite (ports 5173/5174)
+  // default backend to 127.0.0.1:8000 (preferred) or localhost:8000 (fallback)
+  if (typeof window !== 'undefined') {
+    const port = window.location.port
+    if (port === '5173' || port === '5174') {
+      // Always use 127.0.0.1 for consistency and to avoid CORS issues
+      return 'http://127.0.0.1:8000'
+    }
+    return window.location.origin
   }
-
-  // Production: Use Render backend
-  if (import.meta.env.PROD) {
-    return 'https://salamaty-5fw9.onrender.com'
-  }
-
   return 'http://127.0.0.1:8000'
 })()
-
 
 // Log the API base URL on initialization to help debug (dev only)
 if (typeof window !== 'undefined' && import.meta.env.DEV) {
@@ -79,16 +74,20 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit & { timeout?: number } = {}
+    options: RequestInit = {}
   ): Promise<any> {
     // Ensure we use 127.0.0.1 instead of localhost to avoid CORS issues
     let baseURL = this.baseURL
     if (baseURL.includes('localhost:8000')) {
       baseURL = baseURL.replace('localhost:8000', '127.0.0.1:8000')
+      console.log('🔄 Switched from localhost to 127.0.0.1')
     }
-
+    
     const url = `${baseURL}${endpoint}`
-
+    
+    // تم إزالة فحص التوكن القديم لاستخدام البيانات الحقيقية من قاعدة البيانات
+    // الآن سيتم استخدام البيانات الحقيقية دائماً من قاعدة البيانات salamaty_db
+    
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
@@ -99,17 +98,13 @@ class ApiClient {
     }
 
     try {
-      // Use AbortController to enforce a request timeout
+      // Use AbortController to enforce a request timeout to avoid hanging requests
       const controller = new AbortController()
-      const timeoutMs = options.timeout || 5000 // 5s timeout default
+      const timeoutMs = 8000 // 8s timeout for dev responsiveness
       const timeout = setTimeout(() => controller.abort(), timeoutMs)
-
-      const response = await fetch(url, {
-        signal: controller.signal,
-        ...config
-      })
+      const response = await fetch(url, { signal: controller.signal, ...config })
       clearTimeout(timeout)
-
+      
       // التعامل مع 401 و 403 (غير مصادق أو غير مصرح)
       if (response.status === 401 || response.status === 403) {
         // Authentication failure - clear local token and surface error to caller
@@ -119,7 +114,7 @@ class ApiClient {
         try {
           localStorage.removeItem('access_token')
           localStorage.removeItem('sallamaty_user')
-        } catch { }
+        } catch {}
         throw new Error('Authentication required')
       }
 
@@ -153,7 +148,7 @@ class ApiClient {
       const isAbort = error?.name === 'AbortError'
       console.error('❌ API request failed:', isAbort ? 'timeout/abort' : error)
       // Mark global flag to indicate backend unavailable
-      try { (window as any).__API_UNAVAILABLE__ = true } catch { }
+      try { (window as any).__API_UNAVAILABLE__ = true } catch {}
 
       // In development, attempt to use mock data on any network error (not only timeout)
       if (import.meta.env.DEV) {
@@ -192,7 +187,11 @@ class ApiClient {
   // Authentication endpoints
   async login(email: string, password: string) {
     const url = `${this.baseURL}/api/auth/signin`
-    const requestBody = { email, password }
+    // Backend supports both username and email; send the right key
+    const identifier = (email ?? "").trim()
+    const requestBody = identifier.includes("@")
+      ? { email: identifier, password }
+      : { username: identifier, password }
 
     try {
       let response: Response
@@ -206,7 +205,7 @@ class ApiClient {
         })
       } catch (netErr) {
         // Network-level failure (connection refused / DNS / CORS) — mark API unavailable
-        try { (window as any).__API_UNAVAILABLE__ = true } catch { }
+        try { (window as any).__API_UNAVAILABLE__ = true } catch {}
         console.error('❌ Network error during login fetch:', netErr)
         throw netErr
       }
@@ -235,13 +234,13 @@ class ApiClient {
             console.error('📥 Failed to parse error text:', textError)
           }
         }
-
+        
         console.error('❌ Login failed:', {
           status: response.status,
           statusText: response.statusText,
           errorMessage
         })
-
+        
         throw new Error(errorMessage)
       }
 
@@ -268,9 +267,9 @@ class ApiClient {
       // If network-level failure, ensure API_UNAVAILABLE is set to allow demo fallback
       try {
         if (!navigator.onLine) {
-          try { (window as any).__API_UNAVAILABLE__ = true } catch { }
+          try { (window as any).__API_UNAVAILABLE__ = true } catch {}
         }
-      } catch { }
+      } catch {}
 
       console.error('❌ Login error:', error)
       if (error instanceof Error) {
@@ -287,8 +286,8 @@ class ApiClient {
     })
   }
 
-  async getCurrentUser(options: any = {}) {
-    return this.request('/api/auth/me', options)
+  async getCurrentUser() {
+    return this.request('/api/auth/me')
   }
 
   // Rounds endpoints - استخدام البيانات الحقيقية من قاعدة البيانات
@@ -296,7 +295,7 @@ class ApiClient {
     const queryParams = new URLSearchParams()
     if (params?.skip) queryParams.append('skip', params.skip.toString())
     if (params?.limit) queryParams.append('limit', params.limit.toString())
-
+    
     const endpoint = `/api/rounds${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
     return this.request(endpoint)
   }
@@ -305,7 +304,7 @@ class ApiClient {
     const queryParams = new URLSearchParams()
     if (params?.skip) queryParams.append('skip', params.skip.toString())
     if (params?.limit) queryParams.append('limit', params.limit.toString())
-
+    
     const endpoint = `/api/rounds/my${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
     return this.request(endpoint)
   }

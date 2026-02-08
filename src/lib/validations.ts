@@ -25,7 +25,8 @@ export const userCreateSchema = z.object({
 })
 
 export const userLoginSchema = z.object({
-  email: z.string().email("البريد الإلكتروني غير صحيح"),
+  // Allow either username or email (backend supports both)
+  email: z.string().min(1, "اسم المستخدم أو البريد الإلكتروني مطلوب"),
   password: z.string().min(1, "كلمة المرور مطلوبة"),
 })
 

@@ -30,15 +30,16 @@ const UnifiedEvaluationDashboard: React.FC = () => {
 
   // حساب الإحصائيات السريعة
   const quickStats: QuickStats = useMemo(() => {
-    const activeItems = items.filter(item => item.isActive).length
-    const totalWeight = items.reduce((sum, item) => sum + item.weight, 0)
+    const itemsList = Array.isArray(items) ? items : []
+    const activeItems = itemsList.filter(item => item && item.isActive).length
+    const totalWeight = itemsList.reduce((sum, item) => sum + (item?.weight || 0), 0)
 
     return {
-      totalCategories: categories.length,
-      totalItems: items.length,
+      totalCategories: Array.isArray(categories) ? categories.length : 0,
+      totalItems: itemsList.length,
       activeItems,
-      completionRate: items.length > 0 ? (activeItems / items.length) * 100 : 0,
-      averageWeight: items.length > 0 ? totalWeight / items.length : 0
+      completionRate: itemsList.length > 0 ? (activeItems / itemsList.length) * 100 : 0,
+      averageWeight: itemsList.length > 0 ? totalWeight / itemsList.length : 0
     }
   }, [categories, items])
 
@@ -116,7 +117,7 @@ const UnifiedEvaluationDashboard: React.FC = () => {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`w - 4 h - 4 rounded - full bg - ${category.color} -500`}></div>
+                    <div className={`w-4 h-4 rounded-full bg-${category.color}-500`}></div>
                     <CardTitle className="text-lg">{category.name}</CardTitle>
                   </div>
                   <Badge className={getColorClasses(category.color)}>
@@ -225,8 +226,8 @@ const UnifiedEvaluationDashboard: React.FC = () => {
                       </div>
                       <div className="w-full bg-slate-200 rounded-full h-2">
                         <div
-                          className={`h - 2 rounded - full bg - ${category.color} -500`}
-                          style={{ width: `${percentage}% ` }}
+                          className={`h-2 rounded-full bg-${category.color}-500`}
+                          style={{ width: `${percentage}%` }}
                         ></div>
                       </div>
                     </div>
@@ -284,7 +285,7 @@ const UnifiedEvaluationDashboard: React.FC = () => {
                   return (
                     <div key={category.id} className="p-3 bg-white rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className={`w - 3 h - 3 rounded - full bg - ${category.color} -500`}></div>
+                        <div className={`w-3 h-3 rounded-full bg-${category.color}-500`}></div>
                         <span className="text-sm font-medium text-slate-800">{category.name}</span>
                       </div>
                       <p className="text-xs text-slate-500">{categoryItems.length} عنصر مرتبط</p>

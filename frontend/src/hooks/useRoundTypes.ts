@@ -17,6 +17,30 @@ export const useRoundTypes = (): UseRoundTypesReturn => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Helpers to map between camelCase and snake_case
+  const mapToCamelCase = (data: any): RoundTypeSettings => ({
+    id: data.id,
+    name: data.name,
+    nameEn: data.name_en,
+    description: data.description,
+    color: data.color,
+    icon: data.icon,
+    isActive: data.is_active,
+    sortOrder: data.sort_order,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at
+  })
+
+  const mapToSnakeCase = (data: any) => ({
+    name: data.name,
+    name_en: data.nameEn,
+    description: data.description,
+    color: data.color,
+    icon: data.icon,
+    is_active: data.isActive,
+    sort_order: data.sortOrder
+  })
+
   const fetchRoundTypes = async () => {
     try {
       setLoading(true)
@@ -24,19 +48,14 @@ export const useRoundTypes = (): UseRoundTypesReturn => {
       const response = await apiClient.getRoundTypes()
 
       // Accept either an array response or an object with { success, data }
+      let rawData: any[] = []
       if (Array.isArray(response)) {
-        setRoundTypes(response)
-      } else if (response && typeof response === 'object') {
-        if (response.success && Array.isArray(response.data)) {
-          setRoundTypes(response.data)
-        } else if (Array.isArray(response.data)) {
-          setRoundTypes(response.data)
-        } else {
-          setError('فشل في جلب أنواع الجولات')
-        }
-      } else {
-        setError('فشل في جلب أنواع الجولات')
+        rawData = response
+      } else if (response && response.data && Array.isArray(response.data)) {
+        rawData = response.data
       }
+
+      setRoundTypes(rawData.map(mapToCamelCase))
     } catch (err) {
       console.error('Error fetching round types:', err)
       setError(err instanceof Error ? err.message : 'خطأ في جلب أنواع الجولات')
@@ -48,10 +67,12 @@ export const useRoundTypes = (): UseRoundTypesReturn => {
   const createRoundType = async (data: Omit<RoundTypeSettings, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       setError(null)
-      const response = await apiClient.createRoundType(data)
-      
-      if (response.success && response.data) {
-        setRoundTypes(prev => [...prev, response.data])
+      const snakeData = mapToSnakeCase(data)
+      const response = await apiClient.createRoundType(snakeData)
+
+      const newRoundTypeRaw = response?.data || response
+      if (newRoundTypeRaw && newRoundTypeRaw.id) {
+        setRoundTypes(prev => [...prev, mapToCamelCase(newRoundTypeRaw)])
       } else {
         throw new Error('فشل في إنشاء نوع الجولة')
       }
@@ -65,11 +86,17 @@ export const useRoundTypes = (): UseRoundTypesReturn => {
   const updateRoundType = async (id: number, data: Partial<RoundTypeSettings>) => {
     try {
       setError(null)
-      const response = await apiClient.updateRoundType(id, data)
-      
-      if (response.success && response.data) {
-        setRoundTypes(prev => 
-          prev.map(rt => rt.id === id ? { ...rt, ...response.data } : rt)
+      const snakeData = mapToSnakeCase(data)
+      // Remove undefined fields
+      Object.keys(snakeData).forEach(key =>
+        (snakeData as any)[key] === undefined && delete (snakeData as any)[key]
+      )
+
+      const response = await apiClient.updateRoundType(id, snakeData)
+      const updatedRaw = response?.data || response
+      if (updatedRaw) {
+        setRoundTypes(prev =>
+          prev.map(rt => rt.id === id ? mapToCamelCase(updatedRaw) : rt)
         )
       } else {
         throw new Error('فشل في تحديث نوع الجولة')
@@ -85,8 +112,11 @@ export const useRoundTypes = (): UseRoundTypesReturn => {
     try {
       setError(null)
       const response = await apiClient.deleteRoundType(id)
-      
-      if (response.success) {
+
+      // Backend returns { message: "..." } or success object
+      const isSuccess = response?.success || response?.message || response?.status === 'success' || response === true
+
+      if (isSuccess || (response && !response.error)) {
         setRoundTypes(prev => prev.filter(rt => rt.id !== id))
       } else {
         throw new Error('فشل في حذف نوع الجولة')

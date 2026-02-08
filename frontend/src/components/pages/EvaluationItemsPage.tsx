@@ -34,7 +34,7 @@ const EvaluationItemsPage: React.FC = () => {
     const category = categories.find(cat => cat.id === categoryId)
     const categoryCode = category?.name.substring(0, 2).toUpperCase() || 'IT'
     const categoryItems = items.filter(item => item.category_id === categoryId)
-    
+
     // البحث عن أعلى رقم موجود في الكود
     let maxNumber = 0
     categoryItems.forEach(item => {
@@ -46,7 +46,7 @@ const EvaluationItemsPage: React.FC = () => {
         }
       }
     })
-    
+
     const nextNumber = maxNumber + 1
     return `${categoryCode}-${nextNumber.toString().padStart(3, '0')}`
   }
@@ -54,7 +54,7 @@ const EvaluationItemsPage: React.FC = () => {
   const handleCreateItem = async (data: Partial<EvaluationItem>) => {
     try {
       const selectedCategory = categories.find(cat => cat.id === Number(data.category_id))
-      
+
       if (!selectedCategory) {
         alert('يرجى اختيار تصنيف صحيح')
         return
@@ -64,14 +64,14 @@ const EvaluationItemsPage: React.FC = () => {
       let itemCode = generateItemCode(Number(data.category_id))
       let attempts = 0
       const maxAttempts = 10
-      
+
       // التأكد من عدم تكرار الكود
       while (attempts < maxAttempts) {
         const existingItem = items.find(item => item.code === itemCode)
         if (!existingItem) {
           break
         }
-        
+
         // زيادة الرقم وإعادة المحاولة
         const match = itemCode.match(/-(\d+)$/)
         if (match) {
@@ -99,14 +99,14 @@ const EvaluationItemsPage: React.FC = () => {
         guidance_en: data.guidance_en || '',
         standard_version: data.standard_version || ''
       }
-      
+
       console.log('Creating item with code:', itemCode)
       // ensure required backend fields are set
       const payload = { ...newItemData, is_active: true }
       await addItem(payload as any)
       setShowCreateForm(false)
       setEditingItem(null)
-      
+
       console.log(`تم إضافة عنصر جديد: ${newItemData.title} إلى تصنيف: ${selectedCategory.name}`)
     } catch (error) {
       console.error('Failed to create item:', error)
@@ -122,7 +122,7 @@ const EvaluationItemsPage: React.FC = () => {
   const handleUpdateItem = async (data: Partial<EvaluationItem>) => {
     try {
       const selectedCategory = categories.find(cat => cat.id === Number(data.category_id))
-      
+
       if (!selectedCategory) {
         alert('يرجى اختيار تصنيف صحيح')
         return
@@ -148,12 +148,12 @@ const EvaluationItemsPage: React.FC = () => {
         guidance_en: data.guidance_en !== undefined ? data.guidance_en : editingItem.guidance_en,
         standard_version: data.standard_version !== undefined ? data.standard_version : editingItem.standard_version
       }
-      
+
       console.log('تحديث العنصر مع البيانات:', updatedItemData)
       await updateItem(editingItem.id, updatedItemData as any)
       setShowCreateForm(false)
       setEditingItem(null)
-      
+
       console.log(`✅ تم تحديث العنصر بنجاح: ${updatedItemData.title} في تصنيف: ${selectedCategory.name}`)
       alert('✅ تم تحديث العنصر بنجاح')
     } catch (error) {
@@ -210,14 +210,14 @@ const EvaluationItemsPage: React.FC = () => {
   // دالة لعرض أنواع الدليل المتعددة كـ badges منفصلة
   const renderEvidenceTypes = (evidenceType: string) => {
     if (!evidenceType) return null
-    
+
     // تقسيم القيم المتعددة
     const types = evidenceType.split(',').map(type => type.trim())
-    
+
     return (
       <div className="flex flex-wrap gap-1 justify-center">
         {types.map((type, index) => (
-          <span 
+          <span
             key={index}
             className={cn(
               'px-2 py-1 rounded-full text-xs font-medium border',
@@ -231,15 +231,16 @@ const EvaluationItemsPage: React.FC = () => {
     )
   }
 
-  const filteredItems = items.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (item.title_en && item.title_en.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                         (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                         (item.objective && item.objective.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredItems = (Array.isArray(items) ? items : []).filter(item => {
+    if (!item) return false;
+    const matchesSearch = (item.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.title_en && item.title_en.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (item.objective && item.objective.toLowerCase().includes(searchTerm.toLowerCase()))
     const matchesCategory = filterCategory === 'all' || item.category_id === Number(filterCategory)
-    const matchesStatus = filterStatus === 'all' || 
-                         (filterStatus === 'active' && item.is_active) ||
-                         (filterStatus === 'inactive' && !item.is_active)
+    const matchesStatus = filterStatus === 'all' ||
+      (filterStatus === 'active' && item.is_active) ||
+      (filterStatus === 'inactive' && !item.is_active)
     return matchesSearch && matchesCategory && matchesStatus
   })
 
@@ -332,7 +333,7 @@ const EvaluationItemsPage: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">ارتباط العنصر *</label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 bg-gray-50 rounded-lg border">
-              {getActiveObjectiveOptions().map((option) => (
+              {(Array.isArray(getActiveObjectiveOptions()) ? getActiveObjectiveOptions() : []).map((option) => (
                 <label key={option.id} className="flex items-center gap-3 p-3 bg-white rounded-md border hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-colors">
                   <input type="checkbox" name="objective" value={option.name} defaultChecked={editingItem?.objective?.includes(option.name) || false} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" />
                   <div className="flex-1">
@@ -404,11 +405,11 @@ const EvaluationItemsPage: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">إلزامي؟</label>
               <div className="flex items-center gap-2 h-full pt-2">
-                <input 
-                  type="checkbox" 
-                  name="is_required" 
-                  defaultChecked={editingItem?.is_required || false} 
-                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" 
+                <input
+                  type="checkbox"
+                  name="is_required"
+                  defaultChecked={editingItem?.is_required || false}
+                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
                 />
                 <span className="text-sm text-gray-600">عنصر مطلوب (إلزامي)</span>
               </div>
@@ -486,7 +487,7 @@ const EvaluationItemsPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">نشط</p>
-                <p className="text-2xl font-bold text-green-600">{items.filter((i) => i.is_active).length}</p>
+                <p className="text-2xl font-bold text-green-600">{(Array.isArray(items) ? items : []).filter((i) => i && i.is_active).length}</p>
               </div>
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                 <div className="w-4 h-4 bg-green-600 rounded-full"></div>
@@ -500,7 +501,7 @@ const EvaluationItemsPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">مطلوب</p>
-                <p className="text-2xl font-bold text-red-600">{items.filter((i) => i.is_required).length}</p>
+                <p className="text-2xl font-bold text-red-600">{(Array.isArray(items) ? items : []).filter((i) => i && i.is_required).length}</p>
               </div>
               <AlertTriangle className="w-8 h-8 text-red-600" />
             </div>
@@ -513,7 +514,7 @@ const EvaluationItemsPage: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-gray-600">متوسط الوزن</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {items.length > 0 ? (items.reduce((sum, i) => sum + i.weight, 0) / items.length).toFixed(1) : '-'}
+                  {Array.isArray(items) && items.length > 0 ? (items.reduce((sum, i) => sum + (i?.weight || 0), 0) / items.length).toFixed(1) : '-'}
                 </p>
               </div>
               <Target className="w-8 h-8 text-blue-600" />
@@ -595,8 +596,8 @@ const EvaluationItemsPage: React.FC = () => {
                 {item.category_name}
               </span>
               <Badge variant={
-                item.risk_level === 'CRITICAL' ? 'destructive' : 
-                item.risk_level === 'MAJOR' ? 'default' : 'secondary'
+                item.risk_level === 'CRITICAL' ? 'destructive' :
+                  item.risk_level === 'MAJOR' ? 'default' : 'secondary'
               }>
                 {item.risk_level === 'CRITICAL' ? 'حرج' : item.risk_level === 'MAJOR' ? 'جسيم' : 'بسيط'}
               </Badge>

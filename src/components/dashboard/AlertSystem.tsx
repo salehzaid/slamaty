@@ -16,6 +16,7 @@ import {
   Calendar
 } from 'lucide-react'
 import { apiClient } from '@/lib/api'
+import { formatDDMMYYYY } from '@/lib/date'
 
 interface Alert {
   id: number
@@ -57,7 +58,7 @@ const AlertSystem: React.FC<AlertSystemProps> = ({
       const params = new URLSearchParams()
 
       if (userId) params.append('user_id', userId.toString())
-      if (filter !== 'all') params.append('filter', filter)
+      if (filter !== 'all') params.append('filter_type', filter)
       if (priorityFilter !== 'all') params.append('priority', priorityFilter)
 
       if (params.toString()) {
@@ -178,7 +179,7 @@ const AlertSystem: React.FC<AlertSystemProps> = ({
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US')
+    return formatDDMMYYYY(dateString as any)
   }
 
   const formatTime = (dateString: string) => {

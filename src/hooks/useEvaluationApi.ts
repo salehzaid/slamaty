@@ -8,7 +8,6 @@ export interface EvaluationCategory {
   description?: string
   color: string
   icon: string
-  weight_percent: number
   is_active: boolean
   created_at: string
   updated_at: string
@@ -22,7 +21,6 @@ export interface EvaluationItem {
   description?: string
   objective?: string
   category_id: number
-  category_ids?: number[]
   category_name: string
   category_color: string
   is_active: boolean
@@ -37,9 +35,87 @@ export interface EvaluationItem {
   updated_at: string
 }
 
+// Mock data for development
+const mockCategories: EvaluationCategory[] = [
+  {
+    id: 1,
+    name: 'الجودة',
+    name_en: 'Quality',
+    description: 'تصنيف معايير الجودة والتحسين المستمر',
+    color: 'green',
+    icon: 'check-circle',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-15T10:30:00Z'
+  },
+  {
+    id: 2,
+    name: 'مكافحة العدوى',
+    name_en: 'Infection Control',
+    description: 'تصنيف معايير مكافحة العدوى والوقاية منها',
+    color: 'red',
+    icon: 'shield',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-15T10:30:00Z'
+  },
+  {
+    id: 3,
+    name: 'سلامة المرضى',
+    name_en: 'Patient Safety',
+    description: 'تصنيف معايير سلامة المرضى والرعاية الآمنة',
+    color: 'blue',
+    icon: 'heart',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-15T10:30:00Z'
+  }
+]
 
-// Mock data removed in favor of real API data
-
+const mockItems: EvaluationItem[] = [
+  {
+    id: 1,
+    code: 'Q001',
+    title: 'التحقق من هوية المريض',
+    title_en: 'Patient Identity Verification',
+    description: 'التأكد من التحقق من هوية المريض بشكل صحيح',
+    objective: 'منع الأخطاء الطبية',
+    category_id: 1,
+    category_name: 'الجودة',
+    category_color: 'green',
+    is_active: true,
+    is_required: true,
+    weight: 5,
+    risk_level: 'CRITICAL' as const,
+    evidence_type: 'OBSERVATION' as const,
+    guidance_ar: 'يجب التحقق من هوية المريض قبل أي إجراء طبي',
+    guidance_en: 'Patient identity must be verified before any medical procedure',
+    standard_version: '1.0',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-15T10:30:00Z'
+  },
+  {
+    id: 2,
+    code: 'IC001',
+    title: 'غسل اليدين',
+    title_en: 'Hand Hygiene',
+    description: 'التأكد من تطبيق معايير غسل اليدين',
+    objective: 'منع انتقال العدوى',
+    category_id: 2,
+    category_name: 'مكافحة العدوى',
+    category_color: 'red',
+    is_active: true,
+    is_required: true,
+    weight: 5,
+    risk_level: 'CRITICAL' as const,
+    evidence_type: 'OBSERVATION' as const,
+    guidance_ar: 'يجب غسل اليدين قبل وبعد التعامل مع المرضى',
+    guidance_en: 'Hands must be washed before and after patient contact',
+    standard_version: '1.0',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-15T10:30:00Z'
+  }
+]
 
 export const useEvaluationApi = () => {
   const [categories, setCategories] = useState<EvaluationCategory[]>([])
@@ -52,18 +128,18 @@ export const useEvaluationApi = () => {
     try {
       setLoading(true)
       setError(null)
-
+      
       // تحديث الـ token قبل إرسال الطلب
       apiClient.refreshToken()
-
+      
       console.log('Loading categories from database...')
       console.log('Current token:', localStorage.getItem('access_token') ? 'Token exists' : 'No token')
-
+      
       const response = await apiClient.getEvaluationCategories()
       console.log('Categories response:', response)
       const categoriesData = response.data || response
       console.log('Setting categories:', categoriesData)
-
+      
       // تأكد من أن البيانات صحيحة
       if (Array.isArray(categoriesData)) {
         setCategories(categoriesData)
@@ -73,7 +149,7 @@ export const useEvaluationApi = () => {
       }
     } catch (err: any) {
       console.error('Failed to load categories from database:', err)
-
+      
       // التحقق من أخطاء التوثيق
       if (err.message?.includes('Authentication required') || err.message?.includes('403')) {
         setError('يجب تسجيل الدخول أولاً')
@@ -91,18 +167,18 @@ export const useEvaluationApi = () => {
     try {
       setLoading(true)
       setError(null)
-
+      
       // تحديث الـ token قبل إرسال الطلب
       apiClient.refreshToken()
-
+      
       console.log('Loading items from database...')
       console.log('Current token:', localStorage.getItem('access_token') ? 'Token exists' : 'No token')
-
+      
       const response = await apiClient.getEvaluationItems()
       console.log('Items response:', response)
       const itemsData = response.data || response
       console.log('Setting items:', itemsData)
-
+      
       // تأكد من أن البيانات صحيحة
       if (Array.isArray(itemsData)) {
         setItems(itemsData)
@@ -112,7 +188,7 @@ export const useEvaluationApi = () => {
       }
     } catch (err: any) {
       console.error('Failed to load items from database:', err)
-
+      
       // التحقق من أخطاء التوثيق
       if (err.message?.includes('Authentication required') || err.message?.includes('403')) {
         setError('يجب تسجيل الدخول أولاً')
@@ -211,19 +287,19 @@ export const useEvaluationApi = () => {
     try {
       setLoading(true)
       setError(null)
-
+      
       console.log('🔄 Updating item:', id)
       console.log('📤 Sending data:', itemData)
-
+      
       const response = await apiClient.updateEvaluationItem(id, itemData)
-
+      
       console.log('📥 Response:', response)
-
+      
       const updatedItem = response.data || response
       setItems(prev => prev.map(item => item.id === id ? updatedItem : item))
-
+      
       console.log('✅ Item updated successfully')
-
+      
       return updatedItem
     } catch (err: any) {
       console.error('❌ Failed to update item:', err)
@@ -253,7 +329,7 @@ export const useEvaluationApi = () => {
 
   // Helper functions
   const getItemsByCategory = (categoryId: number) => {
-    return (Array.isArray(items) ? items : []).filter(item => item && item.category_id === categoryId)
+    return items.filter(item => item.category_id === categoryId)
   }
 
   const getCategoryById = (id: number) => {

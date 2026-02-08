@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  BarChart3,
-  Download,
-  Calendar,
+import { 
+  BarChart3, 
+  Download, 
+  Calendar, 
   Filter,
   TrendingUp,
   TrendingDown,
@@ -17,7 +17,7 @@ import {
   Building2
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { apiClient, API_BASE_URL } from '@/lib/api'
+import { apiClient } from '@/lib/api'
 
 interface ReportData {
   period: string
@@ -83,7 +83,7 @@ const BasicReports: React.FC<BasicReportsProps> = ({
       if (selectedDepartment !== 'all') {
         params.append('department_id', selectedDepartment)
       }
-
+      
       if (dateRange) {
         params.append('start_date', dateRange.start.toISOString())
         params.append('end_date', dateRange.end.toISOString())
@@ -93,7 +93,7 @@ const BasicReports: React.FC<BasicReportsProps> = ({
         endpoint += `?${params.toString()}`
       }
 
-      const response = await apiClient.get(endpoint)
+      const response = await apiClient.request(endpoint)
       const data = response.data || response
       setReportData(data)
     } catch (err) {
@@ -117,7 +117,7 @@ const BasicReports: React.FC<BasicReportsProps> = ({
       if (selectedDepartment !== 'all') {
         params.append('department_id', selectedDepartment)
       }
-
+      
       if (dateRange) {
         params.append('start_date', dateRange.start.toISOString())
         params.append('end_date', dateRange.end.toISOString())
@@ -127,9 +127,9 @@ const BasicReports: React.FC<BasicReportsProps> = ({
         endpoint += `?${params.toString()}`
       }
 
-      const response = await fetch(`${API_BASE_URL}${endpoint}`)
+      const response = await fetch(endpoint)
       const blob = await response.blob()
-
+      
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -249,7 +249,7 @@ const BasicReports: React.FC<BasicReportsProps> = ({
                 <option value="year">سنة</option>
               </select>
             </div>
-
+            
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-700">القسم:</span>
               <select
@@ -400,21 +400,21 @@ const BasicReports: React.FC<BasicReportsProps> = ({
         <CardContent>
           <div className="space-y-4">
             {reportData.department_stats.map((dept, index) => {
-              const completionRate = dept.total_capas > 0
+              const completionRate = dept.total_capas > 0 
                 ? Math.round((dept.completed_capas / dept.total_capas) * 100)
                 : 0
-
+              
               return (
                 <div key={index} className="p-4 border rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium text-gray-900">{dept.department}</h4>
-                    <Badge className={completionRate >= 80 ? 'bg-green-100 text-green-800' :
-                      completionRate >= 60 ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'}>
+                    <Badge className={completionRate >= 80 ? 'bg-green-100 text-green-800' : 
+                                     completionRate >= 60 ? 'bg-yellow-100 text-yellow-800' : 
+                                     'bg-red-100 text-red-800'}>
                       {completionRate}% إنجاز
                     </Badge>
                   </div>
-
+                  
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
                       <p className="text-gray-600">إجمالي</p>
@@ -429,17 +429,18 @@ const BasicReports: React.FC<BasicReportsProps> = ({
                       <p className="font-medium text-red-600">{dept.overdue_capas}</p>
                     </div>
                   </div>
-
+                  
                   <div className="mt-2">
                     <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
                       <span>التقدم</span>
                       <span>{completionRate}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full ${completionRate >= 80 ? 'bg-green-500' :
+                      <div 
+                        className={`h-2 rounded-full ${
+                          completionRate >= 80 ? 'bg-green-500' :
                           completionRate >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                          }`}
+                        }`}
                         style={{ width: `${completionRate}%` }}
                       ></div>
                     </div>
@@ -466,7 +467,7 @@ const BasicReports: React.FC<BasicReportsProps> = ({
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="font-medium text-gray-900">{trend.month}</h4>
                 </div>
-
+                
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-blue-600">{trend.created}</p>

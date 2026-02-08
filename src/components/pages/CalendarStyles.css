@@ -1,120 +1,106 @@
-/* Custom styles for FullCalendar to match Salamaty design system */
-
+/* Base FullCalendar Styles Customization */
 .fc {
-    direction: rtl;
-    font-family: inherit;
+  font-family: inherit;
+  direction: rtl;
 }
 
-.fc .fc-toolbar-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1e293b;
+.fc-toolbar-title {
+  font-size: 1.5rem !important;
+  font-weight: 700;
+  color: #1e293b;
 }
 
-.fc .fc-button-primary {
-    background-color: #ffffff;
-    border-color: #e2e8f0;
-    color: #475569;
-    font-weight: 500;
-    text-transform: capitalize;
-    padding: 0.5rem 1rem;
-    transition: all 0.2s;
+.fc-button-primary {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+  transition: all 0.2s;
+  text-transform: capitalize;
+  font-weight: 500;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-.fc .fc-button-primary:hover {
-    background-color: #f8fafc;
-    border-color: #cbd5e1;
-    color: #1e293b;
+.fc-button-primary:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
 }
 
-.fc .fc-button-active {
-    background-color: #3b82f6 !important;
-    border-color: #3b82f6 !important;
-    color: #ffffff !important;
+.fc-button-primary:active, 
+.fc-button-primary.fc-button-active {
+  background-color: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  color: #3b82f6 !important;
+  box-shadow: none;
 }
 
-.fc .fc-button-primary:not(:disabled):active,
-.fc .fc-button-primary:not(:disabled).fc-button-active {
-    background-color: #3b82f6;
-    border-color: #3b82f6;
-    color: #ffffff;
-}
-
-.fc .fc-col-header-cell {
-    background-color: #f8fafc;
-    padding: 0.75rem 0;
-    font-weight: 600;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
-}
-
-.fc td,
-.fc th {
-    border: 1px solid #e2e8f0;
-}
-
-.fc .fc-day-today {
-    background-color: #eff6ff !important;
+.fc-daygrid-day-number,
+.fc-col-header-cell-cushion {
+  color: #475569;
+  text-decoration: none !important;
 }
 
 .fc-event {
-    cursor: pointer;
-    border: none;
-    padding: 2px 4px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    transition: transform 0.1s;
+  cursor: pointer;
+  border: none !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+  padding: 2px 4px;
+  border-radius: 6px;
+  margin-bottom: 2px !important;
 }
 
 .fc-event:hover {
-    transform: scale(1.02);
-    filter: brightness(0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 5;
 }
 
-.fc-v-event .fc-event-main {
-    color: inherit;
+.fc-day-today {
+  background-color: #f8fafc !important;
 }
 
-.fc .fc-timegrid-slot {
-    height: 3rem;
-    border-bottom: 1px solid #f1f5f9;
+.fc-daygrid-day-frame {
+  padding: 4px;
 }
 
-.fc-direction-rtl .fc-toolbar>*> :not(:first-child) {
-    margin-right: 0.75rem;
+/* RTL Specific fixes */
+.fc-header-toolbar {
+  flex-direction: row-reverse;
 }
 
-.fc .fc-daygrid-day-number {
-    padding: 8px;
-    color: #64748b;
-    font-weight: 500;
+/* Event content styling */
+.fc-event-main {
+  padding: 2px 4px;
+  font-weight: 500;
+  font-size: 0.85rem;
 }
 
-.fc .fc-daygrid-day-top {
-    flex-direction: row-reverse;
+/* More spacious grid */
+.fc-view-harness {
+  background-color: white;
+  min-height: 600px;
 }
 
-/* Event status colors */
-.event-status-active {
-    background-color: #3b82f6;
-    border-right: 4px solid #1d4ed8 !important;
-    color: white;
+.fc .fc-bg-event {
+  opacity: 0.1;
 }
 
-.event-status-pending {
-    background-color: #f59e0b;
-    border-right: 4px solid #d97706 !important;
-    color: white;
+.fc-timegrid-slot-label-cushion {
+  font-size: 0.8rem;
+  color: #64748b;
 }
 
-.event-status-completed {
-    background-color: #10b981;
-    border-right: 4px solid #059669 !important;
-    color: white;
+/* Week/Day View header */
+.fc-col-header-cell {
+  background-color: #f8fafc;
+  padding: 12px 0;
 }
 
-.event-status-missed {
-    background-color: #ef4444;
-    border-right: 4px solid #dc2626 !important;
-    color: white;
+/* Fix z-index for popovers/tooltips */
+.fc-popover {
+  z-index: 50 !important;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
 }

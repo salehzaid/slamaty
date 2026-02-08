@@ -42,7 +42,6 @@ interface EvaluationItem {
   title_en: string
   code: string
   category_id: number
-  category_ids?: number[]
   description: string
   weight: number
   is_required: boolean
@@ -62,25 +61,6 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
     selected_items: initialData?.evaluation_items ? (Array.isArray(initialData.evaluation_items) ? initialData.evaluation_items : JSON.parse(initialData.evaluation_items)) : [] as number[],
     notes: initialData?.notes || ''
   })
-
-
-
-  // Data fetching - Use simple useState and useEffect
-  const [users, setUsers] = useState<User[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [evaluationItems, setEvaluationItems] = useState<EvaluationItem[]>([])
-  const [usersLoading, setUsersLoading] = useState(true)
-  const [categoriesLoading, setCategoriesLoading] = useState(true)
-  const [itemsLoading, setItemsLoading] = useState(true)
-  const [usersError, setUsersError] = useState<string | null>(null)
-  const [categoriesError, setCategoriesError] = useState<string | null>(null)
-  const [itemsError, setItemsError] = useState<string | null>(null)
-
-  // Use departments hook
-  const { data: departments, loading: departmentsLoading, error: departmentsError } = useDepartments()
-
-  // Use round types hook
-  const { roundTypes, loading: roundTypesLoading, error: roundTypesError } = useRoundTypes()
 
   // Keep formData in sync when initialData (edit payload) arrives or users/items load
   useEffect(() => {
@@ -109,12 +89,13 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
             return mapped
           }
         }
-
         if (typeof raw === 'string') {
           try {
             const parsed = JSON.parse(raw)
             if (Array.isArray(parsed)) {
+              // if parsed is array of numbers
               if (parsed.length > 0 && typeof parsed[0] === 'number') return parsed
+              // else try to map names to ids
               const mapped = parsed.map((name: string) => {
                 const u = users.find((uu: any) => (uu.first_name + ' ' + uu.last_name).trim() === name.trim() || uu.email === name || uu.username === name)
                 return u ? u.id : null
@@ -123,6 +104,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
             }
             return []
           } catch (err) {
+            // maybe single name
             const u = users.find((uu: any) => (uu.first_name + ' ' + uu.last_name).trim() === raw.trim() || uu.email === raw || uu.username === raw)
             return u ? [u.id] : []
           }
@@ -156,7 +138,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
     const parsedItems = parseSelectedItems()
 
     // derive categories from items if not explicitly provided
-    let parsedCategories = initialData.selected_categories && initialData.selected_categories.length > 0
+    let parsedCategories: number[] = initialData.selected_categories && initialData.selected_categories.length > 0
       ? initialData.selected_categories
       : []
 
@@ -165,16 +147,13 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
       parsedCategories = Array.from(new Set(parsedItems.map((id: number) => {
         const it = evaluationItems.find(i => i.id === id)
         return it ? it.category_id : null
-      }).filter(Boolean)))
+      }).filter((x): x is number => x !== null)))
     }
 
-    // Auto-fetch if needed (fire-and-forget or handled by other effects)
-    // Removed complex async fetch inside useEffect to avoid complexity, relying on main data fetch
-
     // Ensure round_type uses the display name used in roundTypes when initialData provides enum key
-    const resolvedRoundType = (() => {
+    const resolveRoundType = (currentRoundType: string) => {
       const incoming = initialData.roundType ?? initialData.round_type
-      if (!incoming) return formData.round_type
+      if (!incoming) return currentRoundType
       // Normalize case for comparison
       const incomingKey = typeof incoming === 'string' ? String(incoming).toLowerCase() : incoming
       // If incoming looks like an enum key (contains underscore) or is uppercase, try to find matching display name in roundTypes
@@ -183,11 +162,11 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
         if (match) return match.name
       }
       return incoming
-    })()
+    }
 
     setFormData(prev => ({
       ...prev,
-      round_type: resolvedRoundType,
+      round_type: resolveRoundType(prev.round_type),
       department: initialData.department ?? prev.department,
       scheduled_date: initialData.scheduledDate ? new Date(initialData.scheduledDate).toISOString().split('T')[0] : (initialData.scheduled_date ? new Date(initialData.scheduled_date).toISOString().split('T')[0] : prev.scheduled_date),
       deadline: initialData.deadline ?? prev.deadline,
@@ -199,15 +178,32 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
     }))
   }, [initialData, users, evaluationItems, roundTypes])
 
+  // Data fetching - Use simple useState and useEffect
+  const [users, setUsers] = useState<User[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [evaluationItems, setEvaluationItems] = useState<EvaluationItem[]>([])
+  const [usersLoading, setUsersLoading] = useState(true)
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
+  const [itemsLoading, setItemsLoading] = useState(true)
+  const [usersError, setUsersError] = useState<string | null>(null)
+  const [categoriesError, setCategoriesError] = useState<string | null>(null)
+  const [itemsError, setItemsError] = useState<string | null>(null)
+
+  // Use departments hook
+  const { data: departments, loading: departmentsLoading, error: departmentsError } = useDepartments()
+  
+  // Use round types hook
+  const { roundTypes, loading: roundTypesLoading, error: roundTypesError } = useRoundTypes()
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [usersData, categoriesData, itemsData] = await Promise.all([
-          apiClient.get('/api/users/assessors'),
+          apiClient.getAssessors(),
           apiClient.getEvaluationCategories(),
           apiClient.getEvaluationItems()
         ])
-
+        
         const normalizeUsers = (d: any) => {
           if (!d) return []
           if (Array.isArray(d)) return d
@@ -219,7 +215,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
 
         const normalizedUsers = normalizeUsers(usersData)
         setUsers(normalizedUsers)
-
+        
         // 🔍 DEBUG: تحليل بنية بيانات المستخدمين
         console.log('🔍 Users API Response:', usersData)
         console.log('👥 Normalized Users:', normalizedUsers)
@@ -237,7 +233,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
             })
           })
         }
-
+        
         setCategories(Array.isArray(categoriesData) ? categoriesData : [])
         setEvaluationItems(Array.isArray(itemsData) ? itemsData : [])
       } catch (error) {
@@ -261,10 +257,8 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
       if (!evaluationItems || !Array.isArray(evaluationItems)) {
         return []
       }
-      return evaluationItems.filter((item: EvaluationItem) =>
-        formData.selected_categories.some((catId: number) =>
-          item.category_ids?.includes(catId)
-        )
+      return evaluationItems.filter((item: EvaluationItem) => 
+        formData.selected_categories.includes(item.category_id)
       )
     } catch (error) {
       console.error('Error filtering items:', error)
@@ -348,7 +342,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
   // Handle form submission
   const handleSubmit = React.useCallback((e: React.FormEvent) => {
     e.preventDefault()
-
+    
     const submitData = {
       ...formData,
       round_code: roundCode,
@@ -407,7 +401,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
 
   // Get selected categories names
   const getSelectedCategoriesNames = React.useCallback(() => {
-    return formData.selected_categories.map(id =>
+    return formData.selected_categories.map(id => 
       categories?.find((c: Category) => c.id === id)?.name || ''
     ).filter(Boolean)
   }, [formData.selected_categories, categories])
@@ -533,10 +527,11 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                     return (
                       <div
                         key={type.id}
-                        className={`p-2 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 ${formData.round_type === type.name
-                          ? 'border-blue-500 bg-blue-50 shadow-md scale-105'
-                          : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
-                          }`}
+                        className={`p-2 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 ${
+                          formData.round_type === type.name
+                            ? 'border-blue-500 bg-blue-50 shadow-md scale-105'
+                            : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                        }`}
                         onClick={() => setFormData(prev => ({ ...prev, round_type: type.name }))}
                       >
                         <div className="flex items-center gap-2">
@@ -587,10 +582,11 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                   {departments.map(dept => (
                     <div
                       key={dept.id}
-                      className={`p-2 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 ${formData.department === dept.name
-                        ? 'border-blue-500 bg-blue-50 shadow-md scale-105'
-                        : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
-                        }`}
+                      className={`p-2 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 ${
+                        formData.department === dept.name
+                          ? 'border-blue-500 bg-blue-50 shadow-md scale-105'
+                          : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                      }`}
                       onClick={() => setFormData(prev => ({ ...prev, department: dept.name }))}
                     >
                       <div className="flex items-center gap-2">
@@ -638,7 +634,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                   />
                 </div>
               </div>
-
+              
               <div>
                 <Label htmlFor="deadline" className="text-sm font-semibold text-gray-700 mb-2 block">
                   المهلة
@@ -670,10 +666,11 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                 {priorityOptions.map(option => (
                   <div
                     key={option.value}
-                    className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md ${formData.priority === option.value
-                      ? 'border-blue-500 bg-blue-50 shadow-md'
-                      : 'border-gray-200 hover:border-gray-300 bg-white'
-                      }`}
+                    className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md ${
+                      formData.priority === option.value
+                        ? 'border-blue-500 bg-blue-50 shadow-md'
+                        : 'border-gray-200 hover:border-gray-300 bg-white'
+                    }`}
                     onClick={() => setFormData(prev => ({ ...prev, priority: option.value }))}
                   >
                     <div className="flex items-center gap-3">
@@ -705,10 +702,11 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                   {categories.map((category: Category) => (
                     <div
                       key={category.id}
-                      className={`p-2 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 ${formData.selected_categories.includes(category.id)
-                        ? 'border-blue-500 bg-blue-50 shadow-md scale-105'
-                        : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
-                        }`}
+                      className={`p-2 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 ${
+                        formData.selected_categories.includes(category.id)
+                          ? 'border-blue-500 bg-blue-50 shadow-md scale-105'
+                          : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                      }`}
                       onClick={() => handleCategoryToggle(category.id)}
                     >
                       <div className="flex items-center gap-2">
@@ -734,7 +732,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                   <span>لا توجد تصنيفات متاحة</span>
                 </div>
               )}
-
+              
               {/* Selected Categories */}
               {formData.selected_categories.length > 0 && (
                 <div className="mt-3">
@@ -743,8 +741,8 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                     {getSelectedCategoriesNames().map((name, index) => (
                       <Badge key={index} variant="secondary" className="flex items-center gap-1 text-xs px-2 py-1">
                         {name}
-                        <X
-                          className="w-2.5 h-2.5 cursor-pointer hover:text-red-500"
+                        <X 
+                          className="w-2.5 h-2.5 cursor-pointer hover:text-red-500" 
                           onClick={() => handleCategoryToggle(formData.selected_categories[index])}
                         />
                       </Badge>
@@ -773,14 +771,15 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                         return (
                           <div
                             key={item.id}
-                            className={`p-3 border rounded-lg cursor-pointer transition-all ${formData.selected_items.includes(item.id)
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-gray-300'
-                              }`}
+                            className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                              formData.selected_items.includes(item.id)
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
                             onClick={() => handleItemToggle(item.id)}
                           >
                             <div className="flex items-start gap-3">
-                              <Checkbox
+                              <Checkbox 
                                 checked={formData.selected_items.includes(item.id)}
                                 onChange={() => handleItemToggle(item.id)}
                               />
@@ -816,7 +815,7 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                     </div>
                   )}
                 </div>
-
+                
                 {/* Selected Items */}
                 {formData.selected_items.length > 0 && (
                   <div className="mt-3">
@@ -827,8 +826,8 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                           return (
                             <Badge key={index} variant="secondary" className="flex items-center gap-1">
                               {name}
-                              <X
-                                className="w-3 h-3 cursor-pointer"
+                              <X 
+                                className="w-3 h-3 cursor-pointer" 
                                 onClick={() => handleItemToggle(formData.selected_items[index])}
                               />
                             </Badge>
@@ -859,42 +858,43 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                     console.log('Total users:', users?.length || 0)
                     console.log('Filtered assessors:', assessors.length)
                     console.log('Assessor details:', assessors.map(u => ({ id: u.id, name: `${u.first_name} ${u.last_name}`, role: u.role })))
-
+                    
                     if (users && users.length > 0) {
                       console.log('All users roles:', users.map(u => ({ id: u.id, name: `${u.first_name} ${u.last_name}`, role: u.role })))
                     }
-
+                    
                     return assessors.map((user: User) => (
-                      <div
-                        key={user.id}
-                        className={`p-3 border rounded-lg cursor-pointer transition-all ${formData.assigned_users.includes(user.id)
+                    <div
+                      key={user.id}
+                      className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                        formData.assigned_users.includes(user.id)
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                        onClick={() => handleUserToggle(user.id)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Checkbox
-                            checked={formData.assigned_users.includes(user.id)}
-                            onChange={() => handleUserToggle(user.id)}
-                          />
-                          <div>
-                            <h4 className="font-medium">{user.first_name} {user.last_name}</h4>
-                            <p className="text-sm text-gray-500">{user.email}</p>
-                            <Badge variant="outline" className="text-xs mt-1">
-                              {user.role === 'super_admin' ? 'مدير النظام' :
-                                user.role === 'assessor' ? 'مقيم' :
-                                  user.role === 'quality_manager' ? 'مدير الجودة' :
-                                    user.role === 'department_head' ? 'رئيس القسم' : 'مشاهد'}
-                            </Badge>
-                          </div>
+                      }`}
+                      onClick={() => handleUserToggle(user.id)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Checkbox 
+                          checked={formData.assigned_users.includes(user.id)}
+                          onChange={() => handleUserToggle(user.id)}
+                        />
+                        <div>
+                          <h4 className="font-medium">{user.first_name} {user.last_name}</h4>
+                          <p className="text-sm text-gray-500">{user.email}</p>
+                          <Badge variant="outline" className="text-xs mt-1">
+                            {user.role === 'super_admin' ? 'مدير النظام' : 
+                             user.role === 'assessor' ? 'مقيم' : 
+                             user.role === 'quality_manager' ? 'مدير الجودة' :
+                             user.role === 'department_head' ? 'رئيس القسم' : 'مشاهد'}
+                          </Badge>
                         </div>
                       </div>
-                    ))
+                    </div>
+                  ))
                   })()
                 )}
               </div>
-
+              
               {/* Selected Users */}
               {formData.assigned_users.length > 0 && (
                 <div className="mt-3">
@@ -904,8 +904,8 @@ const RoundForm: React.FC<RoundFormProps> = ({ onSubmit, onCancel, initialData, 
                       <Badge key={index} variant="secondary" className="flex items-center gap-1">
                         <Users className="w-3 h-3" />
                         {name}
-                        <X
-                          className="w-3 h-3 cursor-pointer"
+                        <X 
+                          className="w-3 h-3 cursor-pointer" 
                           onClick={() => handleUserToggle(formData.assigned_users[index])}
                         />
                       </Badge>

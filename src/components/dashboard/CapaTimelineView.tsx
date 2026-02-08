@@ -13,9 +13,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
-  Edit
+  Edit,
+  Play
 } from 'lucide-react'
 import { apiClient } from '@/lib/api'
+import { formatDDMMYYYY } from '@/lib/date'
 
 interface TimelineEvent {
   id: number
@@ -136,7 +138,7 @@ const CapaTimelineView: React.FC<CapaTimelineViewProps> = ({
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US')
+    return formatDDMMYYYY(dateString as any)
   }
 
   const formatTime = (dateString: string) => {
@@ -205,12 +207,11 @@ const CapaTimelineView: React.FC<CapaTimelineViewProps> = ({
       const endOfWeek = new Date(startOfWeek)
       endOfWeek.setDate(startOfWeek.getDate() + 6)
       
-      return `${startOfWeek.toLocaleDateString('en-US')} - ${endOfWeek.toLocaleDateString('en-US')}`
+      return `${formatDDMMYYYY(startOfWeek.toISOString() as any)} - ${formatDDMMYYYY(endOfWeek.toISOString() as any)}`
     } else if (viewMode === 'month') {
-      return currentDate.toLocaleDateString('ar-SA', { 
-        year: 'numeric', 
-        month: 'long' 
-      })
+      // Keep format consistent (dd/mm/yyyy) by showing the first day of month
+      const first = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+      return formatDDMMYYYY(first.toISOString() as any)
     } else {
       return 'جميع الأحداث'
     }

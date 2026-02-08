@@ -20,7 +20,7 @@ interface ExtendedEvaluationCategory extends EvaluationCategory {
 
 const EvaluationCategoriesPage: React.FC = () => {
   console.log('تم تحميل صفحة تصنيفات التقييم')
-  
+
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -28,17 +28,17 @@ const EvaluationCategoriesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'categories'>('categories')
 
   const { categories: baseCategories, items, addCategory, updateCategory, deleteCategory, clearAllItems, clearAllData, reloadData, getItemsByCategory, loading, error } = useEvaluationApi()
-  
+
   console.log('EvaluationCategoriesPage - baseCategories:', baseCategories)
   console.log('EvaluationCategoriesPage - items:', items)
   console.log('EvaluationCategoriesPage - loading:', loading)
   console.log('EvaluationCategoriesPage - error:', error)
 
   // Transform base categories to extended categories with additional data
-  const categories: ExtendedEvaluationCategory[] = baseCategories.map(cat => {
-    const categoryItems = items.filter(item => item.category_id === cat.id)
+  const categories: ExtendedEvaluationCategory[] = (Array.isArray(baseCategories) ? baseCategories : []).map(cat => {
+    const categoryItems = (Array.isArray(items) ? items : []).filter(item => item && item.category_id === cat.id)
     console.log(`Category ${cat.name} (ID: ${cat.id}) has ${categoryItems.length} items:`, categoryItems)
-    
+
     return {
       ...cat,
       nameEn: cat.name_en || cat.name, // Use English name if available, fallback to Arabic
@@ -54,7 +54,7 @@ const EvaluationCategoriesPage: React.FC = () => {
   const handleCreateCategory = async (data: Partial<ExtendedEvaluationCategory>) => {
     try {
       console.log('Received data in handleCreateCategory:', data)
-      
+
       const newCategoryData = {
         name: data.name || '',
         name_en: data.nameEn || '',
@@ -62,13 +62,13 @@ const EvaluationCategoriesPage: React.FC = () => {
         color: data.color || 'blue',
         icon: data.icon || 'shield'
       }
-      
+
       console.log('Processed category data:', newCategoryData)
-      
+
       await addCategory(newCategoryData)
       setShowCreateForm(false)
       setEditingCategory(null)
-      
+
       console.log(`تم إنشاء تصنيف جديد: ${newCategoryData.name}`)
     } catch (error) {
       console.error('Failed to create category:', error)
@@ -94,13 +94,13 @@ const EvaluationCategoriesPage: React.FC = () => {
         color: data.color || editingCategory.color,
         icon: data.icon || editingCategory.icon
       }
-      
+
       console.log('Processed update data:', updatedCategoryData)
-      
+
       await updateCategory(editingCategory.id, updatedCategoryData)
       setShowCreateForm(false)
       setEditingCategory(null)
-      
+
       console.log(`تم تحديث التصنيف: ${updatedCategoryData.name}`)
     } catch (error) {
       console.error('Failed to update category:', error)
@@ -181,11 +181,11 @@ const EvaluationCategoriesPage: React.FC = () => {
 
   const filteredCategories = categories.filter(category => {
     const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         category.nameEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         category.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === 'all' || 
-                         (filterStatus === 'active' && category.isActive) ||
-                         (filterStatus === 'inactive' && !category.isActive)
+      category.nameEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      category.description.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = filterStatus === 'all' ||
+      (filterStatus === 'active' && category.isActive) ||
+      (filterStatus === 'inactive' && !category.isActive)
     return matchesSearch && matchesStatus
   })
 
@@ -204,7 +204,7 @@ const EvaluationCategoriesPage: React.FC = () => {
               e.preventDefault()
               const formData = new FormData(e.currentTarget)
               const data = Object.fromEntries(formData.entries())
-              
+
               // Ensure all form fields are properly captured
               const formDataComplete = {
                 name: data.name || '',
@@ -213,9 +213,9 @@ const EvaluationCategoriesPage: React.FC = () => {
                 color: data.color || 'blue',
                 icon: data.icon || 'shield'
               }
-              
+
               console.log('Form data being submitted:', formDataComplete)
-              
+
               if (editingCategory) {
                 handleUpdateCategory(formDataComplete)
               } else {
@@ -245,7 +245,7 @@ const EvaluationCategoriesPage: React.FC = () => {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   الوصف
@@ -258,7 +258,7 @@ const EvaluationCategoriesPage: React.FC = () => {
                   rows={3}
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -298,7 +298,7 @@ const EvaluationCategoriesPage: React.FC = () => {
                     <option value="alert-triangle">مثلث تحذير</option>
                     <option value="star">نجمة</option>
                     <option value="clock">ساعة</option>
-                    
+
                     {/* Medical Icons */}
                     <option value="pill">دواء</option>
                     <option value="stethoscope">سماعة طبية</option>
@@ -316,7 +316,7 @@ const EvaluationCategoriesPage: React.FC = () => {
                   </select>
                 </div>
               </div>
-              
+
               <div className="flex justify-end gap-4">
                 <Button
                   type="button"
@@ -340,7 +340,7 @@ const EvaluationCategoriesPage: React.FC = () => {
   }
 
   console.log('عرض صفحة التصنيفات الرئيسية، عدد التصنيفات:', categories.length)
-  
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -353,24 +353,24 @@ const EvaluationCategoriesPage: React.FC = () => {
           <p className="text-gray-600">إدارة تصنيفات عناصر التقييم والمعايير</p>
         </div>
         <div className="flex gap-2">
-          <Button 
-            onClick={handleClearAllData} 
+          <Button
+            onClick={handleClearAllData}
             variant="destructive"
             className="flex items-center gap-2"
           >
             <Trash2 className="w-4 h-4" />
             حذف جميع البيانات
           </Button>
-          <Button 
-            onClick={handleClearAllItems} 
+          <Button
+            onClick={handleClearAllItems}
             variant="outline"
             className="flex items-center gap-2 text-orange-600 hover:text-orange-700"
           >
             <Trash2 className="w-4 h-4" />
             حذف العناصر فقط
           </Button>
-          <Button 
-            onClick={reloadData} 
+          <Button
+            onClick={reloadData}
             variant="outline"
             className="flex items-center gap-2"
           >
@@ -425,213 +425,212 @@ const EvaluationCategoriesPage: React.FC = () => {
         <>
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">إجمالي التصنيفات</p>
-                <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
-              </div>
-              <Shield className="w-8 h-8 text-gray-400" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">نشط</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {categories.filter(c => c.isActive).length}
-                </p>
-              </div>
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <div className="w-4 h-4 bg-green-600 rounded-full"></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">إجمالي العناصر</p>
-                <p className="text-2xl font-bold text-blue-600">
-                  {categories.reduce((sum, c) => sum + c.itemCount, 0)}
-                </p>
-              </div>
-              <CheckCircle className="w-8 h-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">متوسط العناصر</p>
-                <p className="text-2xl font-bold text-purple-600">
-                  {Math.round(categories.reduce((sum, c) => sum + c.itemCount, 0) / categories.length) || 0}
-                </p>
-              </div>
-              <Heart className="w-8 h-8 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="البحث في التصنيفات..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-10"
-                />
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">جميع الحالات</option>
-                <option value="active">نشط</option>
-                <option value="inactive">غير نشط</option>
-              </select>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Filter className="w-4 h-4" />
-                فلترة
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Categories List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCategories.map((category) => (
-          <Card key={category.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center",
-                    getColorClasses(category.color)
-                  )}>
-                    {getIcon(category.icon)}
-                  </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{category.name}</CardTitle>
-                    <p className="text-sm text-gray-600">{category.nameEn}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleEditCategory(category)}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteCategory(category.id)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-3">
-                <p className="text-sm text-gray-600 line-clamp-2">
-                  {category.description}
-                </p>
-                
+            <Card>
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Badge className={getColorClasses(category.color)}>
-                      <Link className="w-3 h-3 mr-1" />
-                      {category.itemCount} عنصر مرتبط
-                    </Badge>
-                    {category.itemCount > 0 && (
-                      <Badge variant="outline" className="text-xs">
-                        {getItemsByCategory(category.id).filter(item => item.is_active).length} نشط
-                      </Badge>
-                    )}
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">إجمالي التصنيفات</p>
+                    <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
                   </div>
-                  <Badge variant={category.isActive ? "default" : "secondary"}>
-                    {category.isActive ? 'نشط' : 'غير نشط'}
-                  </Badge>
+                  <Shield className="w-8 h-8 text-gray-400" />
                 </div>
-                
-                {category.itemCount > 0 && (
-                  <div className="mt-3 p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs font-medium text-gray-700 dark:text-gray-300">العناصر المرتبطة ({category.itemCount})</p>
-                      <Badge variant="outline" className="text-xs">
-                        {category.itemCount} عنصر
-                      </Badge>
-                    </div>
-                    <div className="space-y-1">
-                      {getItemsByCategory(category.id).slice(0, 3).map((item, index) => (
-                        <div key={item.id} className="flex items-center justify-between text-xs group hover:bg-gray-100 dark:hover:bg-slate-700 p-1 rounded transition-colors">
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                              item.risk_level === 'CRITICAL' ? 'bg-red-500' : 
-                              item.risk_level === 'MAJOR' ? 'bg-orange-500' : 'bg-blue-500'
-                            }`}></div>
-                            <span className="text-gray-700 dark:text-gray-300 truncate" title={item.title}>
-                              {item.title}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1 flex-shrink-0">
-                            <Badge 
-                              variant={item.risk_level === 'CRITICAL' ? 'destructive' : 
-                                      item.risk_level === 'MAJOR' ? 'default' : 'secondary'}
-                              className="text-xs px-1.5 py-0.5"
-                            >
-                              {item.risk_level === 'CRITICAL' ? 'حرج' : 
-                               item.risk_level === 'MAJOR' ? 'جسيم' : 'بسيط'}
-                            </Badge>
-                            <span className="text-gray-500 text-xs font-mono">
-                              {item.weight}w
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                      {category.itemCount > 3 && (
-                        <div className="pt-1 border-t border-gray-200 dark:border-slate-600">
-                          <div className="flex items-center justify-center">
-                            <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full">
-                              +{category.itemCount - 3} عناصر أخرى
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">نشط</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {categories.filter(c => c.isActive).length}
+                    </p>
                   </div>
-                )}
-                
-                <div className="text-xs text-gray-500">
-                  آخر تحديث: {new Date(category.updatedAt).toLocaleDateString('en-US')}
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <div className="w-4 h-4 bg-green-600 rounded-full"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">إجمالي العناصر</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {categories.reduce((sum, c) => sum + c.itemCount, 0)}
+                    </p>
+                  </div>
+                  <CheckCircle className="w-8 h-8 text-blue-600" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">متوسط العناصر</p>
+                    <p className="text-2xl font-bold text-purple-600">
+                      {Math.round(categories.reduce((sum, c) => sum + c.itemCount, 0) / categories.length) || 0}
+                    </p>
+                  </div>
+                  <Heart className="w-8 h-8 text-purple-600" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Filters */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      placeholder="البحث في التصنيفات..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pr-10"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">جميع الحالات</option>
+                    <option value="active">نشط</option>
+                    <option value="inactive">غير نشط</option>
+                  </select>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Filter className="w-4 h-4" />
+                    فلترة
+                  </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
+
+          {/* Categories List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCategories.map((category) => (
+              <Card key={category.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-10 h-10 rounded-lg flex items-center justify-center",
+                        getColorClasses(category.color)
+                      )}>
+                        {getIcon(category.icon)}
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{category.name}</CardTitle>
+                        <p className="text-sm text-gray-600">{category.nameEn}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditCategory(category)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteCategory(category.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {category.description}
+                    </p>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge className={getColorClasses(category.color)}>
+                          <Link className="w-3 h-3 mr-1" />
+                          {category.itemCount} عنصر مرتبط
+                        </Badge>
+                        {category.itemCount > 0 && (
+                          <Badge variant="outline" className="text-xs">
+                            {getItemsByCategory(category.id).filter(item => item.is_active).length} نشط
+                          </Badge>
+                        )}
+                      </div>
+                      <Badge variant={category.isActive ? "default" : "secondary"}>
+                        {category.isActive ? 'نشط' : 'غير نشط'}
+                      </Badge>
+                    </div>
+
+                    {category.itemCount > 0 && (
+                      <div className="mt-3 p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs font-medium text-gray-700 dark:text-gray-300">العناصر المرتبطة ({category.itemCount})</p>
+                          <Badge variant="outline" className="text-xs">
+                            {category.itemCount} عنصر
+                          </Badge>
+                        </div>
+                        <div className="space-y-1">
+                          {getItemsByCategory(category.id).slice(0, 3).map((item, index) => (
+                            <div key={item.id} className="flex items-center justify-between text-xs group hover:bg-gray-100 dark:hover:bg-slate-700 p-1 rounded transition-colors">
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.risk_level === 'CRITICAL' ? 'bg-red-500' :
+                                    item.risk_level === 'MAJOR' ? 'bg-orange-500' : 'bg-blue-500'
+                                  }`}></div>
+                                <span className="text-gray-700 dark:text-gray-300 truncate" title={item.title}>
+                                  {item.title}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <Badge
+                                  variant={item.risk_level === 'CRITICAL' ? 'destructive' :
+                                    item.risk_level === 'MAJOR' ? 'default' : 'secondary'}
+                                  className="text-xs px-1.5 py-0.5"
+                                >
+                                  {item.risk_level === 'CRITICAL' ? 'حرج' :
+                                    item.risk_level === 'MAJOR' ? 'جسيم' : 'بسيط'}
+                                </Badge>
+                                <span className="text-gray-500 text-xs font-mono">
+                                  {item.weight}w
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                          {category.itemCount > 3 && (
+                            <div className="pt-1 border-t border-gray-200 dark:border-slate-600">
+                              <div className="flex items-center justify-center">
+                                <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full">
+                                  +{category.itemCount - 3} عناصر أخرى
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="text-xs text-gray-500">
+                      آخر تحديث: {new Date(category.updatedAt).toLocaleDateString('en-US')}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
           {filteredCategories.length === 0 && (
             <div className="text-center py-12">

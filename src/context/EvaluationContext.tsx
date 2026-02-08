@@ -4,7 +4,6 @@ export interface EvaluationCategory {
   id: number
   name: string
   color: string
-  weight: number
   itemCount?: number
 }
 
@@ -36,14 +35,14 @@ interface EvaluationContextType {
   addCategory: (category: Omit<EvaluationCategory, 'id'>) => void
   updateCategory: (id: number, category: Partial<EvaluationCategory>) => void
   deleteCategory: (id: number) => void
-
+  
   // Items
   items: EvaluationItem[]
   addItem: (item: Omit<EvaluationItem, 'id' | 'createdAt' | 'updatedAt'>) => void
   updateItem: (id: number, item: Partial<EvaluationItem>) => void
   deleteItem: (id: number) => void
   clearAllItems: () => void
-
+  
   // Helper functions
   getItemsByCategory: (categoryId: number) => EvaluationItem[]
   getCategoryById: (id: number) => EvaluationCategory | undefined
@@ -53,12 +52,12 @@ const EvaluationContext = createContext<EvaluationContextType | undefined>(undef
 
 // Initial data
 const initialCategories: EvaluationCategory[] = [
-  { id: 1, name: 'مكافحة العدوى', color: 'red', weight: 20 },
-  { id: 2, name: 'سلامة المرضى', color: 'blue', weight: 25 },
-  { id: 3, name: 'الجودة', color: 'green', weight: 15 },
-  { id: 4, name: 'الأمن والسلامة', color: 'orange', weight: 15 },
-  { id: 5, name: 'النظافة والتعقيم', color: 'purple', weight: 15 },
-  { id: 6, name: 'سلامة الأدوية', color: 'cyan', weight: 10 }
+  { id: 1, name: 'مكافحة العدوى', color: 'red' },
+  { id: 2, name: 'سلامة المرضى', color: 'blue' },
+  { id: 3, name: 'الجودة', color: 'green' },
+  { id: 4, name: 'الأمن والسلامة', color: 'orange' },
+  { id: 5, name: 'النظافة والتعقيم', color: 'purple' },
+  { id: 6, name: 'سلامة الأدوية', color: 'cyan' }
 ]
 
 const initialItems: EvaluationItem[] = []
@@ -120,7 +119,7 @@ export const EvaluationProvider: React.FC<{ children: ReactNode }> = ({ children
 
   const updateCategory = (id: number, category: Partial<EvaluationCategory>) => {
     setCategories(prev => {
-      const newCategories = prev.map(cat =>
+      const newCategories = prev.map(cat => 
         cat.id === id ? { ...cat, ...category } : cat
       )
       saveCategories(newCategories)

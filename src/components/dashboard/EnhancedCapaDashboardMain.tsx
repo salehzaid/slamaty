@@ -83,29 +83,11 @@ const EnhancedCapaDashboardMain: React.FC = () => {
       case 'overview':
         return <EnhancedCapaDashboard />
       case 'progress':
-        return (
-          <div className="p-6">
-            <div className="rounded-md bg-yellow-50 border border-yellow-200 p-4 text-yellow-800">
-              ميزة تتبع الإجراءات مؤقتاً غير متاحة - تم تعطيل اللوحة لعدم توفر الجداول المطلوبة في قاعدة البيانات.
-            </div>
-          </div>
-        )
+        return <ActionProgressTracker capaId={selectedCapaId} assignedToId={selectedUserId} />
       case 'timeline':
-        return (
-          <div className="p-6">
-            <div className="rounded-md bg-yellow-50 border border-yellow-200 p-4 text-yellow-800">
-              عرض الجدول الزمني مؤقتاً غير متاح - جدول الأحداث مفقود في قاعدة البيانات.
-            </div>
-          </div>
-        )
+        return <CapaTimelineView capaId={selectedCapaId} />
       case 'alerts':
-        return (
-          <div className="p-6">
-            <div className="rounded-md bg-yellow-50 border border-yellow-200 p-4 text-yellow-800">
-              نظام التنبيهات مؤقتاً معطل - جدول التنبيهات غير موجود في قاعدة البيانات.
-            </div>
-          </div>
-        )
+        return <AlertSystem userId={selectedUserId} />
       case 'reports':
         return <BasicReports />
       default:
@@ -128,7 +110,7 @@ const DashboardCapaCTA: React.FC = () => {
   return (
     <button
       onClick={() => navigate('/capa')}
-      className="ml-4 px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+      className="ml-4 px-3 py-1 bg-primary-500 text-white rounded-md text-sm hover:bg-primary-600"
     >
       إدارة CAPA
     </button>
@@ -137,144 +119,110 @@ const DashboardCapaCTA: React.FC = () => {
 
   if (forceE2EManagement) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-[hsl(var(--background))]">
         <EnhancedCapaManagement />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex">
-        {/* Sidebar Navigation */}
-        <div className="w-64 bg-white shadow-lg border-l border-gray-200">
-          <div className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">
-              داشبورد الخطط التصحيحية
-            </h2>
-            
-            <nav className="space-y-2">
+    <div className="min-h-screen bg-[hsl(var(--background))]">
+      {/* Header + Top Tabs */}
+      <div className="bg-white/90 backdrop-blur border-b border-slate-200">
+        <div className="px-6 py-4">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h1 className="text-xl font-semibold text-slate-900">
+                  داشبورد الخطط التصحيحية
+                </h1>
+                <p className="text-sm text-slate-600">
+                  {getViewDescription(currentView)}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {selectedCapaId && (
+                  <Badge variant="outline" className="text-xs">
+                    خطة #{selectedCapaId}
+                  </Badge>
+                )}
+                {selectedUserId && (
+                  <Badge variant="outline" className="text-xs">
+                    مستخدم #{selectedUserId}
+                  </Badge>
+                )}
+                <DashboardCapaCTA />
+              </div>
+            </div>
+
+            {/* Top navigation (tabs) - no horizontal scroll */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
               {dashboardViews.map((view) => {
                 const Icon = view.icon
                 const isActive = currentView === view.id
-                
                 return (
                   <button
                     key={view.id}
                     onClick={() => setCurrentView(view.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-right transition-colors ${
+                    className={[
+                      "w-full text-right rounded-lg border px-3 py-2 transition-colors",
+                      "flex items-start gap-3",
                       isActive
-                        ? 'bg-blue-100 text-blue-700 border-r-2 border-blue-500'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
+                        ? "bg-primary-50 border-primary-200 text-primary-800"
+                        : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50",
+                    ].join(" ")}
                   >
-                    <Icon className="w-5 h-5" />
-                    <div className="flex-1">
-                      <div className="font-medium">{view.label}</div>
-                      <div className="text-xs text-gray-500">{view.description}</div>
+                    <Icon className={["w-5 h-5 mt-0.5", isActive ? "text-primary-600" : "text-slate-500"].join(" ")} />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium leading-snug">{view.label}</div>
+                      <div className="text-xs text-slate-500 leading-snug whitespace-normal">
+                        {view.description}
+                      </div>
                     </div>
                   </button>
                 )
               })}
-            </nav>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="p-6 border-t border-gray-200">
-            <h3 className="text-sm font-medium text-gray-900 mb-3">إحصائيات سريعة</h3>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">إجمالي الخطط</span>
-                <Badge variant="outline">-</Badge>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">متأخرة</span>
-                <Badge className="bg-red-100 text-red-800">-</Badge>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">مكتملة</span>
-                <Badge className="bg-green-100 text-green-800">-</Badge>
-              </div>
             </div>
-          </div>
 
-          {/* Filters */}
-          {(currentView === 'progress' || currentView === 'timeline') && (
-            <div className="p-6 border-t border-gray-200">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">فلاتر</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
-                    خطة محددة
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="معرف الخطة"
-                    value={selectedCapaId || ''}
-                    onChange={(e) => setSelectedCapaId(e.target.value ? parseInt(e.target.value) : undefined)}
-                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
-                    مستخدم محدد
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="معرف المستخدم"
-                    value={selectedUserId || ''}
-                    onChange={(e) => setSelectedUserId(e.target.value ? parseInt(e.target.value) : undefined)}
-                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1">
-          {/* Header */}
-          <div className="bg-white shadow-sm border-b border-gray-200">
-            <div className="px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {React.createElement(getViewIcon(currentView), {
-                    className: "w-6 h-6 text-blue-600"
-                  })}
+            {/* Filters (when applicable) */}
+            {(currentView === 'progress' || currentView === 'timeline' || currentView === 'alerts') && (
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <h1 className="text-xl font-semibold text-gray-900">
-                      {dashboardViews.find(v => v.id === currentView)?.label}
-                    </h1>
-                    <p className="text-sm text-gray-600">
-                      {getViewDescription(currentView)}
-                    </p>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      خطة محددة
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="معرف الخطة"
+                      value={selectedCapaId || ''}
+                      onChange={(e) => setSelectedCapaId(e.target.value ? parseInt(e.target.value) : undefined)}
+                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-500 bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      مستخدم محدد
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="معرف المستخدم"
+                      value={selectedUserId || ''}
+                      onChange={(e) => setSelectedUserId(e.target.value ? parseInt(e.target.value) : undefined)}
+                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-500 bg-white"
+                    />
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-2">
-                  {selectedCapaId && (
-                    <Badge variant="outline" className="text-xs">
-                      خطة #{selectedCapaId}
-                    </Badge>
-                  )}
-                  {selectedUserId && (
-                    <Badge variant="outline" className="text-xs">
-                      مستخدم #{selectedUserId}
-                    </Badge>
-                  )}
-                  {/* CTA: Open full CAPA management page */}
-                  <DashboardCapaCTA />
-                </div>
               </div>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-            {renderCurrentView()}
+            )}
           </div>
         </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        {renderCurrentView()}
       </div>
     </div>
   )

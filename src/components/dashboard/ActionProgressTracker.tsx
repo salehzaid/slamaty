@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { apiClient } from '@/lib/api'
+import { formatDDMMYYYY } from '@/lib/date'
 
 interface ActionItem {
   id: number
@@ -61,7 +62,7 @@ const ActionProgressTracker: React.FC<ActionProgressTrackerProps> = ({
       const params = new URLSearchParams()
 
       if (capaId) params.append('capa_id', capaId.toString())
-      if (actionType) params.append('type', actionType)
+      if (actionType) params.append('action_type', actionType)
       if (assignedToId) params.append('assigned_to_id', assignedToId.toString())
 
       if (params.toString()) {
@@ -148,7 +149,7 @@ const ActionProgressTracker: React.FC<ActionProgressTrackerProps> = ({
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US')
+    return formatDDMMYYYY(dateString as any)
   }
 
   const getDaysUntilDeadline = (dateString: string) => {

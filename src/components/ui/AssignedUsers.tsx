@@ -2,20 +2,25 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 
 interface Props {
-  users?: Array<string>
+  users?: Array<string | number>
   maxVisible?: number
 }
 
-const isNumeric = (s: any) => {
-  if (typeof s !== 'string') return typeof s === 'number';
-  return /^\d+$/.test(s.trim());
+// Check if value is purely numeric (either number type or string of digits)
+const isNumericValue = (val: string | number): boolean => {
+  if (typeof val === 'number') return true
+  if (typeof val === 'string') return /^\d+$/.test(val.trim())
+  return false
 }
 
 const AssignedUsers: React.FC<Props> = ({ users = [], maxVisible = 3 }) => {
   const [open, setOpen] = useState(false)
 
-  const safeUsers = Array.isArray(users) ? users : []
-  const filtered = safeUsers.filter(u => !!u && !isNumeric(u))
+  // Filter out null/undefined and numeric-only values (user IDs), keep names
+  const filtered = (users || []).filter(u => {
+    if (u === null || u === undefined || u === '') return false
+    return !isNumericValue(u)
+  }).map(u => String(u)) // Convert to string for display
   if (!filtered || filtered.length === 0) {
     return <span className="text-gray-500">غير محدد</span>
   }

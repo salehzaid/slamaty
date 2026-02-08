@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-// import { EvaluationProvider } from './context/EvaluationContext';
+import { EvaluationProvider } from './context/EvaluationContext';
 import { NotificationsProvider } from './context/NotificationsContext';
 import { LayoutProvider } from './context/LayoutContext';
 import { RTLProvider } from './components/RTLProvider';
@@ -14,6 +14,7 @@ import TestRegisterPage from './components/TestRegisterPage';
 // Deprecated traditional CAPA components removed; use enhanced CAPA page instead
 // EnhancedCapaManagement deprecated; kept for reference but not imported
 import EnhancedCapaDashboardMain from './components/dashboard/EnhancedCapaDashboardMain';
+import AdvancedComplianceDashboard from './components/dashboard/AdvancedComplianceDashboard';
 import DepartmentsManagement from './components/pages/DepartmentsManagement';
 import DepartmentFormPage from './components/pages/DepartmentFormPage';
 import ReportsPage from './components/pages/ReportsPage';
@@ -90,8 +91,8 @@ const AppContent: React.FC = () => {
       <AnimatedSidebar onLogout={logout} />
       <MainContent onLogout={logout}>
         <Routes>
-          <Route path="/" element={<ReportsPage />} />
-          <Route path="/dashboard" element={<ReportsPage />} />
+          <Route path="/" element={<AdvancedComplianceDashboard />} />
+          <Route path="/dashboard" element={<AdvancedComplianceDashboard />} />
           <Route path="/rounds" element={<UnifiedRoundsPage />} />
           {/* Redirects from old routes to unified page with query params */}
           <Route path="/rounds/list" element={<Navigate to="/rounds?tab=list" replace />} />
@@ -141,11 +142,13 @@ const App: React.FC = () => {
       <RTLProvider>
         <LayoutProvider>
           <AuthProvider>
-            <NotificationsProvider>
-              <Router>
-                <AppContent />
-              </Router>
-            </NotificationsProvider>
+            <EvaluationProvider>
+              <NotificationsProvider>
+                <Router>
+                  <AppContent />
+                </Router>
+              </NotificationsProvider>
+            </EvaluationProvider>
           </AuthProvider>
         </LayoutProvider>
       </RTLProvider>

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from './card';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface StatsChartProps {
   title: string;
@@ -12,8 +11,6 @@ interface StatsChartProps {
   bgColor: string;
   trend?: 'up' | 'down' | 'stable';
   trendValue?: number;
-  isPercentage?: boolean; // If true, show as percentage with progress bar
-  maxValue?: number; // For calculating progress bar when not percentage
 }
 
 const StatsChart: React.FC<StatsChartProps> = ({
@@ -24,8 +21,7 @@ const StatsChart: React.FC<StatsChartProps> = ({
   color,
   bgColor,
   trend,
-  isPercentage = false,
-  maxValue,
+  trendValue
 }) => {
   const getTrendIcon = () => {
     switch (trend) {
@@ -64,62 +60,50 @@ const StatsChart: React.FC<StatsChartProps> = ({
   })()
   const effectiveTrend = trend || inferredTrend
 
-  // Calculate progress bar percentage
-  const progressPercent = isPercentage
-    ? Math.min(value, 100)
-    : maxValue
-      ? Math.min((value / maxValue) * 100, 100)
-      : 0;
-
   return (
-    <Card className="relative overflow-hidden bg-white/70 backdrop-blur-md border border-white/40 shadow-xl shadow-slate-200/40 rounded-[2rem] group transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 active:scale-[0.98]">
-      <div className={cn("absolute top-0 right-0 w-32 h-32 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 opacity-20 transition-opacity group-hover:opacity-40", bgColor.includes('bg-') ? bgColor.replace('-100', '-500') : bgColor)} />
-
-      <CardContent className="p-6 relative z-10">
+    <Card className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+      <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <div className={cn("p-3 rounded-2xl shadow-sm", bgColor)}>
-            {React.cloneElement(icon as React.ReactElement, { className: cn((icon as React.ReactElement).props.className, color) })}
+          <div className={`p-3 ${bgColor} rounded-xl`}>
+            {icon}
           </div>
           {(effectiveTrend && previousValue !== undefined) && (
             <div
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black shadow-sm ${getTrendColor()} ${getTrendColor().replace('text-', 'bg-').replace('600', '50')}`}
+              className={`flex items-center gap-1 text-sm font-medium ${getTrendColor()}`}
               role="img"
               aria-label={effectiveTrend === 'up' ? 'اتجاه تصاعدي' : effectiveTrend === 'down' ? 'اتجاه هبوطي' : 'مستقر'}
+              title={`الحالي: ${value} — السابق: ${previousValue} (${Math.abs(percentage).toFixed(1)}%)`}
             >
               {getTrendIcon()}
-              <span>{Math.abs(percentage).toFixed(1)}%</span>
+              <span>{effectiveTrend === 'stable' ? `${Math.abs(percentage).toFixed(1)}%` : `${Math.abs(percentage).toFixed(1)}%`}</span>
             </div>
           )}
         </div>
-
+        
         <div className="mb-2">
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{title}</h3>
-          <p className={cn("text-3xl font-black tracking-tight", color)}>
-            {value}{isPercentage ? '%' : ''}
-          </p>
+          <h3 className="text-sm font-medium text-gray-500 mb-1">{title}</h3>
+          <p className={`text-3xl font-bold ${color}`}>{value}</p>
         </div>
-
-        {/* Only show progress bar for percentages or when maxValue is provided */}
-        {(isPercentage || maxValue) && (
-          <div className="mt-3">
-            <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-              <div
-                className={cn("h-full rounded-full transition-all duration-1000 ease-out", bgColor.includes('bg-') ? bgColor.replace('-50', '-500').replace('-100', '-500') : bgColor)}
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
+        
+        {previousValue !== undefined && (
+          <div className="text-xs text-gray-500" title={`الحالي: ${value} — السابق: ${previousValue}`}>
+            مقارنة بالفترة السابقة: <span className="font-medium">{previousValue}</span>
           </div>
         )}
-
-        {previousValue !== undefined && (
-          <p className="text-[10px] text-slate-400 font-medium mt-2">
-            مقارنة بـ <span className="font-bold text-slate-600">{previousValue}</span> سابقاً
-          </p>
-        )}
+        
+        {/* Simple progress bar */}
+        <div className="mt-4">
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className={`h-2 rounded-full transition-all duration-500 ${bgColor.includes('bg-') ? bgColor.replace('-100', '-500') : bgColor}`}
+              style={{ width: `${Math.min((value / 100) * 100, 100)}%` }}
+              aria-hidden
+            />
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
 };
 
 export default StatsChart;
-

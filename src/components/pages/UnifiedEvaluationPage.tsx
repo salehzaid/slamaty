@@ -1,74 +1,63 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import {
-    Target,
-    Folder,
-    FileText,
-    Plus
-} from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { BarChart3, Folder, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// Import sub-components
+// Import the existing page components
 import UnifiedEvaluationDashboard from '../UnifiedEvaluationDashboard'
 import EvaluationCategoriesPage from './EvaluationCategoriesPage'
 import EvaluationItemsPage from './EvaluationItemsPage'
-import { AlertCircle } from 'lucide-react'
 
-// Local Error Boundary to catch sub-component render errors
-class UnifiedErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
-    constructor(props: any) {
-        super(props);
-        this.state = { hasError: false, error: null };
-    }
-    static getDerivedStateFromError(error: any) {
-        return { hasError: true, error };
-    }
-    render() {
-        if (this.state.hasError) {
-            return (
-                <div className="p-8 bg-red-50 border-2 border-red-200 text-red-900 rounded-3xl m-6 shadow-2xl">
-                    <div className="flex items-center gap-4 mb-4">
-                        <AlertCircle className="w-10 h-10 text-red-600" />
-                        <h2 className="text-2xl font-bold">Render Error Captured</h2>
-                    </div>
-                    <div className="bg-white/80 p-6 rounded-2xl border border-red-100 overflow-auto max-h-[400px]">
-                        <p className="font-mono text-sm font-bold text-red-800 mb-2">{String(this.state.error)}</p>
-                        <pre className="text-[10px] leading-relaxed text-slate-500 font-mono">
-                            {this.state.error?.stack}
-                        </pre>
-                    </div>
-                </div>
-            );
-        }
-        return this.props.children;
-    }
-}
+type TabType = 'dashboard' | 'categories' | 'items'
 
 const UnifiedEvaluationPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams()
-    const tabParam = searchParams.get('tab')
-    const [activeTab, setActiveTab] = useState<string>(tabParam || 'dashboard')
 
+    // Get active tab from URL query params, default to 'dashboard'
+    const activeTabFromUrl = (searchParams.get('tab') as TabType) || 'dashboard'
+    const [activeTab, setActiveTab] = useState<TabType>(activeTabFromUrl)
+
+    // Sync active tab with URL
     useEffect(() => {
-        if (tabParam && tabParam !== activeTab) {
-            setActiveTab(tabParam)
+        const tabFromUrl = searchParams.get('tab') as TabType
+        if (tabFromUrl && ['dashboard', 'categories', 'items'].includes(tabFromUrl)) {
+            setActiveTab(tabFromUrl)
+        } else {
+            // Default to 'dashboard' if no valid tab in URL
+            setActiveTab('dashboard')
+            setSearchParams({ tab: 'dashboard' }, { replace: true })
         }
-    }, [tabParam])
+    }, [searchParams, setSearchParams])
 
-    const handleTabChange = (tabId: string, action?: string) => {
-        setActiveTab(tabId)
-        const params: Record<string, string> = { tab: tabId }
-        if (action) params.action = action
-        setSearchParams(params)
+    const handleTabChange = (tab: TabType) => {
+        setActiveTab(tab)
+        setSearchParams({ tab })
     }
 
     const tabs = [
-        { id: 'dashboard', label: 'لوحة التقييمات', icon: Target },
-        { id: 'categories', label: 'تصنيفات التقييم', icon: Folder },
-        { id: 'items', label: 'عناصر التقييم', icon: FileText },
+        {
+            id: 'dashboard' as TabType,
+            label: 'لوحة التقييمات',
+            icon: BarChart3,
+            color: 'text-blue-600'
+        },
+        {
+            id: 'categories' as TabType,
+            label: 'تصنيفات التقييم',
+            icon: Folder,
+            color: 'text-blue-600'
+        },
+        {
+            id: 'items' as TabType,
+            label: 'عناصر التقييم',
+            icon: FileText,
+            color: 'text-green-600'
+        }
     ]
 
+    // Render the appropriate component based on active tab
     const renderContent = () => {
         switch (activeTab) {
             case 'dashboard':
@@ -83,52 +72,41 @@ const UnifiedEvaluationPage: React.FC = () => {
     }
 
     return (
-        <div className="bg-slate-50/50 p-4 md:p-6 space-y-6">
-            {/* Header & Tabs */}
-            <div className="flex flex-col space-y-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900">نظام إدارة التقييمات</h1>
-                        <p className="text-slate-500">إدارة المعايير، التصنيفات، وتحليل النتائج</p>
-                    </div>
-                    <Button
-                        onClick={() => handleTabChange('items', 'new')}
-                        className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg border-none h-11 px-6 transition-all transform hover:scale-105"
-                    >
-                        <Plus className="w-4 h-4 ml-2" />
-                        إنشاء عنصر تقييم
-                    </Button>
-                </div>
+        <div className="min-h-screen bg-gradient-to-br from-[#f7f0ff] via-white to-[#ecf7ff]">
+            <div className="p-6 space-y-6">
+                {/* Tab Navigation */}
+                <Card className="bg-white/80 rounded-2xl shadow-xl border border-slate-200/70 backdrop-blur">
+                    <CardContent className="p-6">
+                        <div className="flex items-center gap-3 flex-wrap">
+                            {tabs.map((tab) => {
+                                const Icon = tab.icon
+                                const isActive = activeTab === tab.id
 
-                <div className="flex items-center space-x-1 space-x-reverse bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200/60 w-fit">
-                    {tabs.map((tab) => {
-                        const Icon = tab.icon
-                        const isActive = activeTab === tab.id
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => handleTabChange(tab.id)}
-                                className={cn(
-                                    "flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
-                                    isActive
-                                        ? "bg-blue-600 text-white shadow-md shadow-blue-200"
-                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                                )}
-                            >
-                                <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-slate-400")} />
-                                {tab.label}
-                            </button>
-                        )
-                    })}
-                </div>
-            </div>
+                                return (
+                                    <Button
+                                        key={tab.id}
+                                        onClick={() => handleTabChange(tab.id)}
+                                        className={cn(
+                                            "flex items-center gap-3 px-6 py-3 h-auto text-base font-semibold rounded-xl transition-all duration-300",
+                                            isActive
+                                                ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg hover:shadow-xl hover:from-primary-600 hover:to-primary-700"
+                                                : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-sm"
+                                        )}
+                                    >
+                                        <Icon className={cn("w-5 h-5", isActive ? "text-white" : tab.color)} />
+                                        <span>{tab.label}</span>
+                                    </Button>
+                                )
+                            })}
+                        </div>
+                    </CardContent>
+                </Card>
 
-            {/* Content Area */}
-            <UnifiedErrorBoundary>
-                <div className="animate-in fade-in duration-500">
+                {/* Content Area */}
+                <div className="transition-all duration-300">
                     {renderContent()}
                 </div>
-            </UnifiedErrorBoundary>
+            </div>
         </div>
     )
 }

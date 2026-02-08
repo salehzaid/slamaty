@@ -1,8 +1,8 @@
 import React from 'react';
-import {
-  ClipboardCheck,
-  AlertTriangle,
-  TrendingUp,
+import { 
+  ClipboardCheck, 
+  AlertTriangle, 
+  TrendingUp, 
   Clock,
   Users,
   CheckCircle2,
@@ -14,21 +14,18 @@ import {
 } from 'lucide-react';
 // Removed mock data imports - using API data instead
 import { useAuth } from '../context/AuthContext';
-import { isCapaEnabled } from '@/lib/features';
-import { useRounds } from '../hooks/useRounds';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
   ResponsiveContainer,
   PieChart as RechartsPieChart,
-  Pie,
   Cell,
   LineChart,
   Line,
@@ -37,39 +34,20 @@ import {
 } from 'recharts';
 
 const Dashboard: React.FC = () => {
-  const auth = useAuth();
-  const user = auth?.user;
-  const hasPermission = auth?.hasPermission;
-  const { data: rounds, loading } = useRounds();
-
-  // Calculate real dashboard stats
-  const stats = React.useMemo(() => {
-    const totalRounds = rounds.length;
-    const completedRounds = rounds.filter(r => r.status === 'completed').length;
-    const pendingRounds = rounds.filter(r => r.status === 'scheduled' || r.status === 'in_progress').length;
-    const overdueRounds = rounds.filter(r => {
-      const deadline = r.deadline ? new Date(r.deadline) : null;
-      return deadline && deadline < new Date() && r.status !== 'completed';
-    }).length;
-
-    // Average compliance
-    const roundsWithCompliance = rounds.filter(r => r.compliancePercentage !== undefined);
-    const averageCompliance = roundsWithCompliance.length > 0
-      ? Math.round(roundsWithCompliance.reduce((acc, r) => acc + (r.compliancePercentage || 0), 0) / roundsWithCompliance.length)
-      : 0;
-
-    return {
-      totalRounds,
-      completedRounds,
-      pendingRounds,
-      overdueRounds,
-      averageCompliance,
-      totalCapa: 0, // Mock for now until CAPA hook is ready
-      openCapa: 0,
-      closedCapa: 0,
-      overdueCapa: 0
-    };
-  }, [rounds]);
+  const { user, hasPermission } = useAuth();
+  
+  // TODO: Replace with API calls to get real dashboard stats
+  const stats = {
+    totalRounds: 0,
+    completedRounds: 0,
+    pendingRounds: 0,
+    overdueRounds: 0,
+    averageCompliance: 0,
+    totalCapa: 0,
+    openCapa: 0,
+    closedCapa: 0,
+    overdueCapa: 0
+  };
 
   // Chart data
   const complianceData = [
@@ -104,17 +82,17 @@ const Dashboard: React.FC = () => {
     { name: 'متأخرة', value: 1, color: '#ef4444' },
   ];
 
-  const StatCard = ({
-    title,
-    value,
-    icon: Icon,
-    color,
+  const StatCard = ({ 
+    title, 
+    value, 
+    icon: Icon, 
+    color, 
     trend,
     description
-  }: {
-    title: string;
-    value: string | number;
-    icon: React.ComponentType<any>;
+  }: { 
+    title: string; 
+    value: string | number; 
+    icon: React.ComponentType<any>; 
     color: string;
     trend?: string;
     description?: string;
@@ -164,8 +142,8 @@ const Dashboard: React.FC = () => {
     return texts[status as keyof typeof texts] || status;
   };
 
-  const recentRounds = rounds.slice(0, 5);
-  const recentCapa: any[] = []; // Placeholder until CAPA integration
+  const recentRounds = mockRounds.slice(0, 5);
+  const recentCapa = mockCapa.slice(0, 5);
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
@@ -174,7 +152,7 @@ const Dashboard: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2">
-              أهلاً وسهلاً، {user?.first_name} {user?.last_name}
+              أهلاً وسهلاً، {user?.firstName} {user?.lastName}
             </h1>
             <p className="text-primary-100">
               مرحباً بك في نظام سلامتي لإدارة جولات الجودة وسلامة المرضى
@@ -183,11 +161,11 @@ const Dashboard: React.FC = () => {
           <div className="text-primary-100 text-right">
             <p className="text-sm">اليوم</p>
             <p className="text-lg font-semibold">
-              {new Date().toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+              {new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
               })}
             </p>
           </div>
@@ -211,21 +189,12 @@ const Dashboard: React.FC = () => {
           trend={`${Math.round((stats.completedRounds / stats.totalRounds) * 100)}% معدل الإكمال`}
         />
         <StatCard
-          title="الجولات المكتملة"
-          value={stats.completedRounds}
-          icon={CheckCircle2}
-          color="bg-green-500"
-          trend={`${Math.round((stats.completedRounds / stats.totalRounds) * 100)}% معدل الإكمال`}
+          title="خطط تصحيحية مفتوحة"
+          value={stats.openCapa}
+          icon={AlertTriangle}
+          color="bg-orange-500"
+          trend={stats.overdueCapa > 0 ? `${stats.overdueCapa} متأخرة` : 'لا توجد متأخرة'}
         />
-        {isCapaEnabled() && (
-          <StatCard
-            title="خطط تصحيحية مفتوحة"
-            value={stats.openCapa}
-            icon={AlertTriangle}
-            color="bg-orange-500"
-            trend={stats.overdueCapa > 0 ? `${stats.overdueCapa} متأخرة` : 'لا توجد متأخرة'}
-          />
-        )}
         <StatCard
           title="معدل الامتثال"
           value={`${stats.averageCompliance}%`}
@@ -236,7 +205,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Charts Section */}
-      <div className={`grid grid-cols-1 ${isCapaEnabled() ? 'lg:grid-cols-2' : 'lg:grid-cols-2'} gap-6`}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Compliance by Department */}
         <Card>
           <CardHeader>
@@ -255,9 +224,9 @@ const Dashboard: React.FC = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" domain={[0, 100]} />
                   <YAxis dataKey="name" type="category" width={100} />
-                  <Tooltip
-                    formatter={(value: number) => [`${value}%`, 'معدل الامتثال']}
-                    labelFormatter={(label: string) => `القسم: ${label}`}
+                  <Tooltip 
+                    formatter={(value, name) => [`${value}%`, 'معدل الامتثال']}
+                    labelFormatter={(label) => `القسم: ${label}`}
                   />
                   <Bar dataKey="compliance" fill="#3b82f6" radius={[0, 4, 4, 0]} />
                 </BarChart>
@@ -322,8 +291,8 @@ const Dashboard: React.FC = () => {
                 <XAxis dataKey="month" />
                 <YAxis yAxisId="left" />
                 <YAxis yAxisId="right" orientation="right" />
-                <Tooltip
-                  formatter={(value: number | string, name: string) => [
+                <Tooltip 
+                  formatter={(value, name) => [
                     name === 'rounds' ? `${value} جولة` : `${value}%`,
                     name === 'rounds' ? 'عدد الجولات' : 'معدل الامتثال'
                   ]}
@@ -351,7 +320,7 @@ const Dashboard: React.FC = () => {
       </Card>
 
       {/* Content Grid */}
-      <div className={`grid grid-cols-1 ${isCapaEnabled() ? 'lg:grid-cols-2' : 'lg:grid-cols-1'} gap-6`}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Rounds */}
         <Card>
           <CardHeader>
@@ -386,42 +355,40 @@ const Dashboard: React.FC = () => {
         </Card>
 
         {/* Recent CAPA */}
-        {isCapaEnabled() && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-orange-600" />
-                الخطط التصحيحية
-              </CardTitle>
-              <CardDescription>
-                آخر الخطط التصحيحية المطلوبة
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {recentCapa.map((capa) => (
-                  <div key={capa.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors">
-                    <div className="flex-1">
-                      <h3 className="font-medium text-foreground mb-1">{capa.title}</h3>
-                      <p className="text-sm text-muted-foreground">{capa.department}</p>
-                      {capa.assignedTo && (
-                        <p className="text-xs text-muted-foreground">المسؤول: {capa.assignedTo}</p>
-                      )}
-                    </div>
-                    <div className="text-left">
-                      <Badge variant={capa.status === 'implemented' ? 'default' : 'secondary'}>
-                        {getStatusText(capa.status)}
-                      </Badge>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        المهلة: {new Date(capa.targetDate).toLocaleDateString('en-US')}
-                      </p>
-                    </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-orange-600" />
+              الخطط التصحيحية
+            </CardTitle>
+            <CardDescription>
+              آخر الخطط التصحيحية المطلوبة
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentCapa.map((capa) => (
+                <div key={capa.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors">
+                  <div className="flex-1">
+                    <h3 className="font-medium text-foreground mb-1">{capa.title}</h3>
+                    <p className="text-sm text-muted-foreground">{capa.department}</p>
+                    {capa.assignedTo && (
+                      <p className="text-xs text-muted-foreground">المسؤول: {capa.assignedTo}</p>
+                    )}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                  <div className="text-left">
+                    <Badge variant={capa.status === 'implemented' ? 'default' : 'secondary'}>
+                      {getStatusText(capa.status)}
+                    </Badge>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      المهلة: {new Date(capa.targetDate).toLocaleDateString('en-US')}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Quick Actions */}
@@ -434,7 +401,7 @@ const Dashboard: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {hasPermission && hasPermission(['super_admin', 'quality_manager']) && (
+            {hasPermission(['super_admin', 'quality_manager']) && (
               <button className="flex items-center gap-3 p-4 bg-primary/5 hover:bg-primary/10 rounded-lg transition-colors group">
                 <div className="p-2 bg-primary rounded-lg group-hover:bg-primary/90">
                   <ClipboardCheck className="w-5 h-5 text-white" />
@@ -445,19 +412,17 @@ const Dashboard: React.FC = () => {
                 </div>
               </button>
             )}
-
-            {isCapaEnabled() && (
-              <button onClick={() => window.location.href = '/capa-dashboard'} className="flex items-center gap-3 p-4 bg-orange-500/5 hover:bg-orange-500/10 rounded-lg transition-colors group">
-                <div className="p-2 bg-orange-500 rounded-lg group-hover:bg-orange-500/90">
-                  <AlertTriangle className="w-5 h-5 text-white" />
-                </div>
-                <div className="text-right">
-                  <h3 className="font-medium text-foreground">إنشاء CAPA</h3>
-                  <p className="text-sm text-muted-foreground">إنشاء خطة تصحيحية جديدة</p>
-                </div>
-              </button>
-            )}
-
+            
+            <button onClick={() => window.location.href = '/capa-dashboard'} className="flex items-center gap-3 p-4 bg-orange-500/5 hover:bg-orange-500/10 rounded-lg transition-colors group">
+              <div className="p-2 bg-orange-500 rounded-lg group-hover:bg-orange-500/90">
+                <AlertTriangle className="w-5 h-5 text-white" />
+              </div>
+              <div className="text-right">
+                <h3 className="font-medium text-foreground">إنشاء CAPA</h3>
+                <p className="text-sm text-muted-foreground">إنشاء خطة تصحيحية جديدة</p>
+              </div>
+            </button>
+            
             <button className="flex items-center gap-3 p-4 bg-green-500/5 hover:bg-green-500/10 rounded-lg transition-colors group">
               <div className="p-2 bg-green-500 rounded-lg group-hover:bg-green-500/90">
                 <Users className="w-5 h-5 text-white" />
